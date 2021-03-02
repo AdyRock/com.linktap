@@ -1,0 +1,225 @@
+{
+    "triggers": [
+        {
+            "id": "alarm_fallen_true",
+            "title": {
+                "en": "The valve has fallen"
+            },
+            "hint": {
+                "en": "When the valve falls down"
+            }
+        },
+        {
+            "id": "alarm_fallen_false",
+            "title": {
+                "en": "The valve has been put back"
+            },
+            "hint": {
+                "en": "When the valve has been put back"
+            }
+        },
+        {
+            "id": "alarm_broken_true",
+            "title": {
+                "en": "The valve is broken"
+            },
+            "hint": {
+                "en": "When the valve fails"
+            }
+        },
+        {
+            "id": "alarm_broken_false",
+            "title": {
+                "en": "The valve is repaired"
+            },
+            "hint": {
+                "en": "When the valve in not broken"
+            }
+        },
+        {
+            "id": "watering_started",
+            "title": {
+                "en": "Watering has started"
+            },
+            "hint": {
+                "en": "When the watering has started"
+            }
+        },
+        {
+            "id": "watering_finished",
+            "title": {
+                "en": "Watering has finished"
+            },
+            "hint": {
+                "en": "When the watering has finished"
+            }
+        }
+    ],
+    "conditions": [
+        {
+            "id": "is_watering",
+            "title": {
+                "en": "Watering !{{is|isn't}} in progress"
+            },
+            "hint": {
+                "en": "This Flow will continue if watering is/is not currently in progress."
+            }
+        },
+        {
+            "id": "alarm_fallen",
+            "title": {
+                "en": "Valve !{{has|hasn't}} fallen"
+            },
+            "hint": {
+                "en": "This Flow will continue if the valve has/has not fallen down."
+            }
+        },
+        {
+            "id": "alarm_broken",
+            "title": {
+                "en": "Valve !{{has|hasn't}} failed"
+            },
+            "hint": {
+                "en": "This Flow will continue if the valve has/has not failed."
+            }
+        }
+    ],
+    "actions": [
+        {
+            "id": "activate_instant_mode",
+            "title": {
+                "en": "Activate Instant Mode"
+            },
+            "titleFormatted": {
+                "en": "Activate Instant Mode for [[water_duration]] minutes. Eco mode is [[eco_mode]] using [[on_time]] minute On and [[off_time]] minute off times. At the end the mode will [[revert]]"
+            },
+            "args": [
+                {
+                    "name": "water_duration",
+                    "type": "number",
+                    "min": 1,
+                    "max": 60,
+                    "placeholder": {
+                        "en": "Minutes"
+                    },
+                    "title": {
+                        "en": "Duration"
+                    }
+                },
+                {
+                    "name": "on_time",
+                    "type": "number",
+                    "min": 1,
+                    "max": 60,
+                    "placeholder": {
+                        "en": "Minutes"
+                    },
+                    "title": {
+                        "en": "Eco On Time"
+                    }
+                },
+                {
+                    "name": "off_time",
+                    "type": "number",
+                    "min": 1,
+                    "max": 60,
+                    "placeholder": {
+                        "en": "Minutes"
+                    },
+                    "title": {
+                        "en": "Eco Off Time"
+                    }
+                },
+                {
+                    "name": "eco_mode",
+                    "type": "dropdown",
+                    "title": {
+                        "en": "Eco mode"
+                    },
+                    "values": [
+                        {
+                            "id": "on",
+                            "label": {
+                                "en": "On"
+                            }
+                        },
+                        {
+                            "id": "off",
+                            "label": {
+                                "en": "Off"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "revert",
+                    "type": "dropdown",
+                    "title": {
+                        "en": "Action at end"
+                    },
+                    "values": [
+                        {
+                            "id": "on",
+                            "label": {
+                                "en": "Revert to previous mode"
+                            }
+                        },
+                        {
+                            "id": "off",
+                            "label": {
+                                "en": "Keep as current mode"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "turn_off_instant_mode",
+            "title": {
+                "en": "Turn Off Instant Mode"
+            }
+        },
+        {
+            "id": "activate_watering_mode",
+            "title": {
+                "en": "Activate Watering Mode"
+            },
+            "args": [
+                {
+                    "name": "mode",
+                    "type": "dropdown",
+                    "title": {
+                        "en": "Watering Mode"
+                    },
+                    "values": [
+                        {
+                            "id": "I",
+                            "label": {
+                                "en": "Interval mode"
+                            }
+                        },
+                        {
+                            "id": "O",
+                            "label": {
+                                "en": "Odd and Even mode"
+                            }
+                        },
+                        {
+                            "id": "T",
+                            "label": {
+                                "en": "Seven day mode"
+                            }
+                        },
+                        {
+                            "id": "Y",
+                            "label": {
+                                "en": "Month mode"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

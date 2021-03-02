@@ -1,0 +1,9 @@
+{
+    "type": "boolean",
+    "title": {
+        "en": "Fallen Alarm"
+    },
+    "getable": true,
+    "setable": false,
+    "icon": "/assets/fallen.svg"
+}

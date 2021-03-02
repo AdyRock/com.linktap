@@ -1,0 +1,41 @@
+{
+    "type": "enum",
+    "getable": true,
+    "setable": true,
+    "uiComponent": "picker",
+    "title": {
+        "en": "Watering Mode"
+    },
+    "values": [
+        {
+            "id": "M",
+            "title": {
+                "en": "Instant Mode"
+            }
+        },
+        {
+            "id": "I",
+            "title": {
+                "en": "Interval Mode"
+            }
+        },
+        {
+            "id": "O",
+            "title": {
+                "en": "Odd and Even Mode"
+            }
+        },
+        {
+            "id": "T",
+            "title": {
+                "en": "Seven Day Mode"
+            }
+        },
+        {
+            "id": "Y",
+            "title": {
+                "en": "Month Mode"
+            }
+        }
+    ]
+}

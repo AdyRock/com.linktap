@@ -1,0 +1,7 @@
+env.json
+node_modules/
+.vscode/
+.vs/
+*.gz
+package-lock.json
+.cpuprofile

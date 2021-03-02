@@ -1,0 +1,592 @@
+{
+  "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
+  "id": "com.linktap",
+  "version": "0.0.1",
+  "compatibility": ">=5.0.0",
+  "sdk": 3,
+  "brandColor": "#FF7D4B",
+  "name": {
+    "en": "Link Tap"
+  },
+  "description": {
+    "en": "Adds support for Link Tap devices."
+  },
+  "category": [
+    "climate"
+  ],
+  "permissions": [],
+  "contributing": {
+    "donate": {
+      "paypal": {
+        "username": "adyrock"
+      }
+    }
+  },
+  "bugs": {
+    "url": "https://github.com/AdyRock/com.linktap/issues"
+  },
+  "source": "https://github.com/AdyRock/com.linktap",
+  "homeyCommunityTopicId": 42296,
+  "images": {
+    "large": "/assets/images/large.png",
+    "small": "/assets/images/small.png"
+  },
+  "author": {
+    "name": "Adrian Rockall",
+    "email": "ady@rockall.plus.com"
+  },
+  "api": {
+    "getLog": {
+      "method": "get",
+      "path": "/getLog/"
+    },
+    "getDetect": {
+      "method": "get",
+      "path": "/getDetect/"
+    },
+    "clearLog": {
+      "method": "post",
+      "path": "/clearLog/"
+    }
+  },
+  "flow": {
+    "triggers": [
+      {
+        "id": "alarm_fallen_true",
+        "title": {
+          "en": "The valve has fallen"
+        },
+        "hint": {
+          "en": "When the valve falls down"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=link-tap"
+          }
+        ]
+      },
+      {
+        "id": "alarm_fallen_false",
+        "title": {
+          "en": "The valve has been put back"
+        },
+        "hint": {
+          "en": "When the valve has been put back"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=link-tap"
+          }
+        ]
+      },
+      {
+        "id": "alarm_broken_true",
+        "title": {
+          "en": "The valve is broken"
+        },
+        "hint": {
+          "en": "When the valve fails"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=link-tap"
+          }
+        ]
+      },
+      {
+        "id": "alarm_broken_false",
+        "title": {
+          "en": "The valve is repaired"
+        },
+        "hint": {
+          "en": "When the valve in not broken"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=link-tap"
+          }
+        ]
+      },
+      {
+        "id": "watering_started",
+        "title": {
+          "en": "Watering has started"
+        },
+        "hint": {
+          "en": "When the watering has started"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=link-tap"
+          }
+        ]
+      },
+      {
+        "id": "watering_finished",
+        "title": {
+          "en": "Watering has finished"
+        },
+        "hint": {
+          "en": "When the watering has finished"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=link-tap"
+          }
+        ]
+      }
+    ],
+    "conditions": [
+      {
+        "id": "is_watering",
+        "title": {
+          "en": "Watering !{{is|isn't}} in progress"
+        },
+        "hint": {
+          "en": "This Flow will continue if watering is/is not currently in progress."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=link-tap"
+          }
+        ]
+      },
+      {
+        "id": "alarm_fallen",
+        "title": {
+          "en": "Valve !{{has|hasn't}} fallen"
+        },
+        "hint": {
+          "en": "This Flow will continue if the valve has/has not fallen down."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=link-tap"
+          }
+        ]
+      },
+      {
+        "id": "alarm_broken",
+        "title": {
+          "en": "Valve !{{has|hasn't}} failed"
+        },
+        "hint": {
+          "en": "This Flow will continue if the valve has/has not failed."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=link-tap"
+          }
+        ]
+      }
+    ],
+    "actions": [
+      {
+        "id": "activate_instant_mode",
+        "title": {
+          "en": "Activate Instant Mode"
+        },
+        "titleFormatted": {
+          "en": "Activate Instant Mode for [[water_duration]] minutes. Eco mode is [[eco_mode]] using [[on_time]] minute On and [[off_time]] minute off times. At the end the mode will [[revert]]"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=link-tap"
+          },
+          {
+            "name": "water_duration",
+            "type": "number",
+            "min": 1,
+            "max": 60,
+            "placeholder": {
+              "en": "Minutes"
+            },
+            "title": {
+              "en": "Duration"
+            }
+          },
+          {
+            "name": "on_time",
+            "type": "number",
+            "min": 1,
+            "max": 60,
+            "placeholder": {
+              "en": "Minutes"
+            },
+            "title": {
+              "en": "Eco On Time"
+            }
+          },
+          {
+            "name": "off_time",
+            "type": "number",
+            "min": 1,
+            "max": 60,
+            "placeholder": {
+              "en": "Minutes"
+            },
+            "title": {
+              "en": "Eco Off Time"
+            }
+          },
+          {
+            "name": "eco_mode",
+            "type": "dropdown",
+            "title": {
+              "en": "Eco mode"
+            },
+            "values": [
+              {
+                "id": "on",
+                "label": {
+                  "en": "On"
+                }
+              },
+              {
+                "id": "off",
+                "label": {
+                  "en": "Off"
+                }
+              }
+            ]
+          },
+          {
+            "name": "revert",
+            "type": "dropdown",
+            "title": {
+              "en": "Action at end"
+            },
+            "values": [
+              {
+                "id": "on",
+                "label": {
+                  "en": "Revert to previous mode"
+                }
+              },
+              {
+                "id": "off",
+                "label": {
+                  "en": "Keep as current mode"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "turn_off_instant_mode",
+        "title": {
+          "en": "Turn Off Instant Mode"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=link-tap"
+          }
+        ]
+      },
+      {
+        "id": "activate_watering_mode",
+        "title": {
+          "en": "Activate Watering Mode"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=link-tap"
+          },
+          {
+            "name": "mode",
+            "type": "dropdown",
+            "title": {
+              "en": "Watering Mode"
+            },
+            "values": [
+              {
+                "id": "I",
+                "label": {
+                  "en": "Interval mode"
+                }
+              },
+              {
+                "id": "O",
+                "label": {
+                  "en": "Odd and Even mode"
+                }
+              },
+              {
+                "id": "T",
+                "label": {
+                  "en": "Seven day mode"
+                }
+              },
+              {
+                "id": "Y",
+                "label": {
+                  "en": "Month mode"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "drivers": [
+    {
+      "id": "link-tap",
+      "name": {
+        "en": "Link Tap"
+      },
+      "class": "other",
+      "energy": {
+        "batteries": [
+          "AA",
+          "AA"
+        ]
+      },
+      "capabilities": [
+        "measure_battery",
+        "watering_mode",
+        "alarm_fallen",
+        "alarm_broken",
+        "alarm_water",
+        "signal_strength",
+        "measure_water",
+        "meter_water",
+        "time_remaining",
+        "cycles_remaining",
+        "watering",
+        "water_on"
+      ],
+      "pair": [
+        {
+          "id": "list_my_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_my_devices"
+          }
+        },
+        {
+          "id": "add_my_devices",
+          "template": "add_devices"
+        }
+      ],
+      "images": {
+        "large": "/drivers/link-tap/assets/images/large.png",
+        "small": "/drivers/link-tap/assets/images/small.png"
+      },
+      "settings": [
+        {
+          "type": "group",
+          "label": {
+            "en": "Instant Mode settings"
+          },
+          "children": [
+            {
+              "id": "watering_duration",
+              "type": "number",
+              "label": {
+                "en": "Duration"
+              },
+              "value": 4,
+              "units": "Minutes",
+              "hint": {
+                "en": "The length of time to active the Instant mode"
+              }
+            },
+            {
+              "id": "eco_mode",
+              "type": "checkbox",
+              "label": {
+                "en": "Eco Mode"
+              },
+              "value": false,
+              "hint": {
+                "en": "Enable Eco mode so the water switches off and on during while Instant mode is active"
+              }
+            },
+            {
+              "id": "on_duration",
+              "type": "number",
+              "label": {
+                "en": "On Time"
+              },
+              "value": 1,
+              "units": "Minutes",
+              "hint": {
+                "en": "The length of time to switch the water on in Eco mode"
+              }
+            },
+            {
+              "id": "off_duration",
+              "type": "number",
+              "label": {
+                "en": "Off Time"
+              },
+              "value": 2,
+              "units": "Minutes",
+              "hint": {
+                "en": "The length of time to switch the water off in Eco mode"
+              }
+            },
+            {
+              "id": "revert",
+              "type": "checkbox",
+              "label": {
+                "en": "Revert to previous plan"
+              },
+              "value": true,
+              "hint": {
+                "en": "Revert to previous plan when instant mode has finished"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "capabilities": {
+    "alarm_broken": {
+      "type": "boolean",
+      "title": {
+        "en": "Broken Alarm"
+      },
+      "getable": true,
+      "setable": false,
+      "icon": "/assets/broken.svg"
+    },
+    "alarm_fallen": {
+      "type": "boolean",
+      "title": {
+        "en": "Fallen Alarm"
+      },
+      "getable": true,
+      "setable": false,
+      "icon": "/assets/fallen.svg"
+    },
+    "cycles_remaining": {
+      "type": "number",
+      "title": {
+        "en": "Cycles Remaining"
+      },
+      "getable": true,
+      "setable": false,
+      "icon": "/assets/countdown.svg"
+    },
+    "signal_strength": {
+      "type": "number",
+      "title": {
+        "en": "Signal Strength"
+      },
+      "getable": true,
+      "setable": false,
+      "icon": "/assets/signal_strength.svg"
+    },
+    "time_remaining": {
+      "type": "number",
+      "title": {
+        "en": "Time Remaining"
+      },
+      "units": "Minutes",
+      "getable": true,
+      "setable": false,
+      "icon": "/assets/time_remaining.svg"
+    },
+    "water_on": {
+      "type": "boolean",
+      "title": {
+        "en": "Water On"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": null,
+      "insights": true,
+      "insightsTitleTrue": {
+        "en": "Water Turned on"
+      },
+      "insightsTitleFalse": {
+        "en": "Water Turned off"
+      }
+    },
+    "watering": {
+      "type": "boolean",
+      "title": {
+        "en": "Watering"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": null,
+      "insights": true,
+      "insightsTitleTrue": {
+        "en": "Watering Started"
+      },
+      "insightsTitleFalse": {
+        "en": "Watering Finished"
+      }
+    },
+    "watering_mode": {
+      "type": "enum",
+      "getable": true,
+      "setable": true,
+      "uiComponent": "picker",
+      "title": {
+        "en": "Watering Mode"
+      },
+      "values": [
+        {
+          "id": "M",
+          "title": {
+            "en": "Instant Mode"
+          }
+        },
+        {
+          "id": "I",
+          "title": {
+            "en": "Interval Mode"
+          }
+        },
+        {
+          "id": "O",
+          "title": {
+            "en": "Odd and Even Mode"
+          }
+        },
+        {
+          "id": "T",
+          "title": {
+            "en": "Seven Day Mode"
+          }
+        },
+        {
+          "id": "Y",
+          "title": {
+            "en": "Month Mode"
+          }
+        }
+      ]
+    }
+  }
+}

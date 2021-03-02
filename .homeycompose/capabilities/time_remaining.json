@@ -1,0 +1,10 @@
+{
+    "type": "number",
+    "title": {
+        "en": "Time Remaining"
+    },
+    "units": "Minutes",
+    "getable": true,
+    "setable": false,
+    "icon": "/assets/time_remaining.svg"
+}

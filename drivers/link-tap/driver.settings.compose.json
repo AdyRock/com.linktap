@@ -1,0 +1,68 @@
+[
+    {
+        "type": "group",
+        "label": {
+            "en": "Instant Mode settings"
+        },
+        "children": [
+            {
+                "id": "watering_duration",
+                "type": "number",
+                "label": {
+                    "en": "Duration"
+                },
+                "value": 4,
+                "units": "Minutes",
+                "hint": {
+                    "en": "The length of time to active the Instant mode"
+                }
+            },
+            {
+                "id": "eco_mode",
+                "type": "checkbox",
+                "label": {
+                    "en": "Eco Mode"
+                },
+                "value": false,
+                "hint": {
+                    "en": "Enable Eco mode so the water switches off and on during while Instant mode is active"
+                }
+            },
+            {
+                "id": "on_duration",
+                "type": "number",
+                "label": {
+                    "en": "On Time"
+                },
+                "value": 1,
+                "units": "Minutes",
+                "hint": {
+                    "en": "The length of time to switch the water on in Eco mode"
+                }
+            },
+            {
+                "id": "off_duration",
+                "type": "number",
+                "label": {
+                    "en": "Off Time"
+                },
+                "value": 2,
+                "units": "Minutes",
+                "hint": {
+                    "en": "The length of time to switch the water off in Eco mode"
+                }
+            },
+            {
+                "id": "revert",
+                "type": "checkbox",
+                "label": {
+                    "en": "Revert to previous plan"
+                },
+                "value": true,
+                "hint": {
+                    "en": "Revert to previous plan when instant mode has finished"
+                }
+            }
+        ]
+    }
+]

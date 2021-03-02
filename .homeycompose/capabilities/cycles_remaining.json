@@ -1,0 +1,9 @@
+{
+    "type": "number",
+    "title": {
+        "en": "Cycles Remaining"
+    },
+    "getable": true,
+    "setable": false,
+    "icon": "/assets/countdown.svg"
+}
