@@ -40,7 +40,7 @@
     }],
     "images":
     {
-        "large": "/drivers/link-tap/assets/images/large.png",
-        "small": "/drivers/link-tap/assets/images/small.png"
+        "large": "/drivers/link-tap/assets/images/large.jpg",
+        "small": "/drivers/link-tap/assets/images/small.jpg"
     }
 }

@@ -1,63 +1,51 @@
 {
-    "id": "com.linktap",
-    "version": "0.0.1",
-    "compatibility": ">=5.0.0",
-    "sdk": 3,
-    "brandColor": "#FF7D4B",
-    "name":
-    {
-        "en": "Link Tap"
-    },
-    "description":
-    {
-        "en": "Adds support for Link Tap devices."
-    },
-    "category": [
-        "climate"
-    ],
-    "permissions": [],
-    "contributing":
-    {
-        "donate":
-        {
-            "paypal":
-            {
-                "username": "adyrock"
-            }
-        }
-    },
-    "bugs":
-    {
-        "url": "https://github.com/AdyRock/com.linktap/issues"
-    },
-    "source": "https://github.com/AdyRock/com.linktap",
-    "homeyCommunityTopicId": 42296,
-    "images":
-    {
-        "large": "/assets/images/large.png",
-        "small": "/assets/images/small.png"
-    },
-    "author":
-    {
-        "name": "Adrian Rockall",
-        "email": "ady@rockall.plus.com"
-    },
-    "api":
-    {
-        "getLog":
-        {
-            "method": "get",
-            "path": "/getLog/"
-        },
-        "getDetect":
-        {
-            "method": "get",
-            "path": "/getDetect/"
-        },
-        "clearLog":
-        {
-            "method": "post",
-            "path": "/clearLog/"
-        }
+  "id": "com.linktap",
+  "version": "0.0.2",
+  "compatibility": ">=5.0.0",
+  "sdk": 3,
+  "brandColor": "#FF7D4B",
+  "name": {
+    "en": "Link Tap"
+  },
+  "description": {
+    "en": "Adds support for Link Tap devices."
+  },
+  "category": [
+    "climate"
+  ],
+  "permissions": [],
+  "contributing": {
+    "donate": {
+      "paypal": {
+        "username": "adyrock"
+      }
     }
+  },
+  "bugs": {
+    "url": "https://github.com/AdyRock/com.linktap/issues"
+  },
+  "source": "https://github.com/AdyRock/com.linktap",
+  "homeyCommunityTopicId": 43963,
+  "images": {
+    "large": "/assets/images/large.jpg",
+    "small": "/assets/images/small.jpg"
+  },
+  "author": {
+    "name": "Adrian Rockall",
+    "email": "ady@rockall.plus.com"
+  },
+  "api": {
+    "getLog": {
+      "method": "get",
+      "path": "/getLog/"
+    },
+    "getDetect": {
+      "method": "get",
+      "path": "/getDetect/"
+    },
+    "clearLog": {
+      "method": "post",
+      "path": "/clearLog/"
+    }
+  }
 }
