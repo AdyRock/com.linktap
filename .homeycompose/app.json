@@ -5,7 +5,8 @@
   "sdk": 3,
   "brandColor": "#FF7D4B",
   "name": {
-    "en": "Link Tap"
+    "en": "Link Tap",
+    "de": "Link Tap"
   },
   "description": {
     "en": "Adds support for Link Tap devices.",
