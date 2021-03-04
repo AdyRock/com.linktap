@@ -1,16 +1,19 @@
 {
     "type": "boolean",
     "title": {
-        "en": "Water On"
+        "en": "Water On",
+        "de": "Wasser an"
     },
     "getable": true,
     "setable": false,
     "uiComponent": null,
     "insights": true,
     "insightsTitleTrue": {
-        "en": "Water Turned on"
+        "en": "Water Turned on",
+        "de": "Wasser angestellt"
     },
     "insightsTitleFalse": {
-        "en": "Water Turned off"
+        "en": "Water Turned off",
+        "de": "Wasser ausgestellt"
     }
 }
