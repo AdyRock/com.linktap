@@ -1,16 +1,19 @@
 {
     "type": "boolean",
     "title": {
-        "en": "Watering"
+        "en": "Watering",
+        "de": "Bewässerung"
     },
     "getable": true,
     "setable": false,
     "uiComponent": null,
     "insights": true,
     "insightsTitleTrue": {
-        "en": "Watering Started"
+        "en": "Watering Started",
+        "de": "Bewässerung gestartet"
     },
     "insightsTitleFalse": {
-        "en": "Watering Finished"
+        "en": "Watering Finished",
+        "de": "Bewässerung beendet"
     }
 }
