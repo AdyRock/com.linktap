@@ -8,7 +8,8 @@
     "en": "Link Tap"
   },
   "description": {
-    "en": "Adds support for Link Tap devices."
+    "en": "Adds support for Link Tap devices.",
+    "de": "Fügt die Unterstützung von Link Tap Geräten hinzu."
   },
   "category": [
     "climate"
