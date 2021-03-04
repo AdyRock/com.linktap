@@ -1,7 +1,8 @@
 {
     "type": "number",
     "title": {
-        "en": "Time Remaining"
+        "en": "Time Remaining",
+        "de": "Verbleibende Zeit"
     },
     "units": "Minutes",
     "getable": true,
