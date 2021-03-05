@@ -8,7 +8,8 @@
     "en": "Link Tap"
   },
   "description": {
-    "en": "A water timer that give you total peace of mind."
+    "en": "A water timer that give you total peace of mind.",
+    "de": "Ein Bewässerungssystem, das Ihnen absolute Sicherheit gibt."
   },
   "category": [
     "climate"
@@ -46,6 +47,13 @@
     "clearLog": {
       "method": "post",
       "path": "/clearLog/"
+    },
+    "contributors": {
+      "translators": [
+        {
+          "name": "Dirk Göbel"
+        }
+      ]
     }
   }
 }
