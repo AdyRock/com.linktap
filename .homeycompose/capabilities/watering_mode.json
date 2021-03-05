@@ -4,37 +4,43 @@
     "setable": true,
     "uiComponent": "picker",
     "title": {
-        "en": "Watering Mode"
+        "en": "Watering Mode",
+        "de": "Bewässerungsmodus"
     },
     "values": [
         {
             "id": "M",
             "title": {
-                "en": "Instant Mode"
+                "en": "Instant Mode",
+                "de": "Sofort-Modus"
             }
         },
         {
             "id": "I",
             "title": {
-                "en": "Interval Mode"
+                "en": "Interval Mode",
+                "de": "Intervall-Modus"
             }
         },
         {
             "id": "O",
             "title": {
-                "en": "Odd and Even Mode"
+                "en": "Odd and Even Mode",
+                "de": "Ungerade- und Gerade-Modus"
             }
         },
         {
             "id": "T",
             "title": {
-                "en": "Seven Day Mode"
+                "en": "Seven Day Mode",
+                "de": "Sieben-Tage-Modus"
             }
         },
         {
             "id": "Y",
             "title": {
-                "en": "Month Mode"
+                "en": "Month Mode",
+                "de": "Monats-Modus"
             }
         }
     ]

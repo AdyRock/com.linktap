@@ -1,7 +1,8 @@
 {
     "type": "number",
     "title": {
-        "en": "Cycles Remaining"
+        "en": "Cycles Remaining",
+        "de": "Verbleibende Zyklen"
     },
     "getable": true,
     "setable": false,
