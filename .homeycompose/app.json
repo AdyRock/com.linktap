@@ -1,65 +1,63 @@
 {
-  "id": "com.linktap",
-  "version": "0.0.2",
-  "compatibility": ">=5.0.0",
-  "sdk": 3,
-  "brandColor": "#FF7D4B",
-  "name": {
-    "en": "Link Tap"
-  },
-  "description": {
-    "en": "A water timer that give you total peace of mind.",
-    "de": "Ein Bewässerungssystem, das Ihnen absolute Sicherheit gibt."
-  },
-  "category": [
-    "climate"
-  ],
-  "permissions": [],
-  "contributing": {
-    "donate": {
-      "paypal": {
-        "username": "adyrock"
-      }
-    }
-  },
-  "bugs": {
-    "url": "https://github.com/AdyRock/com.linktap/issues"
-  },
-  "source": "https://github.com/AdyRock/com.linktap",
-  "homeyCommunityTopicId": 43963,
-  "images": {
-    "large": "/assets/images/large.jpg",
-    "small": "/assets/images/small.jpg"
-  },
-  "author": {
-    "name": "Adrian Rockall",
-    "email": "ady@rockall.plus.com"
-  },
-  "api": {
-    "getLog": {
-      "method": "get",
-      "path": "/getLog/"
+    "id": "com.linktap",
+    "version": "0.0.2",
+    "compatibility": ">=5.0.0",
+    "sdk": 3,
+    "brandColor": "#FF7D4B",
+    "name": {
+        "en": "Link Tap"
     },
-    "getDetect": {
-      "method": "get",
-      "path": "/getDetect/"
+    "description": {
+        "en": "A water timer that give you total peace of mind.",
+        "de": "Ein Bewässerungssystem, das Ihnen absolute Sicherheit gibt."
     },
-    "clearLog": {
-      "method": "post",
-      "path": "/clearLog/"
-    },
-<<<<<<< HEAD
-    "sendLog": {
-        "method": "post",
-        "path": "/sendLog/"
-=======
-    "contributors": {
-      "translators": [
-        {
-          "name": "Dirk Göbel"
+    "category": [
+        "climate"
+    ],
+    "permissions": [],
+    "contributing": {
+        "donate": {
+            "paypal": {
+                "username": "adyrock"
+            }
         }
-      ]
->>>>>>> 71ea4798d6ef0ffeb24456b85da29351a261e90e
+    },
+    "bugs": {
+        "url": "https://github.com/AdyRock/com.linktap/issues"
+    },
+    "source": "https://github.com/AdyRock/com.linktap",
+    "homeyCommunityTopicId": 43963,
+    "images": {
+        "large": "/assets/images/large.jpg",
+        "small": "/assets/images/small.jpg"
+    },
+    "author": {
+        "name": "Adrian Rockall",
+        "email": "ady@rockall.plus.com"
+    },
+    "api": {
+        "getLog": {
+            "method": "get",
+            "path": "/getLog/"
+        },
+        "getDetect": {
+            "method": "get",
+            "path": "/getDetect/"
+        },
+        "clearLog": {
+            "method": "post",
+            "path": "/clearLog/"
+        },
+        "sendLog": {
+            "method": "post",
+            "path": "/sendLog/"
+        }
+    },
+    "contributors": {
+        "translators": [
+            {
+                "name": "Dirk Göbel"
+            }
+        ]
     }
-  }
 }
