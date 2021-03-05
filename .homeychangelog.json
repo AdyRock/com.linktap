@@ -1,5 +1,8 @@
 {
-  "0.0.2": {
-    "en": "First release"
-  }
+    "0.0.2": {
+        "en": "First release"
+    },
+    "0.0.3": {
+        "en": "Support for G1 valves, German translation added by Dirk Göbel"
+    }
 }

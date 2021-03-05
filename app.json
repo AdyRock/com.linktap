@@ -1,7 +1,7 @@
 {
   "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
   "id": "com.linktap",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "compatibility": ">=5.0.0",
   "sdk": 3,
   "brandColor": "#FF7D4B",
@@ -9,7 +9,8 @@
     "en": "Link Tap"
   },
   "description": {
-    "en": "Adds support for Link Tap devices."
+    "en": "A water timer that give you total peace of mind.",
+    "de": "Ein Bewässerungssystem, das Ihnen absolute Sicherheit gibt."
   },
   "category": [
     "climate"
@@ -53,15 +54,24 @@
       "path": "/sendLog/"
     }
   },
+  "contributors": {
+    "translators": [
+      {
+        "name": "Dirk Göbel"
+      }
+    ]
+  },
   "flow": {
     "triggers": [
       {
         "id": "alarm_fallen_true",
         "title": {
-          "en": "The valve has fallen"
+          "en": "The valve has fallen",
+          "de": "Das Ventil ist gefallen"
         },
         "hint": {
-          "en": "When the valve falls down"
+          "en": "When the valve falls down",
+          "de": "Wenn das Ventil herunterfällt"
         },
         "args": [
           {
@@ -74,10 +84,12 @@
       {
         "id": "alarm_fallen_false",
         "title": {
-          "en": "The valve has been put back"
+          "en": "The valve has been put back",
+          "de": "Das Ventil wurde wieder angeschlossen"
         },
         "hint": {
-          "en": "When the valve has been put back"
+          "en": "When the valve has been put back",
+          "de": "Wenn das Ventil wieder angeschlossen wurde"
         },
         "args": [
           {
@@ -90,10 +102,12 @@
       {
         "id": "alarm_broken_true",
         "title": {
-          "en": "The valve is broken"
+          "en": "The valve is broken",
+          "de": "Das Ventil ist defekt"
         },
         "hint": {
-          "en": "When the valve fails"
+          "en": "When the valve fails",
+          "de": "Wenn das Ventil ausfällt"
         },
         "args": [
           {
@@ -106,10 +120,12 @@
       {
         "id": "alarm_broken_false",
         "title": {
-          "en": "The valve is repaired"
+          "en": "The valve is repaired",
+          "de": "Das Ventil ist repariert"
         },
         "hint": {
-          "en": "When the valve in not broken"
+          "en": "When the valve in not broken",
+          "de": "Wenn das Ventil nicht defekt ist"
         },
         "args": [
           {
@@ -122,10 +138,12 @@
       {
         "id": "watering_started",
         "title": {
-          "en": "Watering has started"
+          "en": "Watering has started",
+          "de": "Bewässerung hat begonnen"
         },
         "hint": {
-          "en": "When the watering has started"
+          "en": "When the watering has started",
+          "de": "Wenn die Bewässerung begonnen hat"
         },
         "args": [
           {
@@ -138,10 +156,12 @@
       {
         "id": "watering_finished",
         "title": {
-          "en": "Watering has finished"
+          "en": "Watering has finished",
+          "de": "Bewässerung ist beendet"
         },
         "hint": {
-          "en": "When the watering has finished"
+          "en": "When the watering has finished",
+          "de": "Wenn die Bewässerung beendet ist"
         },
         "args": [
           {
@@ -156,10 +176,12 @@
       {
         "id": "is_watering",
         "title": {
-          "en": "Watering !{{is|isn't}} in progress"
+          "en": "Watering !{{is|isn't}} in progress",
+          "de": "Bewässerung !{{ist|ist nicht}} ist aktiv"
         },
         "hint": {
-          "en": "This Flow will continue if watering is/is not currently in progress."
+          "en": "This Flow will continue if watering is/is not currently in progress.",
+          "de": "Dieser Flow wird fortgeführt, wenn die Bewässerung derzeit aktiv/nicht aktiv ist."
         },
         "args": [
           {
@@ -172,10 +194,12 @@
       {
         "id": "alarm_fallen",
         "title": {
-          "en": "Valve !{{has|hasn't}} fallen"
+          "en": "Valve !{{has|hasn't}} fallen",
+          "de": "Ventil !{{ist|ist nicht}} gefallen"
         },
         "hint": {
-          "en": "This Flow will continue if the valve has/has not fallen down."
+          "en": "This Flow will continue if the valve has/has not fallen down.",
+          "de": "Dieser Flow wird fortgeführt, wenn das Ventil gefallen/nicht gefallen ist."
         },
         "args": [
           {
@@ -188,10 +212,12 @@
       {
         "id": "alarm_broken",
         "title": {
-          "en": "Valve !{{has|hasn't}} failed"
+          "en": "Valve !{{has|hasn't}} failed",
+          "de": "Ventil !{{ist|ist nicht}} ausgefallen"
         },
         "hint": {
-          "en": "This Flow will continue if the valve has/has not failed."
+          "en": "This Flow will continue if the valve has/has not failed.",
+          "de": "Dieser Flow wird fortgeführt, wenn das Ventil ausgefallen/nicht ausgefallen ist."
         },
         "args": [
           {
@@ -206,10 +232,12 @@
       {
         "id": "activate_instant_mode",
         "title": {
-          "en": "Activate Instant Mode"
+          "en": "Activate Instant Mode",
+          "de": "Sofort-Modus aktiviert"
         },
         "titleFormatted": {
-          "en": "Activate Instant Mode for [[water_duration]] minutes. Eco mode is [[eco_mode]] using [[on_time]] minute On and [[off_time]] minute off times. At the end the mode will [[revert]]"
+          "en": "Activate Instant Mode for [[water_duration]] minutes. Eco mode is [[eco_mode]] using [[on_time]] minute On and [[off_time]] minute off times. At the end the mode will [[revert]]",
+          "de": "Sofort-Modus für [[water_duration]] Minuten aktivieren. Eco-Modus [[eco_mode]] verwendet [[on_time]] Minuten Ein- und [[off_time]] Minuten Ausschaltzeiten. Am Ende wird die Betriebsart [[revert]]"
         },
         "args": [
           {
@@ -223,10 +251,12 @@
             "min": 1,
             "max": 60,
             "placeholder": {
-              "en": "Minutes"
+              "en": "Minutes",
+              "de": "Minuten"
             },
             "title": {
-              "en": "Duration"
+              "en": "Duration",
+              "de": "Dauer"
             }
           },
           {
@@ -235,10 +265,12 @@
             "min": 1,
             "max": 60,
             "placeholder": {
-              "en": "Minutes"
+              "en": "Minutes",
+              "de": "Minuten"
             },
             "title": {
-              "en": "Eco On Time"
+              "en": "Eco On Time",
+              "de": "Eco Einschaltzeit"
             }
           },
           {
@@ -247,29 +279,34 @@
             "min": 1,
             "max": 60,
             "placeholder": {
-              "en": "Minutes"
+              "en": "Minutes",
+              "de": "Minuten"
             },
             "title": {
-              "en": "Eco Off Time"
+              "en": "Eco Off Time",
+              "de": "Eco Ausschaltzeit"
             }
           },
           {
             "name": "eco_mode",
             "type": "dropdown",
             "title": {
-              "en": "Eco mode"
+              "en": "Eco mode",
+              "de": "Eco-Modus"
             },
             "values": [
               {
                 "id": "on",
                 "label": {
-                  "en": "On"
+                  "en": "On",
+                  "de": "An"
                 }
               },
               {
                 "id": "off",
                 "label": {
-                  "en": "Off"
+                  "en": "Off",
+                  "de": "Aus"
                 }
               }
             ]
@@ -278,19 +315,22 @@
             "name": "revert",
             "type": "dropdown",
             "title": {
-              "en": "Action at end"
+              "en": "Action at end",
+              "de": "Aktion am Ende"
             },
             "values": [
               {
                 "id": "on",
                 "label": {
-                  "en": "Revert to previous mode"
+                  "en": "Revert to previous mode",
+                  "de": "Zurück zum vorherigen Modus"
                 }
               },
               {
                 "id": "off",
                 "label": {
-                  "en": "Keep as current mode"
+                  "en": "Keep as current mode",
+                  "de": "Als aktuellen Modus beibehalten"
                 }
               }
             ]
@@ -300,7 +340,8 @@
       {
         "id": "turn_off_instant_mode",
         "title": {
-          "en": "Turn Off Instant Mode"
+          "en": "Turn Off Instant Mode",
+          "de": "Sofort-Modus ausschalten"
         },
         "args": [
           {
@@ -313,7 +354,8 @@
       {
         "id": "activate_watering_mode",
         "title": {
-          "en": "Activate Watering Mode"
+          "en": "Activate Watering Mode",
+          "de": "Bewässerungsmodus aktivieren"
         },
         "args": [
           {
@@ -325,31 +367,36 @@
             "name": "mode",
             "type": "dropdown",
             "title": {
-              "en": "Watering Mode"
+              "en": "Watering Mode",
+              "de": "Bewässerungsmodus"
             },
             "values": [
               {
                 "id": "I",
                 "label": {
-                  "en": "Interval mode"
+                  "en": "Interval mode",
+                  "de": "Intervall-Modus"
                 }
               },
               {
                 "id": "O",
                 "label": {
-                  "en": "Odd and Even mode"
+                  "en": "Odd and Even mode",
+                  "de": "Ungerade- und Gerade-Modus"
                 }
               },
               {
                 "id": "T",
                 "label": {
-                  "en": "Seven day mode"
+                  "en": "Seven day mode",
+                  "de": "Sieben-Tage-Modus"
                 }
               },
               {
                 "id": "Y",
                 "label": {
-                  "en": "Month mode"
+                  "en": "Month mode",
+                  "de": "Monats-Modus"
                 }
               }
             ]
@@ -406,65 +453,76 @@
         {
           "type": "group",
           "label": {
-            "en": "Instant Mode settings"
+            "en": "Instant Mode settings",
+            "de": "Sofort-Modus Einstellungen"
           },
           "children": [
             {
               "id": "watering_duration",
               "type": "number",
               "label": {
-                "en": "Duration"
+                "en": "Duration",
+                "de": "Dauer"
               },
               "value": 4,
               "units": "Minutes",
               "hint": {
-                "en": "The length of time to active the Instant mode"
+                "en": "The length of time to active the Instant mode",
+                "de": "Die Zeitdauer zum Aktivieren des Sofort-Modus"
               }
             },
             {
               "id": "eco_mode",
               "type": "checkbox",
               "label": {
-                "en": "Eco Mode"
+                "en": "Eco Mode",
+                "de": "Eco-Modus"
               },
               "value": false,
               "hint": {
-                "en": "Enable Eco mode so the water switches off and on during while Instant mode is active"
+                "en": "Enable Eco mode so the water switches off and on during while Instant mode is active",
+                "de": "Aktivieren Sie den Eco-Modus, damit das Wasser während des Sofort-Modus aus- und wieder eingeschaltet wird"
               }
             },
             {
               "id": "on_duration",
               "type": "number",
               "label": {
-                "en": "On Time"
+                "en": "On Time",
+                "de": "Einschaltzeit"
               },
               "value": 1,
               "units": "Minutes",
               "hint": {
-                "en": "The length of time to switch the water on in Eco mode"
+                "en": "The length of time to switch the water on in Eco mode",
+                "de": "Die Zeitdauer zum Einschalten des Wassers im Eco-Modus"
               }
             },
             {
               "id": "off_duration",
               "type": "number",
               "label": {
-                "en": "Off Time"
+                "en": "Off Time",
+                "de": "Ausschaltzeit"
               },
               "value": 2,
               "units": "Minutes",
               "hint": {
-                "en": "The length of time to switch the water off in Eco mode"
+                "en": "The length of time to switch the water off in Eco mode",
+                "de": "Die Zeitdauer zum Ausschalten des Wassers im Eco-Modus"
               }
             },
             {
               "id": "revert",
               "type": "checkbox",
               "label": {
-                "en": "Revert to previous plan"
+                "en": "Revert to previous plan",
+                "de": "Zurück zum vorherigen Plan"
               },
               "value": true,
               "hint": {
-                "en": "Revert to previous plan when instant mode has finished"
+                "en": "Revert to previous plan when instant mode has finished",
+                "de": "Zurück zum vorherigen Plan wenn der Sofort-Modus beendet ist"
               }
             }
           ]
@@ -476,7 +534,8 @@
     "alarm_broken": {
       "type": "boolean",
       "title": {
-        "en": "Broken Alarm"
+        "en": "Broken Alarm",
+        "de": "Bruch Alarm"
       },
       "getable": true,
       "setable": false,
@@ -485,7 +544,8 @@
     "alarm_fallen": {
       "type": "boolean",
       "title": {
-        "en": "Fallen Alarm"
+        "en": "Fallen Alarm",
+        "de": "Fall Alarm"
       },
       "getable": true,
       "setable": false,
@@ -494,7 +554,8 @@
     "cycles_remaining": {
       "type": "number",
       "title": {
-        "en": "Cycles Remaining"
+        "en": "Cycles Remaining",
+        "de": "Verbleibende Zyklen"
       },
       "getable": true,
       "setable": false,
@@ -503,7 +564,8 @@
     "signal_strength": {
       "type": "number",
       "title": {
-        "en": "Signal Strength"
+        "en": "Signal Strength",
+        "de": "Signalstärke"
       },
       "getable": true,
       "setable": false,
@@ -512,7 +574,8 @@
     "time_remaining": {
       "type": "number",
       "title": {
-        "en": "Time Remaining"
+        "en": "Time Remaining",
+        "de": "Verbleibende Zeit"
       },
       "units": "Minutes",
       "getable": true,
@@ -522,33 +585,39 @@
     "water_on": {
       "type": "boolean",
       "title": {
-        "en": "Water On"
+        "en": "Water On",
+        "de": "Wasser an"
       },
       "getable": true,
       "setable": false,
       "uiComponent": null,
       "insights": true,
       "insightsTitleTrue": {
-        "en": "Water Turned on"
+        "en": "Water Turned on",
+        "de": "Wasser angestellt"
       },
       "insightsTitleFalse": {
-        "en": "Water Turned off"
+        "en": "Water Turned off",
+        "de": "Wasser ausgestellt"
       }
     },
     "watering": {
       "type": "boolean",
       "title": {
-        "en": "Watering"
+        "en": "Watering",
+        "de": "Bewässerung"
       },
       "getable": true,
       "setable": false,
       "uiComponent": null,
       "insights": true,
       "insightsTitleTrue": {
-        "en": "Watering Started"
+        "en": "Watering Started",
+        "de": "Bewässerung gestartet"
       },
       "insightsTitleFalse": {
-        "en": "Watering Finished"
+        "en": "Watering Finished",
+        "de": "Bewässerung beendet"
       }
     },
     "watering_mode": {
@@ -557,37 +626,43 @@
       "setable": true,
       "uiComponent": "picker",
       "title": {
-        "en": "Watering Mode"
+        "en": "Watering Mode",
+        "de": "Bewässerungsmodus"
       },
       "values": [
         {
           "id": "M",
           "title": {
-            "en": "Instant Mode"
+            "en": "Instant Mode",
+            "de": "Sofort-Modus"
           }
         },
         {
           "id": "I",
           "title": {
-            "en": "Interval Mode"
+            "en": "Interval Mode",
+            "de": "Intervall-Modus"
           }
         },
         {
           "id": "O",
           "title": {
-            "en": "Odd and Even Mode"
+            "en": "Odd and Even Mode",
+            "de": "Ungerade- und Gerade-Modus"
           }
         },
         {
           "id": "T",
           "title": {
-            "en": "Seven Day Mode"
+            "en": "Seven Day Mode",
+            "de": "Sieben-Tage-Modus"
           }
         },
         {
           "id": "Y",
           "title": {
-            "en": "Month Mode"
+            "en": "Month Mode",
+            "de": "Monats-Modus"
           }
         }
       ]
