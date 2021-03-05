@@ -1,0 +1,20 @@
+{
+    "settings": {
+        "settings": "Einstellungen",
+        "detected": "Erkannt",
+        "diagnosticsLog": "Diagnoseprotokoll",
+        "subtitle": "Programmeinstellungen",
+        "accountDetails": "Kontodetails",
+        "userName": "Benutzername",
+        "apiKey": "API Key",
+        "saveChanges": "Änderungen speichern",
+        "clearLog": "Protokoll löschen",
+        "sendLog": "Protokoll senden",
+        "detectedDescription": "** Diese Informationen nicht veröffentlichen **",
+        "logEnabled": "Protokoll aktiviert",
+        "saved": "Die Einstellungen wurden gespeichert",
+        "confirmSend": "Das Protokoll an den Entwickler senden?\n** Alle Identifizierungsmerkmale werden entfernt **",
+        "logSent": "Das Protokoll wurde gesendet.",
+        "logSendFailed": "Senden nach 5 Versuchen fehlgeschlagen.\nDie Fehlermeldungen finden Sie am Ende des Protokolls."
+    }
+}
