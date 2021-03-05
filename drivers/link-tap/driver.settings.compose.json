@@ -2,65 +2,76 @@
     {
         "type": "group",
         "label": {
-            "en": "Instant Mode settings"
+            "en": "Instant Mode settings",
+            "de": "Sofort-Modus Einstellungen"
         },
         "children": [
             {
                 "id": "watering_duration",
                 "type": "number",
                 "label": {
-                    "en": "Duration"
+                    "en": "Duration",
+                    "de": "Dauer"
                 },
                 "value": 4,
                 "units": "Minutes",
                 "hint": {
-                    "en": "The length of time to active the Instant mode"
+                    "en": "The length of time to active the Instant mode",
+                    "de": "Die Zeitdauer zum Aktivieren des Sofort-Modus"
                 }
             },
             {
                 "id": "eco_mode",
                 "type": "checkbox",
                 "label": {
-                    "en": "Eco Mode"
+                    "en": "Eco Mode",
+                    "de": "Eco-Modus"
                 },
                 "value": false,
                 "hint": {
-                    "en": "Enable Eco mode so the water switches off and on during while Instant mode is active"
+                    "en": "Enable Eco mode so the water switches off and on during while Instant mode is active",
+                    "de": "Aktivieren Sie den Eco-Modus, damit das Wasser während des Sofort-Modus aus- und wieder eingeschaltet wird"
                 }
             },
             {
                 "id": "on_duration",
                 "type": "number",
                 "label": {
-                    "en": "On Time"
+                    "en": "On Time",
+                    "de": "Einschaltzeit"
                 },
                 "value": 1,
                 "units": "Minutes",
                 "hint": {
-                    "en": "The length of time to switch the water on in Eco mode"
+                    "en": "The length of time to switch the water on in Eco mode",
+                    "de": "Die Zeitdauer zum Einschalten des Wassers im Eco-Modus"
                 }
             },
             {
                 "id": "off_duration",
                 "type": "number",
                 "label": {
-                    "en": "Off Time"
+                    "en": "Off Time",
+                    "de": "Ausschaltzeit"
                 },
                 "value": 2,
                 "units": "Minutes",
                 "hint": {
-                    "en": "The length of time to switch the water off in Eco mode"
+                    "en": "The length of time to switch the water off in Eco mode",
+                    "de": "Die Zeitdauer zum Ausschalten des Wassers im Eco-Modus"
                 }
             },
             {
                 "id": "revert",
                 "type": "checkbox",
                 "label": {
-                    "en": "Revert to previous plan"
+                    "en": "Revert to previous plan",
+                    "de": "Zurück zum vorherigen Plan"
                 },
                 "value": true,
                 "hint": {
-                    "en": "Revert to previous plan when instant mode has finished"
+                    "en": "Revert to previous plan when instant mode has finished",
+                    "de": "Zurück zum vorherigen Plan wenn der Sofort-Modus beendet ist"
                 }
             }
         ]
