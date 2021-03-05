@@ -7,9 +7,13 @@ module.exports = {
     {
         return homey.app.detectedDevices;
     },
-    async clearLog({ homey, query })
+    async clearLog({ homey, body })
     {
         homey.app.diagLog = "";
         return 'OK';
     },
+    async sendLog({ homey, body })
+    {
+        return await homey.app.sendLog(body);
+    }
 };

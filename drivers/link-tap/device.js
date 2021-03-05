@@ -21,9 +21,12 @@ class LinkTapDevice extends Homey.Device
         this.onDeviceStatusPoll = this.onDeviceStatusPoll.bind(this);
         this.timerPollID = this.homey.setTimeout(this.onDeviceStatusPoll, (1000 * 30));
 
-        await this.setCapabilityValue('alarm_fallen', false);
-        await this.setCapabilityValue('alarm_broken', false);
-        await this.setCapabilityValue('alarm_water', false);
+        if (this.hasCapability('alarm_fallen'))
+        {
+            await this.setCapabilityValue('alarm_fallen', false);
+            await this.setCapabilityValue('alarm_broken', false);
+            await this.setCapabilityValue('alarm_water', false);
+        }
     }
 
     /**
@@ -96,11 +99,35 @@ class LinkTapDevice extends Homey.Device
 
             await this.setCapabilityValue('watering_mode', tapLinker.workMode);
             await this.setCapabilityValue('measure_battery', parseInt(tapLinker.batteryStatus));
-            await this.setCapabilityValue('alarm_fallen', tapLinker.fall);
-            await this.setCapabilityValue('alarm_broken', tapLinker.valveBroken);
-            await this.setCapabilityValue('alarm_water', tapLinker.noWater);
-            await this.setCapabilityValue('measure_water', tapLinker.vel / 1000);
             await this.setCapabilityValue('signal_strength', tapLinker.signal);
+
+            if (typeof tapLinker.fall !== "undefined")
+            {
+                if (!this.hasCapability('alarm_fallen'))
+                {
+                    this.addCapability('alarm_fallen');
+                    this.addCapability('alarm_broken');
+                    this.addCapability('alarm_water');
+                    this.addCapability('measure_water');
+                    this.addCapability('meter_water');
+                }
+
+                await this.setCapabilityValue('alarm_fallen', tapLinker.fall);
+                await this.setCapabilityValue('alarm_broken', tapLinker.valveBroken);
+                await this.setCapabilityValue('alarm_water', tapLinker.noWater);
+                await this.setCapabilityValue('measure_water', tapLinker.vel / 1000);
+            }
+            else
+            {
+                if (this.hasCapability('alarm_fallen'))
+                {
+                    this.removeCapability('alarm_fallen');
+                    this.removeCapability('alarm_broken');
+                    this.removeCapability('alarm_water');
+                    this.removeCapability('measure_water');
+                    this.removeCapability('meter_water');
+                }
+            }
         }
         catch (err)
         {
@@ -278,7 +305,7 @@ class LinkTapDevice extends Homey.Device
                     {
                         await this.setCapabilityValue('water_on', false);
                         await this.setCapabilityValue('time_remaining', 0);
-                        
+
                         this.cycles--;
                         this.setCapabilityValue('cycles_remaining', this.cycles);
 

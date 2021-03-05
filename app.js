@@ -8,6 +8,7 @@ if (process.env.DEBUG === '1')
 
 const Homey = require('homey');
 const https = require("https");
+const nodemailer = require("nodemailer");
 
 class MyApp extends Homey.App
 {
@@ -34,7 +35,7 @@ class MyApp extends Homey.App
         this.detectedDevices = this.homey.settings.get('detectedDevices');
 
         this.onDevicePoll = this.onDevicePoll.bind(this);
-        this.restartPolling (5);
+        this.restartPolling(5);
     }
 
     restartPolling(initialDelay)
@@ -71,6 +72,15 @@ class MyApp extends Homey.App
     {
         let searchData;
 
+        if (process.env.DEBUG === '1')
+        {
+            const simData = this.homey.settings.get('simData');
+            if (simData)
+            {
+                return JSON.parse(simData);
+            }
+        }
+
         if (!this.lastDetectionTime || (Date.now() - this.lastDetectionTime > (1000 * 60 * 5)))
         {
             // More than 5 minutes since last request
@@ -78,7 +88,7 @@ class MyApp extends Homey.App
             const url = "getAllDevices";
             let response = await this.PostURL(url, {});
             searchData = response.devices;
-            this.detectedDevices = this.homey.app.varToString(searchData);
+            this.detectedDevices = this.varToString(searchData);
             this.lastDetectionTime = Date.now();
             this.homey.settings.set('detectedDevices', this.detectedDevices);
             this.homey.settings.set('lastDetectionTime', this.lastDetectionTime);
@@ -110,7 +120,7 @@ class MyApp extends Homey.App
                     let data = {};
                     data = {
                         "id": tapLinker.taplinkerId,
-                        "gatewayId": gateway.gatewayId
+                        "gatewayId": gateway.gatewayId,
                     };
 
                     // Add this device to the table
@@ -289,6 +299,91 @@ class MyApp extends Homey.App
         }
     }
 
+    async sendLog(body)
+    {
+        let tries = 5;
+
+        let logData;
+        if (body.logType == "diag")
+        {
+            logData = Homey.ManagerSettings.get('diagLog');
+        }
+        else
+        {
+            logData = JSON.parse(this.detectedDevices);
+            if (logData)
+            {
+                let gNum = 1;
+                for (const gateway of logData)
+                {
+                    // rename the gateway ID
+                    gateway.location =
+                        gateway.gatewayId = `GateWay ${gNum}`;
+                    gNum++;
+
+                    let vNum = 1;
+                    for (const tapLinker of gateway.taplinker)
+                    {
+                        tapLinker.taplinkerId = `tapLinker ${vNum}`;
+                        vNum++;
+                    }
+                }
+            }
+            else
+            {
+                throw (new Error("No data to send"));
+            }
+
+            logData = this.varToString(logData);
+        }
+
+        while (tries-- > 0)
+        {
+            try
+            {
+                // create reusable transporter object using the default SMTP transport
+                let transporter = nodemailer.createTransport(
+                {
+                    host: Homey.env.MAIL_HOST, //Homey.env.MAIL_HOST,
+                    port: 465,
+                    ignoreTLS: false,
+                    secure: true, // true for 465, false for other ports
+                    auth:
+                    {
+                        user: Homey.env.MAIL_USER, // generated ethereal user
+                        pass: Homey.env.MAIL_SECRET // generated ethereal password
+                    },
+                    tls:
+                    {
+                        // do not fail on invalid certs
+                        rejectUnauthorized: false
+                    }
+                });
+
+                // send mail with defined transport object
+                let info = await transporter.sendMail(
+                {
+                    from: '"Homey User" <' + Homey.env.MAIL_USER + '>', // sender address
+                    to: Homey.env.MAIL_RECIPIENT, // list of receivers
+                    subject: "LinkTap " + body.logType + " log", // Subject line
+                    text: logData // plain text body
+                });
+
+                this.updateLog("Message sent: " + info.messageId);
+                // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+
+                // Preview only available when sending through an Ethereal account
+                console.log("Preview URL: ", nodemailer.getTestMessageUrl(info));
+                return this.homey.__('settings.logSent');
+            }
+            catch (err)
+            {
+                this.updateLog("Send log error: " + err.stack, 0);
+            }
+        }
+
+        return (this.homey.__('settings.logSendFailed'));
+    }
 }
 
 module.exports = MyApp;

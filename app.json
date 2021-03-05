@@ -47,6 +47,10 @@
     "clearLog": {
       "method": "post",
       "path": "/clearLog/"
+    },
+    "sendLog": {
+      "method": "post",
+      "path": "/sendLog/"
     }
   },
   "flow": {

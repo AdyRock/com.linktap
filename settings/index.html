@@ -11,9 +11,9 @@
 <body>
     <!-- Tab links -->
     <div class="tab">
-        <button class="tablinks" onclick="setPage(event, 'settings')" id="defaultOpen">Settings</button>
-        <button class="tablinks" onclick="setPage(event, 'detected')">Detected</button>
-        <button class="tablinks" onclick="setPage(event, 'log')">Log</button>
+        <button class="tablinks" onclick="setPage(event, 'settings')" id="defaultOpen"><span data-i18n="settings.settings"></span></button>
+        <button class="tablinks" onclick="setPage(event, 'detected')"><span data-i18n="settings.detected"></span></button>
+        <button class="tablinks" onclick="setPage(event, 'log')"><span data-i18n="settings.diagnosticsLog"></span></button>
         <button class="tablinks" onclick="setPage(event, 'simulator')" id="simLogTab" style="visibility:hidden">Simulation Data</button>
     </div>
 
@@ -23,32 +23,30 @@
         <p data-i18n="settings.subtitle"></p>
 
         <fieldset>
-            <legend>Account Details</legend>
+            <legend><span data-i18n="settings.accountDetails"></span></legend>
             <fieldset>
                 <div class="field row">
-                    <label for="UserName">User Name</label>
+                    <label for="UserName"><span data-i18n="settings.userName"></span></label>
                     <input id="UserName" type="text" value="" />
                 </div>
             </fieldset>
             <fieldset>
                 <div class="field row">
-                    <label for="APIToken">API Token</label>
+                    <label for="APIToken"><span data-i18n="settings.apiKey"></span></label>
                     <input id="APIToken" type="text" value="" />
                 </div>
             </fieldset>
         </fieldset>
         <fieldset>
-            <p><button id="save" class="right">Save changes</button></p>
+            <p><button id="save" class="right"><span data-i18n="settings.saveChanges"></span></button></p>
         </fieldset>
     </div>
 
     <!-- detected-->
     <div id="detected" class="tabcontent">
         <fieldset>
+            <p><button id="sendDetectedLog"><span data-i18n="settings.sendLog"></span></button></p>
             <p data-i18n="settings.detectedDescription">
-                <!--
-                    This field will also be translated
-                    -->
             </p>
             <div class="field row">
                 <textarea id="detectedDevices"></textarea>
@@ -59,15 +57,15 @@
     <!-- LOG PAGE -->
     <div id="log" class="tabcontent">
         <fieldset>
-            <p> Diagnostics Log
+            <p data-i18n="settings.diagnosticsLog">
             </p>
             <div class="field row">
-                <label for="logEnabled">Log Enabled</label>
+                <label for="logEnabled"><span data-i18n="settings.logEnabled"></span></label>
                 <input id="logEnabled" type="checkbox" value="logEnabled" />
             </div>
         </fieldset>
         <fieldset>
-            <p><button id="clearLog">Clear Log</button></p>
+            <p><button id="clearDiagLog"><span data-i18n="settings.clearLog"></span></button> <button id="sendDiagLog"><span data-i18n="settings.sendLog"></span></button></p>
             <div class="field row">
                 <textarea id="diagLog"></textarea>
             </div>
@@ -86,235 +84,287 @@
     </div>
 
     <script type="text/javascript">
-        var UserNameElement = document.getElementById( 'UserName' );
-        var APITokenElement = document.getElementById( 'APIToken' );
-        var detectedDevicesElement = document.getElementById( 'detectedDevices' );
-        var diagLogElement = document.getElementById( 'diagLog' );
-        var logEnabledElement = document.getElementById( 'logEnabled' );
+        var UserNameElement = document.getElementById('UserName');
+        var APITokenElement = document.getElementById('APIToken');
+        var detectedDevicesElement = document.getElementById('detectedDevices');
+        var diagLogElement = document.getElementById('diagLog');
+        var logEnabledElement = document.getElementById('logEnabled');
 
-        var saveElement = document.getElementById( 'save' );
-        var clearLogElement = document.getElementById( 'clearLog' );
+        var saveElement = document.getElementById('save');
+        var clearLogElement = document.getElementById('clearDiagLog');
+        var sendDiagLogElement = document.getElementById('sendDiagLog');
+        var sendDetectedElement = document.getElementById('sendDetectedLog');
 
         // Simulation log tab
-        var useSimElement = document.getElementById( 'useSim' );
-        var clearSimElement = document.getElementById( 'clearSim' );
-        var simDataElement = document.getElementById( 'simData' );
+        var useSimElement = document.getElementById('useSim');
+        var clearSimElement = document.getElementById('clearSim');
+        var simDataElement = document.getElementById('simData');
 
         // a method named 'onHomeyReady' must be present in your code
-        function onHomeyReady( Homey )
+        function onHomeyReady(Homey)
         {
-            Homey.get( 'debugMode', function( err, debugMode )
+            Homey.get('debugMode', function(err, debugMode)
             {
-                if ( err ) return Homey.alert( err );
-                if ( debugMode )
+                if (err) return Homey.alert(err);
+                if (debugMode)
                 {
-                    document.getElementById( "simLogTab" ).style.visibility = 'visible';
+                    document.getElementById("simLogTab").style.visibility = 'visible';
                 }
-            } );
+            });
 
-            document.getElementById( "defaultOpen" ).click();
+            document.getElementById("defaultOpen").click();
 
-            Homey.on( 'com.linktap.logupdated', function( data )
+            Homey.on('com.linktap.logupdated', function(data)
             {
                 diagLogElement.value = data.log;
-            } );
+            });
 
-            Homey.on( 'com.linktap.detectedDevicesUpdated', function( data )
+            Homey.on('com.linktap.detectedDevicesUpdated', function(data)
             {
                 detectedDevicesElement.value = data.devices;
-            } );
+            });
 
-            Homey.on( 'settings.set', function()
+            Homey.on('settings.set', function()
             {
-                Homey.get( 'APIToken', function( err, APIToken )
+                Homey.get('APIToken', function(err, APIToken)
                 {
-                    if ( err ) return Homey.alert( err );
+                    if (err) return Homey.alert(err);
                     APITokenElement.value = APIToken;
-                } );
-            } );
+                });
+            });
 
-            Homey.get( 'APIToken', function( err, APIToken )
+            Homey.get('APIToken', function(err, APIToken)
             {
-                if ( err ) return Homey.alert( err );
+                if (err) return Homey.alert(err);
                 APITokenElement.value = APIToken;
-            } );
+            });
 
-            Homey.get( 'UserName', function( err, UserName )
+            Homey.get('UserName', function(err, UserName)
             {
-                if ( err ) return Homey.alert( err );
+                if (err) return Homey.alert(err);
                 UserNameElement.value = UserName;
-            } );
+            });
 
-            Homey.get( 'logEnabled', function( err, logEnabled )
+            Homey.get('logEnabled', function(err, logEnabled)
             {
-                if ( err ) return Homey.alert( err );
+                if (err) return Homey.alert(err);
                 logEnabledElement.checked = logEnabled;
-            } );
+            });
 
-            Homey.api( 'GET', '/getLog/',
+            Homey.api('GET', '/getLog/',
             {
                 notify: true
-            }, function( err, result )
+            }, function(err, result)
             {
-                if ( err )
+                if (err)
                 {
-                    return Homey.alert( err );
+                    return Homey.alert(err);
                 }
                 else
                 {
                     diagLogElement.value = result;
                 }
-            } );
+            });
 
-            Homey.api( 'GET', '/getDetect/',
+            Homey.api('GET', '/getDetect/',
             {
                 notify: true
-            }, function( err, result )
+            }, function(err, result)
             {
-                if ( err )
+                if (err)
                 {
-                    return Homey.alert( err );
+                    return Homey.alert(err);
                 }
                 else
                 {
                     detectedDevicesElement.value = result;
                 }
-            } );
+            });
 
-            saveElement.addEventListener( 'click', function( e )
+            saveElement.addEventListener('click', function(e)
             {
-                APITokenElement.value = APITokenElement.value.replace( /[\"\']/g, '' );
-                Homey.set( 'APIToken', APITokenElement.value, function( err )
+                APITokenElement.value = APITokenElement.value.replace(/[\"\']/g, '');
+                Homey.set('APIToken', APITokenElement.value, function(err)
                 {
-                    if ( err ) return Homey.alert( err );
-                } );
+                    if (err) return Homey.alert(err);
+                });
 
-                Homey.set( 'UserName', UserNameElement.value, function( err )
+                Homey.set('UserName', UserNameElement.value, function(err)
                 {
-                    if ( err ) return Homey.alert( err );
-                } );
+                    if (err) return Homey.alert(err);
+                });
 
-                return Homey.alert( "The settings have been saved" );
-            } );
+                return Homey.alert(Homey.__('settings.saved'));
+            });
 
-            logEnabledElement.addEventListener( 'click', function( e )
+            logEnabledElement.addEventListener('click', function(e)
             {
-                Homey.set( 'logEnabled', logEnabledElement.checked, function( err )
+                Homey.set('logEnabled', logEnabledElement.checked, function(err)
                 {
-                    if ( err ) return Homey.alert( err );
-                } );
-            } );
+                    if (err) return Homey.alert(err);
+                });
+            });
 
-            clearLogElement.addEventListener( 'click', function( e )
+            clearLogElement.addEventListener('click', function(e)
             {
-                Homey.api( 'POST', '/clearLog/',
+                Homey.api('POST', '/clearDiagLog/',
                 {
                     notify: true
-                }, function( err, result )
+                }, function(err, result)
                 {
-                    if ( err )
+                    if (err)
                     {
-                        return Homey.alert( err );
+                        return Homey.alert(err);
                     }
                     else
                     {
                         diagLogElement.value = "";
                     }
-                } );
-            } );
+                });
+            });
 
-            useSimElement.addEventListener( 'click', function( e )
+            sendDiagLogElement.addEventListener('click', function(e)
+            {
+                Homey.confirm(Homey.__('settings.confirmSend'), null, function(e, ok)
+                {
+                    if (ok)
+                    {
+                        Homey.api('POST', '/sendLog/',
+                        {
+                            notify: true,
+                            logType: "diag"
+                        }, function(err, result)
+                        {
+                            if (err)
+                            {
+                                return Homey.alert(err);
+                            }
+                            else
+                            {
+                                return Homey.alert(result);
+                            }
+                        });
+                    }
+                });
+            });
+
+            sendDetectedElement.addEventListener('click', function(e)
+            {
+                Homey.confirm(Homey.__('settings.confirmSend'), null, function(e, ok)
+                {
+                    if (ok)
+                    {
+                        Homey.api('POST', '/sendLog/',
+                        {
+                            notify: true,
+                            logType: "detected"
+                        }, function(err, result)
+                        {
+                            if (err)
+                            {
+                                return Homey.alert(err);
+                            }
+                            else
+                            {
+                                return Homey.alert(result);
+                            }
+                        });
+                    }
+                });
+            });
+
+            useSimElement.addEventListener('click', function(e)
             {
                 try
                 {
-                    Homey.set( 'simData', simDataElement.value, function( err )
+                    Homey.set('simData', simDataElement.value, function(err)
                     {
-                        if ( err )
+                        if (err)
                         {
-                            Homey.alert( err );
+                            Homey.alert(err);
                         }
                         else
                         {
-                            Homey.alert( "Simulator On" );
+                            Homey.alert("Simulator On");
                         }
-                    } );
+                    });
                 }
-                catch ( err )
+                catch (err)
                 {
-                    return Homey.alert( err );
+                    return Homey.alert(err);
                 }
-            } );
+            });
 
-            clearSimElement.addEventListener( 'click', function( e )
+            clearSimElement.addEventListener('click', function(e)
             {
-                Homey.set( 'simData', "", function( err )
+                Homey.set('simData', "", function(err)
                 {
-                    if ( err )
+                    if (err)
                     {
-                        return Homey.alert( err );
+                        return Homey.alert(err);
                     }
                     else
                     {
-                        return Homey.alert( "Simulator Off" );
+                        return Homey.alert("Simulator Off");
                     }
-                } );
-            } );
+                });
+            });
 
             // Tell Homey we're ready to be displayed
             Homey.ready();
         };
 
-        function setPage( evt, tabPage )
+        function setPage(evt, tabPage)
         {
             var i, tabcontent, tablinks;
 
             // Get all elements with class="tabcontent" and hide them
-            tabcontent = document.getElementsByClassName( "tabcontent" );
-            for ( i = 0; i < tabcontent.length; i++ )
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++)
             {
-                tabcontent[ i ].style.display = "none";
+                tabcontent[i].style.display = "none";
             }
 
             // Get all elements with class="tablinks" and remove the class "active"
-            tablinks = document.getElementsByClassName( "tablinks" );
-            for ( i = 0; i < tablinks.length; i++ )
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++)
             {
-                tablinks[ i ].className = tablinks[ i ].className.replace( " active", "" );
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
             }
 
             // Show the current tab, and add an "active" class to the button that opened the tab
-            document.getElementById( tabPage ).style.display = "block";
+            document.getElementById(tabPage).style.display = "block";
             evt.currentTarget.className += " active";
 
-            if ( tabPage == 'log' )
+            if (tabPage == 'log')
             {
                 // Refresh the log data
-                Homey.get( 'logEnabled', function( err, logEnabled )
+                Homey.get('logEnabled', function(err, logEnabled)
                 {
-                    if ( err ) return Homey.alert( err );
+                    if (err) return Homey.alert(err);
                     logEnabledElement.checked = logEnabled;
-                } );
+                });
 
                 // Make the log text area fill the page
-                diagLogElement.setAttribute( 'cols', diagLogElement.parentElement.clientWidth / 8 );
-                diagLogElement.style.height = ( window.innerHeight - diagLogElement.offsetTop - 20 ) + 'px';
+                diagLogElement.setAttribute('cols', diagLogElement.parentElement.clientWidth / 8);
+                diagLogElement.style.height = (window.innerHeight - diagLogElement.offsetTop - 20) + 'px';
             }
-            else if ( tabPage == 'detected' )
+            else if (tabPage == 'detected')
             {
                 // Make the detected devices text area fill the page
-                detectedDevicesElement.setAttribute( 'cols', detectedDevicesElement.parentElement.clientWidth / 8 );
-                detectedDevicesElement.style.height = ( window.innerHeight - detectedDevicesElement.offsetTop - 20 ) + 'px';
+                detectedDevicesElement.setAttribute('cols', detectedDevicesElement.parentElement.clientWidth / 8);
+                detectedDevicesElement.style.height = (window.innerHeight - detectedDevicesElement.offsetTop - 20) + 'px';
             }
-            else if ( tabPage == 'simulator' )
+            else if (tabPage == 'simulator')
             {
-                Homey.get( 'simData', function( err, simData )
+                Homey.get('simData', function(err, simData)
                 {
-                    if ( err ) return Homey.alert( err );
+                    if (err) return Homey.alert(err);
                     simDataElement.value = simData ? simData : "";
-                } );
+                });
                 // Make the simulator text box fill the page
-                simDataElement.setAttribute( 'cols', simDataElement.parentElement.clientWidth / 8 );
-                simDataElement.style.height = ( window.innerHeight - simDataElement.offsetTop - 40 ) + 'px';
+                simDataElement.setAttribute('cols', simDataElement.parentElement.clientWidth / 8);
+                simDataElement.style.height = (window.innerHeight - simDataElement.offsetTop - 40) + 'px';
             }
         };
     </script>

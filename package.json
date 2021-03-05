@@ -1,8 +1,16 @@
 {
-  "name": "com.linktap",
-  "version": "0.0.1",
-  "main": "app.js",
-  "devDependencies": {
-    "homey": "^2.9.7"
-  }
+    "name": "com.linktap",
+    "version": "0.0.2",
+    "main": "app.js",
+    "devDependencies": {
+        "homey": "^2.9.7"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/AdyRock/com.linktap"
+    },
+    "dependencies": {
+        "nodemailer": "^6.5.0"
+    },
+    "license": "GPL-3.0"
 }
