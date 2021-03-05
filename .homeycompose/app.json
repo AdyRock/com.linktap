@@ -8,7 +8,8 @@
     "en": "Link Tap"
   },
   "description": {
-    "en": "Adds support for Link Tap devices."
+    "en": "A water timer that give you total peace of mind.",
+    "de": "Ein Bewässerungssystem, das Ihnen absolute Sicherheit gibt."
   },
   "category": [
     "climate"
@@ -47,9 +48,18 @@
       "method": "post",
       "path": "/clearLog/"
     },
+<<<<<<< HEAD
     "sendLog": {
         "method": "post",
         "path": "/sendLog/"
+=======
+    "contributors": {
+      "translators": [
+        {
+          "name": "Dirk Göbel"
+        }
+      ]
+>>>>>>> 71ea4798d6ef0ffeb24456b85da29351a261e90e
     }
   }
 }
