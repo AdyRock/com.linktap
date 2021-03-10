@@ -190,10 +190,13 @@ class MyApp extends Homey.App
 
                     res.on('end', () =>
                     {
-                        let returnData = JSON.parse(Buffer.concat(body));
-                        //this.homey.app.updateLog("Post response: " + this.homey.app.varToString(returnData));
                         if (res.statusCode === 200)
                         {
+                            let returnData = Buffer.concat(body);
+                            if (returnData.length > 2)
+                            {
+                                returnData = JSON.parse(returnData);
+                            }
                             resolve(returnData);
                             return;
                         }

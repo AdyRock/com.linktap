@@ -1,6 +1,6 @@
 {
     "name": "com.linktap",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "main": "app.js",
     "devDependencies": {
         "homey": "^2.9.7"

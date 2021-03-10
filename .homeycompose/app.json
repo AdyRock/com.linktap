@@ -1,11 +1,11 @@
 {
     "id": "com.linktap",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "compatibility": ">=5.0.0",
     "sdk": 3,
     "brandColor": "#FF7D4B",
     "name": {
-        "en": "Link Tap"
+        "en": "LinkTap"
     },
     "description": {
         "en": "A water timer that give you total peace of mind.",

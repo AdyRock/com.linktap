@@ -1,4 +1,4 @@
-# Link Tap
+# LinkTap
 
 With this app it's possible to connect your LinkTap to Homey and control your valves directly from Homey.
 

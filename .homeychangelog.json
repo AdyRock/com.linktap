@@ -4,5 +4,8 @@
     },
     "0.0.3": {
         "en": "Support for G1 valves, German translation added by Dirk Göbel"
+    },
+    "0.0.4": {
+        "en": "Fix crash if no data returned from LinkTap. Fix Clear Log button."
     }
 }
