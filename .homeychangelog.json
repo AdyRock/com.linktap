@@ -7,5 +7,8 @@
     },
     "0.0.4": {
         "en": "Fix crash if no data returned from LinkTap. Fix Clear Log button."
+    },
+    "0.0.5": {
+        "en": "Fix issue with app settings not taking effect until the app is restarted. Fixed issue with the Turn Off Instant Mode flow card."
     }
 }

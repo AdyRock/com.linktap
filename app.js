@@ -29,6 +29,18 @@ class MyApp extends Homey.App
             this.homey.settings.set('debugMode', false);
         }
 
+        this.homey.settings.on('set', (key) =>
+        {
+            if (key === 'APIToken')
+            {
+                this.APIToken = this.homey.settings.get('APIToken');
+            }
+            else if (key === 'UserName')
+            {
+                this.UserName = this.homey.settings.get('UserName');
+            }
+        });
+
         this.APIToken = this.homey.settings.get('APIToken');
         this.UserName = this.homey.settings.get('UserName');
         this.lastDetectionTime = this.homey.settings.get('lastDetectionTime');
@@ -114,8 +126,8 @@ class MyApp extends Homey.App
             {
                 for (const tapLinker of gateway.taplinker)
                 {
-                    this.homey.app.updateLog("Found tapLinker: ");
-                    this.homey.app.updateLog(tapLinker);
+                    this.updateLog("Found tapLinker: ");
+                    this.updateLog(tapLinker);
 
                     let data = {};
                     data = {
@@ -135,30 +147,30 @@ class MyApp extends Homey.App
         }
         else
         {
-            this.homey.app.updateLog("HTTPS Error: Nothing returned");
+            this.updateLog("HTTPS Error: Nothing returned");
             throw (new Error("HTTPS Error: Nothing returned"));
         }
     }
 
     async PostURL(url, body)
     {
-        //this.homey.app.updateLog(url);
-
-        if (!this.homey.app.UserName)
+        if (!this.UserName)
         {
             throw (new Error("HTTPS: No user name specified"));
         }
 
-        if (!this.homey.app.APIToken)
+        if (!this.APIToken)
         {
             throw (new Error("HTTPS: No API Key specified"));
         }
 
-        body.username = this.homey.app.UserName;
-        body.apiKey = this.homey.app.APIToken;
+        this.updateLog("POST to: " + url + "\r\n" + this.varToString(body) + "\r\n");
+
+        body.username = this.UserName;
+        body.apiKey = this.APIToken;
 
         let bodyText = JSON.stringify(body);
-        //this.homey.app.updateLog(bodyText);
+        //this.updateLog(bodyText);
 
         return new Promise((resolve, reject) =>
         {
@@ -177,14 +189,14 @@ class MyApp extends Homey.App
                     },
                 };
 
-                //this.homey.app.updateLog(https_options);
+                //this.updateLog(https_options);
 
                 let req = https.request(https_options, (res) =>
                 {
                     let body = [];
                     res.on('data', (chunk) =>
                     {
-                        //this.homey.app.updateLog("Post: retrieve data");
+                        //this.updateLog("Post: retrieve data");
                         body.push(chunk);
                     });
 
@@ -202,7 +214,7 @@ class MyApp extends Homey.App
                         }
                         else
                         {
-                            this.homey.app.updateLog("HTTPS Error: " + res.statusCode);
+                            this.updateLog("HTTPS Error: " + res.statusCode);
                             reject(new Error("HTTPS Error - " + res.statusCode));
                             return;
                         }
@@ -211,7 +223,7 @@ class MyApp extends Homey.App
 
                 req.on('error', (err) =>
                 {
-                    this.homey.app.updateLog(err);
+                    this.updateLog(err);
                     reject(new Error("HTTPS Catch: " + err));
                     return;
                 });
@@ -228,7 +240,7 @@ class MyApp extends Homey.App
             }
             catch (err)
             {
-                this.homey.app.updateLog(this.homey.app.varToString(err));
+                this.updateLog(this.varToString(err));
                 reject(new Error("HTTPS Catch: " + err));
                 return;
             }
@@ -291,7 +303,29 @@ class MyApp extends Homey.App
         if ((errorLevel == 0) || this.homey.settings.get('logEnabled'))
         {
             console.log(newMessage);
-            this.diagLog += "* ";
+
+            const nowTime = new Date(Date.now());
+
+            this.diagLog += "\r\n* ";
+            this.diagLog += (nowTime.getHours());
+            this.diagLog += ":";
+            this.diagLog += nowTime.getMinutes();
+            this.diagLog += ":";
+            this.diagLog += nowTime.getSeconds();
+            this.diagLog += ".";
+            let milliSeconds = nowTime.getMilliseconds().toString();
+            if (milliSeconds.length == 2)
+            {
+                this.diagLog += '0';
+            }
+            else if (milliSeconds.length == 1)
+            {
+                this.diagLog += '00';
+            }
+            this.diagLog += milliSeconds;
+            this.diagLog += ": ";
+            this.diagLog += "\r\n";
+
             this.diagLog += newMessage;
             this.diagLog += "\r\n";
             if (this.diagLog.length > 60000)

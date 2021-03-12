@@ -191,16 +191,14 @@ class LinkTapDevice extends Homey.Device
     async activateInstantMode(onOff, duration, eco_option, ecoOn, ecoOff, autoBack)
     {
         let url = "activateInstantMode";
-        let body;
+        const dd = this.getData();
+        let body = {
+            gatewayId: dd.gatewayId,
+            taplinkerId: dd.id
+        };
 
         if (onOff)
         {
-            const dd = this.getData();
-            body = {
-                gatewayId: dd.gatewayId,
-                taplinkerId: dd.id,
-            };
-
             body.action = true;
 
             if (!duration)
@@ -234,9 +232,19 @@ class LinkTapDevice extends Homey.Device
         }
         else
         {
-            url = "activateInstantMode";
             body.action = false;
-            body.duration = 0;
+            body.duration = 1;
+
+            await this.setCapabilityValue('time_remaining', 0);
+            this.isWatering = false;
+            this.cycles = 0;
+            this.setCapabilityValue('cycles_remaining', this.cycles);
+
+            if (this.getCapabilityValue('water_on'))
+            {
+                await this.setCapabilityValue('water_on', false);
+                this.driver.triggerWateringFinished(this);
+            }
         }
 
         let response = await this.homey.app.PostURL(url, body);
