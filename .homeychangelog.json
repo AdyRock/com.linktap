@@ -10,5 +10,8 @@
     },
     "0.0.5": {
         "en": "Fix issue with app settings not taking effect until the app is restarted. Fixed issue with the Turn Off Instant Mode flow card."
+    },
+    "0.0.6": {
+        "en": "Fixed issue with the water volume. Reset cycle remaining when instanat mode is cancelled."
     }
 }

@@ -97,6 +97,20 @@ class LinkTapDevice extends Homey.Device
 
             await this.setAvailable();
 
+            if (this.isWatering && (tapLinker.watering === null))
+            {
+                this.isWatering = false;
+                this.cycles = 0;
+                if (this.getCapabilityValue('water_on'))
+                {
+                    await this.setCapabilityValue('water_on', false);
+                }
+                this.setCapabilityValue('cycles_remaining', this.cycles);
+                await this.setCapabilityValue('time_remaining', 0);
+                await this.setCapabilityValue('watering', this.isWatering);
+                this.driver.triggerWateringFinished(this);
+            }
+
             await this.setCapabilityValue('watering_mode', tapLinker.workMode);
             await this.setCapabilityValue('measure_battery', parseInt(tapLinker.batteryStatus));
             await this.setCapabilityValue('signal_strength', tapLinker.signal);
@@ -227,6 +241,7 @@ class LinkTapDevice extends Homey.Device
             }
 
             await this.setCapabilityValue('cycles_remaining', this.cycles);
+            await this.setCapabilityValue('meter_water', 0);
 
             body.autoBack = autoBack;
         }
@@ -271,6 +286,7 @@ class LinkTapDevice extends Homey.Device
             {
                 if (this.cycles === 0)
                 {
+                    await this.setCapabilityValue('meter_water', 0);
                     this.cycles = 1;
                     if (response.status.ecoTotal)
                     {
@@ -298,12 +314,16 @@ class LinkTapDevice extends Homey.Device
                 if (response.status.vel)
                 {
                     await this.setCapabilityValue('measure_water', parseInt(response.status.vel) / 1000);
+
+                    let vol = this.getCapabilityValue('meter_water');
+                    vol += (response.status.vel / 2000);
+                    await this.setCapabilityValue('meter_water', vol);
                 }
 
-                if (response.status.vol)
-                {
-                    await this.setCapabilityValue('meter_water', parseInt(response.status.vol) / 1000);
-                }
+                // if (response.status.vol)
+                // {
+                //     await this.setCapabilityValue('meter_water', parseInt(response.status.vol) / 1000);
+                // }
             }
             else
             {
