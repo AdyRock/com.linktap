@@ -1,7 +1,7 @@
 {
   "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
   "id": "com.linktap",
-  "version": "0.0.5",
+  "version": "0.0.7",
   "compatibility": ">=5.0.0",
   "sdk": 3,
   "brandColor": "#FF7D4B",
@@ -357,6 +357,10 @@
           "en": "Activate Watering Mode",
           "de": "Bewässerungsmodus aktivieren"
         },
+        "titleFormatted": {
+          "en": "Activate [[mode]] Watering Mode",
+          "de": "Bewässerungsmodus aktivieren '[[mode]]'"
+        },
         "args": [
           {
             "type": "device",
@@ -367,35 +371,35 @@
             "name": "mode",
             "type": "dropdown",
             "title": {
-              "en": "Watering Mode",
+              "en": "Watering",
               "de": "Bewässerungsmodus"
             },
             "values": [
               {
                 "id": "I",
                 "label": {
-                  "en": "Interval mode",
+                  "en": "Interval",
                   "de": "Intervall-Modus"
                 }
               },
               {
                 "id": "O",
                 "label": {
-                  "en": "Odd and Even mode",
+                  "en": "Odd and Even",
                   "de": "Ungerade- und Gerade-Modus"
                 }
               },
               {
                 "id": "T",
                 "label": {
-                  "en": "Seven day mode",
+                  "en": "Seven day",
                   "de": "Sieben-Tage-Modus"
                 }
               },
               {
                 "id": "Y",
                 "label": {
-                  "en": "Month mode",
+                  "en": "Month",
                   "de": "Monats-Modus"
                 }
               }
@@ -432,6 +436,11 @@
         "watering",
         "water_on"
       ],
+      "capabilitiesOptions": {
+        "meter_water": {
+          "units": "L"
+        }
+      },
       "pair": [
         {
           "id": "list_my_devices",

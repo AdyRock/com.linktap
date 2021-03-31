@@ -219,40 +219,44 @@
                 "en": "Activate Watering Mode",
                 "de": "Bewässerungsmodus aktivieren"
             },
+            "titleFormatted": {
+                "en": "Activate [[mode]] Watering Mode",
+                "de": "Bewässerungsmodus aktivieren '[[mode]]'"
+            },
             "args": [
                 {
                     "name": "mode",
                     "type": "dropdown",
                     "title": {
-                        "en": "Watering Mode",
+                        "en": "Watering",
                         "de": "Bewässerungsmodus"
                     },
                     "values": [
                         {
                             "id": "I",
                             "label": {
-                                "en": "Interval mode",
+                                "en": "Interval",
                                 "de": "Intervall-Modus"
                             }
                         },
                         {
                             "id": "O",
                             "label": {
-                                "en": "Odd and Even mode",
+                                "en": "Odd and Even",
                                 "de": "Ungerade- und Gerade-Modus"
                             }
                         },
                         {
                             "id": "T",
                             "label": {
-                                "en": "Seven day mode",
+                                "en": "Seven day",
                                 "de": "Sieben-Tage-Modus"
                             }
                         },
                         {
                             "id": "Y",
                             "label": {
-                                "en": "Month mode",
+                                "en": "Month",
                                 "de": "Monats-Modus"
                             }
                         }

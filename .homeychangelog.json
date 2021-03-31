@@ -13,5 +13,8 @@
     },
     "0.0.6": {
         "en": "Fixed issue with the water volume. Reset cycle remaining when instanat mode is cancelled."
+    },
+    "0.0.7": {
+        "en": "Changed Water Volume units to L."
     }
 }

@@ -1,14 +1,13 @@
 {
     "id": "link-tap",
-    "name":
-    {
+    "name": {
         "en": "LinkTap"
     },
     "class": "other",
-    "energy":
-    {
+    "energy": {
         "batteries": [
-            "AA", "AA"
+            "AA",
+            "AA"
         ]
     },
     "capabilities": [
@@ -25,21 +24,25 @@
         "watering",
         "water_on"
     ],
-    "pair": [
-    {
-        "id": "list_my_devices",
-        "template": "list_devices",
-        "navigation":
-        {
-            "next": "add_my_devices"
+    "capabilitiesOptions": {
+        "meter_water": {
+            "units": "L"
         }
     },
-    {
-        "id": "add_my_devices",
-        "template": "add_devices"
-    }],
-    "images":
-    {
+    "pair": [
+        {
+            "id": "list_my_devices",
+            "template": "list_devices",
+            "navigation": {
+                "next": "add_my_devices"
+            }
+        },
+        {
+            "id": "add_my_devices",
+            "template": "add_devices"
+        }
+    ],
+    "images": {
         "large": "/drivers/link-tap/assets/images/large.jpg",
         "small": "/drivers/link-tap/assets/images/small.jpg"
     }
