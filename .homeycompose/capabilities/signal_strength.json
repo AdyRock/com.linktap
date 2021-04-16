@@ -6,5 +6,6 @@
     },
     "getable": true,
     "setable": false,
+    "units": "dBm",
     "icon": "/assets/signal_strength.svg"
 }

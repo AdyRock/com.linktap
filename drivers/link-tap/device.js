@@ -13,6 +13,7 @@ class LinkTapDevice extends Homey.Device
         this.log('LinkTapDevice has been initialized');
         this.isWatering = false;
 
+        this.registerCapabilityListener('onoff', this.onCapabilityOnOff.bind(this));
         this.registerCapabilityListener('watering_mode', this.onCapabilityWateringMode.bind(this));
 
         const searchData = await this.homey.app.getDeviceData();
@@ -21,12 +22,22 @@ class LinkTapDevice extends Homey.Device
         this.onDeviceStatusPoll = this.onDeviceStatusPoll.bind(this);
         this.timerPollID = this.homey.setTimeout(this.onDeviceStatusPoll, (1000 * 30));
 
+        if (!this.hasCapability('onoff'))
+        {
+            this.addCapability('onoff');
+        }
+
         if (this.hasCapability('alarm_fallen'))
         {
             await this.setCapabilityValue('alarm_fallen', false);
             await this.setCapabilityValue('alarm_broken', false);
             await this.setCapabilityValue('alarm_water', false);
+            await this.setCapabilityValue('measure_water', 0);
         }
+
+        await this.setCapabilityValue('onoff', this.isWatering);
+        await this.setCapabilityValue('cycles_remaining', 0);
+        await this.setCapabilityValue('time_remaining', 0);
     }
 
     /**
@@ -91,29 +102,15 @@ class LinkTapDevice extends Homey.Device
 
             if (tapLinker.status !== 'Connected')
             {
-                await this.setUnavailable("Tap Linker Offline");
+                await this.setUnavailable("LinkTap Offline");
                 return;
             }
 
             await this.setAvailable();
 
-            if (this.isWatering && (tapLinker.watering === null))
-            {
-                this.isWatering = false;
-                this.cycles = 0;
-                if (this.getCapabilityValue('water_on'))
-                {
-                    await this.setCapabilityValue('water_on', false);
-                }
-                this.setCapabilityValue('cycles_remaining', this.cycles);
-                await this.setCapabilityValue('time_remaining', 0);
-                await this.setCapabilityValue('watering', this.isWatering);
-                this.driver.triggerWateringFinished(this);
-            }
-
             await this.setCapabilityValue('watering_mode', tapLinker.workMode);
             await this.setCapabilityValue('measure_battery', parseInt(tapLinker.batteryStatus));
-            await this.setCapabilityValue('signal_strength', tapLinker.signal);
+            await this.setCapabilityValue('signal_strength', -tapLinker.signal);
 
             if (typeof tapLinker.fall !== "undefined")
             {
@@ -147,6 +144,18 @@ class LinkTapDevice extends Homey.Device
         {
             this.homey.app.updateLog("updateDeviceValues (" + dd.id + ") Error: " + this.homey.app.varToString(err));
         }
+    }
+
+    async onCapabilityOnOff(value)
+    {
+        //Instant mode
+        const settings = this.getSettings();
+        return this.activateInstantMode(value,
+            settings.watering_duration,
+            settings.eco_mode,
+            settings.on_duration,
+            settings.off_duration,
+            settings.revert);
     }
 
     async onCapabilityWateringMode(value)
@@ -252,6 +261,7 @@ class LinkTapDevice extends Homey.Device
 
             await this.setCapabilityValue('time_remaining', 0);
             this.isWatering = false;
+            await this.setCapabilityValue('onoff', this.isWatering);
             this.cycles = 0;
             this.setCapabilityValue('cycles_remaining', this.cycles);
 
@@ -284,8 +294,10 @@ class LinkTapDevice extends Homey.Device
             this.homey.app.updateLog("onDeviceStatusPoll (" + dd.id + ") response: " + this.homey.app.varToString(response));
             if (response.status)
             {
-                if (this.cycles === 0)
+                if (!this.cycles)
                 {
+                    await this.setAvailable();
+
                     await this.setCapabilityValue('meter_water', 0);
                     this.cycles = 1;
                     if (response.status.ecoTotal)
@@ -299,6 +311,7 @@ class LinkTapDevice extends Homey.Device
                 if (!this.isWatering)
                 {
                     this.isWatering = true;
+                    await this.setCapabilityValue('onoff', this.isWatering);
                     await this.setCapabilityValue('watering', this.isWatering);
 
                     this.driver.triggerWateringStarted(this);
@@ -309,21 +322,34 @@ class LinkTapDevice extends Homey.Device
                     await this.setCapabilityValue('water_on', true);
                 }
 
+                if (response.status.total === '-1')
+                {
+                    // Turned on via the button
+                    //duration *= -1;
+                    this.setCapabilityOptions('time_remaining', { 'title': this.homey.__('timeActive') });
+                }
+                else
+                {
+                    this.setCapabilityOptions('time_remaining', { 'title': this.homey.__('timeRemaining') });
+                }
+
                 await this.setCapabilityValue('time_remaining', parseInt(response.status.onDuration));
 
                 if (response.status.vel)
                 {
                     await this.setCapabilityValue('measure_water', parseInt(response.status.vel) / 1000);
 
-                    let vol = this.getCapabilityValue('meter_water');
-                    vol += (response.status.vel / 2000);
-                    await this.setCapabilityValue('meter_water', vol);
+                    // let vol = this.getCapabilityValue('meter_water');
+                    // vol += (response.status.vel / 2000);
+                    // await this.setCapabilityValue('meter_water', vol);
                 }
 
-                // if (response.status.vol)
-                // {
-                //     await this.setCapabilityValue('meter_water', parseInt(response.status.vol) / 1000);
-                // }
+                if (response.status.vol)
+                {
+                    // let vol = this.getCapabilityValue('meter_water');
+                    // vol += (response.status.vol / 1000);
+                    await this.setCapabilityValue('meter_water', (response.status.vol / 1000));
+                }
             }
             else
             {
@@ -337,9 +363,10 @@ class LinkTapDevice extends Homey.Device
                         this.cycles--;
                         this.setCapabilityValue('cycles_remaining', this.cycles);
 
-                        if (this.cycles === 0)
+                        if (!this.cycles)
                         {
                             this.isWatering = false;
+                            await this.setCapabilityValue('onoff', this.isWatering);
                             await this.setCapabilityValue('watering', this.isWatering);
 
                             this.driver.triggerWateringFinished(this);

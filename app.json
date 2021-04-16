@@ -423,6 +423,7 @@
         ]
       },
       "capabilities": [
+        "onoff",
         "measure_battery",
         "watering_mode",
         "alarm_fallen",
@@ -578,6 +579,7 @@
       },
       "getable": true,
       "setable": false,
+      "units": "dBm",
       "icon": "/assets/signal_strength.svg"
     },
     "time_remaining": {

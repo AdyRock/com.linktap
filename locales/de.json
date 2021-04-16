@@ -16,5 +16,7 @@
         "confirmSend": "Das Protokoll an den Entwickler senden?\n** Alle Identifizierungsmerkmale werden entfernt **",
         "logSent": "Das Protokoll wurde gesendet.",
         "logSendFailed": "Senden nach 5 Versuchen fehlgeschlagen.\nDie Fehlermeldungen finden Sie am Ende des Protokolls."
-    }
+    },
+    "timeRemaining": "Verbleibende Zeit",
+    "timeActive": "Zeit aktiv"
 }

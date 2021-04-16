@@ -126,7 +126,7 @@ class MyApp extends Homey.App
             {
                 for (const tapLinker of gateway.taplinker)
                 {
-                    this.updateLog("Found tapLinker: ");
+                    this.updateLog("Found LinkTap: ");
                     this.updateLog(tapLinker);
 
                     let data = {};
@@ -164,7 +164,7 @@ class MyApp extends Homey.App
             throw (new Error("HTTPS: No API Key specified"));
         }
 
-        this.updateLog("POST to: " + url + "\r\n" + this.varToString(body) + "\r\n");
+        //this.updateLog("POST to: " + url + "\r\n" + this.varToString(body) + "\r\n");
 
         body.username = this.UserName;
         body.apiKey = this.APIToken;
