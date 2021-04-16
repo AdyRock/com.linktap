@@ -1,7 +1,7 @@
 {
   "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
   "id": "com.linktap",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "compatibility": ">=5.0.0",
   "sdk": 3,
   "brandColor": "#FF7D4B",
@@ -177,7 +177,7 @@
         "id": "is_watering",
         "title": {
           "en": "Watering !{{is|isn't}} in progress",
-          "de": "Bewässerung !{{ist|ist nicht}} ist aktiv"
+          "de": "Bewässerung !{{ist|ist nicht}} aktiv"
         },
         "hint": {
           "en": "This Flow will continue if watering is/is not currently in progress.",
@@ -233,7 +233,7 @@
         "id": "activate_instant_mode",
         "title": {
           "en": "Activate Instant Mode",
-          "de": "Sofort-Modus aktiviert"
+          "de": "Sofort-Modus aktivieren"
         },
         "titleFormatted": {
           "en": "Activate Instant Mode for [[water_duration]] minutes. Eco mode is [[eco_mode]] using [[on_time]] minute On and [[off_time]] minute off times. At the end the mode will [[revert]]",

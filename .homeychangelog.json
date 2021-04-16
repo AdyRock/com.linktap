@@ -16,5 +16,8 @@
     },
     "0.0.7": {
         "en": "Changed Water Volume units to L."
+    },
+    "0.0.8": {
+        "en": "Added On / Off capability for quick instant mode activation / deactivation"
     }
 }
