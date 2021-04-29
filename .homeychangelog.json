@@ -19,5 +19,8 @@
     },
     "0.0.8": {
         "en": "Added On / Off capability for quick instant mode activation / deactivation"
+    },
+    "0.0.9": {
+        "en": "Added more diagnostics to see what is sent to LinkTap. Fixed issue with new On / Off capability not being added early enough."
     }
 }

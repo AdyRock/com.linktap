@@ -84,7 +84,7 @@ class MyApp extends Homey.App
     {
         let searchData;
 
-        if (process.env.DEBUG === '1')
+        if (this.homey.settings.get('debugMode'))
         {
             const simData = this.homey.settings.get('simData');
             if (simData)
@@ -164,7 +164,7 @@ class MyApp extends Homey.App
             throw (new Error("HTTPS: No API Key specified"));
         }
 
-        //this.updateLog("POST to: " + url + "\r\n" + this.varToString(body) + "\r\n");
+        this.updateLog("POST to: " + url + "\r\n" + this.varToString(body) + "\r\n");
 
         body.username = this.UserName;
         body.apiKey = this.APIToken;
@@ -189,7 +189,7 @@ class MyApp extends Homey.App
                     },
                 };
 
-                //this.updateLog(https_options);
+                //this.updateLog(this.varToString(https_options));
 
                 let req = https.request(https_options, (res) =>
                 {
@@ -343,7 +343,7 @@ class MyApp extends Homey.App
         let logData;
         if (body.logType == "diag")
         {
-            logData = Homey.ManagerSettings.get('diagLog');
+            logData = this.diagLog;
         }
         else
         {

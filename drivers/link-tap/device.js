@@ -13,6 +13,11 @@ class LinkTapDevice extends Homey.Device
         this.log('LinkTapDevice has been initialized');
         this.isWatering = false;
 
+        if (!this.hasCapability('onoff'))
+        {
+            this.addCapability('onoff');
+        }
+
         this.registerCapabilityListener('onoff', this.onCapabilityOnOff.bind(this));
         this.registerCapabilityListener('watering_mode', this.onCapabilityWateringMode.bind(this));
 
@@ -21,11 +26,6 @@ class LinkTapDevice extends Homey.Device
 
         this.onDeviceStatusPoll = this.onDeviceStatusPoll.bind(this);
         this.timerPollID = this.homey.setTimeout(this.onDeviceStatusPoll, (1000 * 30));
-
-        if (!this.hasCapability('onoff'))
-        {
-            this.addCapability('onoff');
-        }
 
         if (this.hasCapability('alarm_fallen'))
         {
@@ -142,7 +142,7 @@ class LinkTapDevice extends Homey.Device
         }
         catch (err)
         {
-            this.homey.app.updateLog("updateDeviceValues (" + dd.id + ") Error: " + this.homey.app.varToString(err));
+            this.homey.app.updateLog("updateDeviceValues (" + dd.id + ") Error: " + this.homey.app.varToString(err), 0);
         }
     }
 
