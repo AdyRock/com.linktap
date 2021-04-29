@@ -22,5 +22,8 @@
     },
     "0.0.9": {
         "en": "Added more diagnostics to see what is sent to LinkTap. Fixed issue with new On / Off capability not being added early enough."
+    },
+    "0.0.10": {
+        "en": "Fix error when activating instant mode on G1 tapLinkers."
     }
 }

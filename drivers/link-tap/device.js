@@ -250,8 +250,11 @@ class LinkTapDevice extends Homey.Device
             }
 
             await this.setCapabilityValue('cycles_remaining', this.cycles);
-            await this.setCapabilityValue('meter_water', 0);
 
+            if (this.hasCapability('meter_water'))
+            {
+                await this.setCapabilityValue('meter_water', 0);
+            }
             body.autoBack = autoBack;
         }
         else
@@ -298,7 +301,11 @@ class LinkTapDevice extends Homey.Device
                 {
                     await this.setAvailable();
 
-                    await this.setCapabilityValue('meter_water', 0);
+                    if (this.hasCapability('meter_water'))
+                    {
+                        await this.setCapabilityValue('meter_water', 0);
+                    }
+                    
                     this.cycles = 1;
                     if (response.status.ecoTotal)
                     {
@@ -335,7 +342,7 @@ class LinkTapDevice extends Homey.Device
 
                 await this.setCapabilityValue('time_remaining', parseInt(response.status.onDuration));
 
-                if (response.status.vel)
+                if (response.status.vel && this.hasCapability('measure_water'))
                 {
                     await this.setCapabilityValue('measure_water', parseInt(response.status.vel) / 1000);
 
@@ -344,7 +351,7 @@ class LinkTapDevice extends Homey.Device
                     // await this.setCapabilityValue('meter_water', vol);
                 }
 
-                if (response.status.vol)
+                if (response.status.vol && this.hasCapability('meter_water'))
                 {
                     // let vol = this.getCapabilityValue('meter_water');
                     // vol += (response.status.vol / 1000);
