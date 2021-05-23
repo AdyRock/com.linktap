@@ -95,16 +95,24 @@ class MyApp extends Homey.App
 
         if (!this.lastDetectionTime || (Date.now() - this.lastDetectionTime > (1000 * 60 * 5)))
         {
-            // More than 5 minutes since last request
-            //https://www.link-tap.com/api/getAllDevices
-            const url = "getAllDevices";
-            let response = await this.PostURL(url, {});
-            searchData = response.devices;
-            this.detectedDevices = this.varToString(searchData);
-            this.lastDetectionTime = Date.now();
-            this.homey.settings.set('detectedDevices', this.detectedDevices);
-            this.homey.settings.set('lastDetectionTime', this.lastDetectionTime);
-            this.homey.api.realtime('com.linktap.detectedDevicesUpdated', { 'devices': this.detectedDevices });
+            try
+            {
+                // More than 5 minutes since last request
+                //https://www.link-tap.com/api/getAllDevices
+                const url = "getAllDevices";
+                let response = await this.PostURL(url, {});
+                searchData = response.devices;
+                this.detectedDevices = this.varToString(searchData);
+                this.lastDetectionTime = Date.now();
+                this.homey.settings.set('detectedDevices', this.detectedDevices);
+                this.homey.settings.set('lastDetectionTime', this.lastDetectionTime);
+                this.homey.api.realtime('com.linktap.detectedDevicesUpdated', { 'devices': this.detectedDevices });
+            }
+            catch (err)
+            {
+                this.updateLog(this.varToString(err));
+                return null;
+            }
         }
         else
         {

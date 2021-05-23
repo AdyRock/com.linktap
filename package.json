@@ -3,7 +3,8 @@
     "version": "0.0.10",
     "main": "app.js",
     "devDependencies": {
-        "homey": "^2.9.7"
+        "@types/homey": "npm:homey-apps-sdk-v3-types@^0.1.0",
+        "homey": "^2.18.0"
     },
     "repository": {
         "type": "git",
