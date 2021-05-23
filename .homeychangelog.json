@@ -25,5 +25,8 @@
     },
     "0.0.10": {
         "en": "Fix error when activating instant mode on G1 tapLinkers."
+    },
+    "0.0.11": {
+        "en": "Trap POST errors, Added instructions and LinkTap URL to obtain API key"
     }
 }
