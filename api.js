@@ -7,6 +7,10 @@ module.exports = {
     {
         return homey.app.detectedDevices;
     },
+    async getAPIKey({ homey, body })
+    {
+        return await homey.app.getAPIKey(body);
+    },
     async clearLog({ homey, body })
     {
         homey.app.diagLog = "";

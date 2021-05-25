@@ -162,20 +162,23 @@ class MyApp extends Homey.App
 
     async PostURL(url, body)
     {
-        if (!this.UserName)
+        if (!body.username)
         {
-            throw (new Error("HTTPS: No user name specified"));
+            if (!this.UserName)
+            {
+                throw (new Error("HTTPS: No user name specified"));
+            }
+
+            if (!this.APIToken)
+            {
+                throw (new Error("HTTPS: No API Key specified"));
+            }
+
+            this.updateLog("POST to: " + url + "\r\n" + this.varToString(body) + "\r\n");
+
+            body.username = this.UserName;
+            body.apiKey = this.APIToken;
         }
-
-        if (!this.APIToken)
-        {
-            throw (new Error("HTTPS: No API Key specified"));
-        }
-
-        this.updateLog("POST to: " + url + "\r\n" + this.varToString(body) + "\r\n");
-
-        body.username = this.UserName;
-        body.apiKey = this.APIToken;
 
         let bodyText = JSON.stringify(body);
         //this.updateLog(bodyText);
@@ -428,6 +431,11 @@ class MyApp extends Homey.App
         }
 
         return (this.homey.__('settings.logSendFailed'));
+    }
+
+    async getAPIKey(body)
+    {
+        return await this.PostURL('getApiKey', body);
     }
 }
 

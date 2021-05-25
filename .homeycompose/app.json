@@ -1,6 +1,6 @@
 {
     "id": "com.linktap",
-    "version": "0.0.11",
+    "version": "0.0.12",
     "compatibility": ">=5.0.0",
     "sdk": 3,
     "brandColor": "#FF7D4B",
@@ -8,7 +8,7 @@
         "en": "LinkTap"
     },
     "description": {
-        "en": "A water timer that give you total peace of mind.",
+        "en": "A water timer that gives you total peace of mind.",
         "de": "Ein Bewässerungssystem, das Ihnen absolute Sicherheit gibt."
     },
     "category": [
@@ -43,6 +43,10 @@
         "getDetect": {
             "method": "get",
             "path": "/getDetect/"
+        },
+        "getAPIKey": {
+            "method": "post",
+            "path": "/getAPIKey/"
         },
         "clearLog": {
             "method": "post",

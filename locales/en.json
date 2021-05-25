@@ -5,7 +5,7 @@
         "diagnosticsLog": "Diagnostics Log",
         "subtitle": "Application Settings",
         "accountDetails": "Account Details",
-        "userName": "User Name",
+        "userName": "LinkTap User Name ( NOT your email )",
         "apiKey": "API Key",
         "saveChanges": "Save Changes",
         "clearLog": "Clear Log",
@@ -15,7 +15,15 @@
         "saved": "The settings have been saved",
         "confirmSend": "Send the log contents to the developer?\n** All identifiers will be removed **",
         "logSent": "The log has been sent.",
-        "logSendFailed": "Failed to send after 5 attempts.\nThe error messages are at the end of the log."
+        "logSendFailed": "Failed to send after 5 attempts.\nThe error messages are at the end of the log.",
+        "password": "TapLink Password",
+        "getKey": "Get a new API key",
+        "getKeyInstruction1": "If you don't have an API key",
+        "getKeyInstruction2": "Enter your LinkTap password below and click the 'Get a new API key' button",
+        "note": "Note",
+        "noteText": "If you generate a new key it will invalidate the old key and the anything using it will stop working.",
+        "missingUsername": "You need to enter your LinTap Username",
+        "missingPassword": "You need to enter your LinTap Password"
     },
     "timeRemaining": "Time Remaining",
     "timeActive": "Time Active"
