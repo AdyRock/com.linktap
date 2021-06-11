@@ -10,6 +10,16 @@ const Homey = require('homey');
 const https = require("https");
 const nodemailer = require("nodemailer");
 
+const aedes = require('aedes')();
+const server = require('net').createServer(aedes.handle);
+const port = 49876;
+
+server.listen(port, function()
+{
+    console.log('server started and listening on port ', port)
+})
+
+var mqtt = require('mqtt');
 class MyApp extends Homey.App
 {
     /**
@@ -47,7 +57,58 @@ class MyApp extends Homey.App
         this.detectedDevices = this.homey.settings.get('detectedDevices');
 
         this.onDevicePoll = this.onDevicePoll.bind(this);
-        this.restartPolling(5);
+        //        this.restartPolling(5);
+
+        this.client = mqtt.connect('mqtt://localhost:49876');
+        let _this = this;
+        this.client.on('connect', function()
+        {
+            _this.client.subscribe('linktap/up', function(err)
+            {
+                if (!err)
+                {
+
+                }
+            });
+        });
+
+        this.client.on('message', function(topic, message)
+        {
+            // message is Buffer
+            console.log(message.toString());
+
+            try
+            {
+                let tapLinkData = JSON.parse(message.toString());
+                _this.updateDevicesMQTT(tapLinkData);
+            }
+            catch (err)
+            {
+
+            }
+        });
+    }
+
+    async updateDevicesMQTT(tapLinkData)
+    {
+        const promises = [];
+        const drivers = this.homey.drivers.getDrivers();
+        for (const driver in drivers)
+        {
+            let devices = this.homey.drivers.getDriver(driver).getDevices();
+            let numDevices = devices.length;
+            for (var i = 0; i < numDevices; i++)
+            {
+                let device = devices[i];
+                if (device.updateDeviceMQTT)
+                {
+                    promises.push(device.updateDeviceMQTT(tapLinkData));
+                }
+            }
+        }
+
+        await Promise.all(promises);
+
     }
 
     restartPolling(initialDelay)
