@@ -14,10 +14,15 @@ const aedes = require('aedes')();
 const server = require('net').createServer(aedes.handle);
 const port = 49876;
 
+aedes.authenticate = function(client, username, password, callback)
+{
+    callback(null, (username === 'homeyApp') && (password.toString() === 'fred69'));
+};
+
 server.listen(port, function()
 {
     console.log('server started and listening on port ', port)
-})
+});
 
 var mqtt = require('mqtt');
 class MyApp extends Homey.App
@@ -59,7 +64,7 @@ class MyApp extends Homey.App
         this.onDevicePoll = this.onDevicePoll.bind(this);
         //        this.restartPolling(5);
 
-        this.client = mqtt.connect('mqtt://localhost:49876');
+        this.client = mqtt.connect('mqtt://localhost:49876', { clientId: "homeyLinkTapApp", username: "homeyApp", password: "fred69" });
         let _this = this;
         this.client.on('connect', function()
         {
