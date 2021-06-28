@@ -12,6 +12,7 @@
     },
     "capabilities": [
         "onoff",
+        "clear_alarms",
         "measure_battery",
         "watering_mode",
         "alarm_fallen",

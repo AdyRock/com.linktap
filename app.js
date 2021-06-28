@@ -21,7 +21,7 @@ aedes.authenticate = function(client, username, password, callback)
 
 server.listen(port, function()
 {
-    console.log('server started and listening on port ', port)
+    console.log('server started and listening on port ', port);
 });
 
 var mqtt = require('mqtt');
@@ -62,17 +62,24 @@ class MyApp extends Homey.App
         this.detectedDevices = this.homey.settings.get('detectedDevices');
 
         this.onDevicePoll = this.onDevicePoll.bind(this);
-        //        this.restartPolling(5);
+        this.restartPolling(30);
 
-        this.client = mqtt.connect('mqtt://localhost:49876', { clientId: "homeyLinkTapApp", username: "homeyApp", password: "fred69" });
         let _this = this;
+        this.client = mqtt.connect('mqtt://localhost:49876', { clientId: "homeyLinkTapApp", username: "homeyApp", password: "fred69" });
         this.client.on('connect', function()
         {
-            _this.client.subscribe('linktap/up', function(err)
+            _this.client.subscribe('linktap/up_cmd', function(err)
             {
-                if (!err)
+                if (err)
                 {
-
+                    _this.updateLog(_this.varToString(err));
+                }
+            });
+            _this.client.subscribe('linktap/down_cmd_ack', function(err)
+            {
+                if (err)
+                {
+                    _this.updateLog(_this.varToString(err));
                 }
             });
         });
@@ -80,22 +87,52 @@ class MyApp extends Homey.App
         this.client.on('message', function(topic, message)
         {
             // message is Buffer
-            console.log(message.toString());
+            console.log(topic, message.toString());
 
             try
             {
                 let tapLinkData = JSON.parse(message.toString());
-                _this.updateDevicesMQTT(tapLinkData);
+                if ((tapLinkData.cmd === 0) || (tapLinkData.cmd === 13))
+                {
+                    // Return date and time
+                    const t = new Date();
+                    const date = ('0' + t.getDate()).slice(-2);
+                    const month = ('0' + (t.getMonth() + 1)).slice(-2);
+                    const year = t.getFullYear();
+                    const hours = ('0' + t.getHours()).slice(-2);
+                    const minutes = ('0' + t.getMinutes()).slice(-2);
+                    const seconds = ('0' + t.getSeconds()).slice(-2);
+                    const dateTxt = `${year}${month}${date}`;
+                    const timeTxt = `${hours}${minutes}${seconds}`;
+                    const reply = {
+                        "cmd":0,
+                        "gwID": tapLinkData.gwID,
+                        "date":dateTxt,
+                        "time":timeTxt,
+                        "wday":t.getDay()
+                    };
+
+                    const data = JSON.stringify(reply);
+
+                    _this.client.publish('linktap/up_cmd_ack', data);
+                }
+                else if ((tapLinkData.cmd === 3) || (tapLinkData.cmd === 9))
+                {
+                    _this.updateDevicesMQTT(tapLinkData);
+                }
             }
             catch (err)
             {
-
+                console.log(topic, err);
             }
         });
     }
 
     async updateDevicesMQTT(tapLinkData)
     {
+        // Resume polling method if nothing received via MQTT withing the timeout period
+        this.restartPolling(120);
+
         const promises = [];
         const drivers = this.homey.drivers.getDrivers();
         for (const driver in drivers)
@@ -116,9 +153,15 @@ class MyApp extends Homey.App
 
     }
 
+    async publishMQTTMessage(message)
+    {
+        const data = JSON.stringify(message);
+        this.client.publish('linktap/down_cmd', data);
+    }
+
     restartPolling(initialDelay)
     {
-        clearTimeout(this.timerPollID);
+        this.homey.clearTimeout(this.timerPollID);
         this.timerPollID = this.homey.setTimeout(this.onDevicePoll, (1000 * initialDelay));
     }
 

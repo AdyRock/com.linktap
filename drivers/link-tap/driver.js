@@ -44,6 +44,7 @@ class LinkTapDriver extends Homey.Driver
 
         this.wateringStartedTrigger = this.homey.flow.getDeviceTriggerCard('watering_started');
         this.wateringFinishedTrigger = this.homey.flow.getDeviceTriggerCard('watering_finished');
+        this.wateringSkippedTrigger = this.homey.flow.getDeviceTriggerCard('watering_skipped');
     }
 
     triggerWateringStarted(device, tokens, state)
@@ -59,6 +60,14 @@ class LinkTapDriver extends Homey.Driver
             .then(this.log)
             .catch(this.error);
     }
+
+    triggerWateringSkipped(device, tokens, state)
+    {
+        this.wateringSkippedTrigger.trigger(device, tokens, state)
+            .then(this.log)
+            .catch(this.error);
+    }
+
     /**
      * onPairListDevices is called when a user is adding a device and the 'list_devices' view is called.
      * This should return an array with the data of devices that are available for pairing.

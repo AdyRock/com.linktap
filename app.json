@@ -140,6 +140,40 @@
         ]
       },
       {
+        "id": "watering_skipped",
+        "title": {
+          "en": "The watering cycle has been skipped"
+        },
+        "hint": {
+          "en": "When the watering cycle has been skipped due to rain"
+        },
+        "tokens": [
+          {
+            "name": "past_rainfall",
+            "type": "number",
+            "title": {
+              "en": "Past Rainfall"
+            },
+            "example": 2.5
+          },
+          {
+            "name": "forecast_rainfall",
+            "type": "number",
+            "title": {
+              "en": "Forecast Rainfall"
+            },
+            "example": 2.5
+          }
+        ],
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=link-tap"
+          }
+        ]
+      },
+      {
         "id": "watering_started",
         "title": {
           "en": "Watering has started",
@@ -428,6 +462,7 @@
       },
       "capabilities": [
         "onoff",
+        "clear_alarms",
         "measure_battery",
         "watering_mode",
         "alarm_fallen",
@@ -564,6 +599,15 @@
       "getable": true,
       "setable": false,
       "icon": "/assets/fallen.svg"
+    },
+    "clear_alarms": {
+      "type": "boolean",
+      "getable": false,
+      "setable": true,
+      "uiComponent": "button",
+      "title": {
+        "en": "Clear Alarms"
+      }
     },
     "cycles_remaining": {
       "type": "number",
