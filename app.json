@@ -726,5 +726,26 @@
         }
       ]
     }
+  },
+  "discovery": {
+    "link_tap": {
+      "type": "mdns-sd",
+      "mdns-sd": {
+        "name": "http",
+        "protocol": "tcp"
+      },
+      "id": "{{txt.id}}",
+      "conditions": [
+        [
+          {
+            "field": "txt.vendor",
+            "match": {
+              "type": "string",
+              "value": "LinkTap"
+            }
+          }
+        ]
+      ]
+    }
   }
 }

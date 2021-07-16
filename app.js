@@ -8,23 +8,23 @@ if (process.env.DEBUG === '1')
 
 const Homey = require('homey');
 const https = require("https");
+const http = require("http");
+
 const nodemailer = require("nodemailer");
 
 const aedes = require('aedes')();
 const server = require('net').createServer(aedes.handle);
 const port = 49876;
-
 aedes.authenticate = function(client, username, password, callback)
 {
     callback(null, (username === 'homeyApp') && (password.toString() === 'fred69'));
 };
-
 server.listen(port, function()
 {
     console.log('server started and listening on port ', port);
 });
-
 var mqtt = require('mqtt');
+
 class MyApp extends Homey.App
 {
     /**
@@ -34,6 +34,27 @@ class MyApp extends Homey.App
     {
         this.log('MyApp has been initialized');
         this.diagLog = "";
+        this.useInternet = this.homey.settings.get('useInternet');
+
+        this.mDNSGateways = this.homey.settings.get('gateways');
+//        if (!this.mDNSGateways)
+        {
+            this.mDNSGateways = [];
+        }
+
+        this.autoConfigGateway = this.homey.settings.get('autoConfig');
+
+        this.discoveryStrategy = this.homey.discovery.getStrategy("link_tap");
+
+        let result = this.discoveryStrategy.getDiscoveryResults();
+        this.log("Got mDNS result:", result);
+        //this.mDNSGatewaysUpdate(result);
+
+        this.discoveryStrategy.on("result", discoveryResult =>
+        {
+            this.log("Got mDNS result:", discoveryResult);
+            this.mDNSGatewaysUpdate(discoveryResult);
+        });
 
         if (process.env.DEBUG === '1')
         {
@@ -54,6 +75,18 @@ class MyApp extends Homey.App
             {
                 this.UserName = this.homey.settings.get('UserName');
             }
+            else if (key === 'autoConfig')
+            {
+                this.autoConfigGateway = this.homey.settings.get('autoConfig');
+                if (this.autoConfigGateway)
+                {
+                    this.checkGatewaysConfiguration();
+                }
+            }
+            else if (key === 'useInternet')
+            {
+                this.useInternet = this.homey.settings.get('useInternet');
+            }
         });
 
         this.APIToken = this.homey.settings.get('APIToken');
@@ -62,7 +95,7 @@ class MyApp extends Homey.App
         this.detectedDevices = this.homey.settings.get('detectedDevices');
 
         this.onDevicePoll = this.onDevicePoll.bind(this);
-        this.restartPolling(30);
+        this.restartPolling(60);
 
         let _this = this;
         this.client = mqtt.connect('mqtt://localhost:49876', { clientId: "homeyLinkTapApp", username: "homeyApp", password: "fred69" });
@@ -87,13 +120,17 @@ class MyApp extends Homey.App
         this.client.on('message', function(topic, message)
         {
             // message is Buffer
-            console.log(topic, message.toString());
+            //console.log(topic, message.toString());
 
             try
             {
                 let tapLinkData = JSON.parse(message.toString());
+                _this.homey.app.updateLog("MQTTDeviceValues: " + _this.homey.app.varToString(tapLinkData));
+
                 if ((tapLinkData.cmd === 0) || (tapLinkData.cmd === 13))
                 {
+                    _this.restartPolling(180);
+
                     // Return date and time
                     const t = new Date();
                     const date = ('0' + t.getDate()).slice(-2);
@@ -105,11 +142,11 @@ class MyApp extends Homey.App
                     const dateTxt = `${year}${month}${date}`;
                     const timeTxt = `${hours}${minutes}${seconds}`;
                     const reply = {
-                        "cmd":0,
+                        "cmd": 0,
                         "gwID": tapLinkData.gwID,
-                        "date":dateTxt,
-                        "time":timeTxt,
-                        "wday":t.getDay()
+                        "date": dateTxt,
+                        "time": timeTxt,
+                        "wday": t.getDay()
                     };
 
                     const data = JSON.stringify(reply);
@@ -118,6 +155,7 @@ class MyApp extends Homey.App
                 }
                 else if ((tapLinkData.cmd === 3) || (tapLinkData.cmd === 9))
                 {
+                    _this.updateDetectedDevices(tapLinkData);
                     _this.updateDevicesMQTT(tapLinkData);
                 }
             }
@@ -128,10 +166,163 @@ class MyApp extends Homey.App
         });
     }
 
+    updateDetectedDevices(tapLinkData)
+    {
+        // find the gateway
+        let index = this.mDNSGateways.findIndex((gateway) =>
+        {
+            return gateway.gatewayId === tapLinkData.gw_id;
+        });
+
+        if (index >= 0)
+        {
+            // Found the gateway so look for the taplinkers
+            let gatewayTapLinkers = this.mDNSGateways[index].taplinker;
+            tapLinkData.dev_stat.forEach(tapLinker1 =>
+            {
+                let index2 = gatewayTapLinkers.findIndex((tapLinker2) =>
+                {
+                    return tapLinker2.taplinkerId === tapLinker1.dev_id;
+                });
+
+                if (index2 < 0)
+                {
+                    // No match found so add this tapLinker
+                    let newTapLinker = {
+                        "location": "",
+                        "taplinkerName": tapLinker1.dev_id,
+                        "taplinkerId": tapLinker1.dev_id,                
+                    };
+                    gatewayTapLinkers.push(newTapLinker);
+                    this.homey.settings.set('gateways', this.mDNSGateways);
+                    this.homey.app.updateLog("MQTTDevice: " + this.homey.app.varToString(this.mDNSGateways));
+                }
+            });
+        }
+    }
+
+    mDNSGatewaysUpdate(discoveryResult)
+    {
+        const address = discoveryResult.address;
+        const id = discoveryResult.id;
+        const model = discoveryResult.txt.model;
+
+        let index = this.mDNSGateways.findIndex((gateway) =>
+        {
+            return gateway.gatewayId === id;
+        });
+
+        if (index >= 0)
+        {
+            this.mDNSGateways[index].address = address;
+        }
+        else
+        {
+            const gateway = {
+                gatewayId: id,
+                address: address,
+                model: model,
+                taplinker: []
+            };
+
+            this.mDNSGateways.push(gateway);
+            index = this.mDNSGateways.length - 1;
+        }
+
+        this.homey.settings.set('gateways', this.mDNSGateways);
+
+        if (this.autoConfigGateway)
+        {
+            this.checkGatewayConfiguration(this.mDNSGateways[index]);
+        }
+    }
+
+    async checkGatewaysConfiguration()
+    {
+        this.mDNSGateways.forEach(async gateway =>
+        {
+            await this.checkGatewayConfiguration(gateway);
+        });
+    }
+
+    async checkGatewayConfiguration(gateway)
+    {
+        // Check if gateway already configured
+        const homeyIP = await (await this.homey.cloud.getLocalAddress()).split(":")[0];
+        const res = await this.GetURL("http://" + gateway.address, {});
+        const hostPos = res.search("#HOST");
+        if (hostPos > 0)
+        {
+            const hostValuePos = res.indexOf("value=", hostPos);
+            let hostValue = res.substr(hostValuePos + 6, 17);
+            hostValue = hostValue.split('"');
+            hostValue = hostValue[1];
+
+            if (hostValue !== homeyIP)
+            {
+                // the gateway needs to be configured for local access
+                this.updateGatewayConfiguration(gateway, homeyIP);
+            }
+        }
+    }
+
+    async updateGatewayConfiguration(gateway, homeyIP)
+    {
+        // Post form 2 data to configure the MQTT client settings
+        let urlOptions = '?';
+        urlOptions += 'flag=2';
+        urlOptions += '&func=2';
+        urlOptions += '&hosttype=0';
+        urlOptions += '&prefix=linktap';
+        urlOptions += '&host=' + encodeURIComponent(homeyIP);
+        urlOptions += '&port=49876';
+        urlOptions += '&cltid=' + gateway.gatewayId;
+        urlOptions += '&user=homeyApp';
+        urlOptions += '&pwd=fred69';
+        urlOptions += '&alive=120';
+        try
+        {
+            await this.GetURL("http://" + gateway.address + "/index.shtml" + urlOptions, {});
+        }
+        catch (err)
+        {
+            this.log("Publish Form 1:", err);
+        }
+
+        // Post form 3 data to configure the MQTT topics settings
+        urlOptions = '?';
+        urlOptions += 'flag=3';
+        urlOptions += '&uptopic=linktap/up_cmd';
+        urlOptions += '&uptpcrx=linktap/up_cmd_ack';
+        urlOptions += '&dwntpc=linktap/down_cmd';
+        urlOptions += '&dwntpcrx=linktap/down_cmd_ack';
+        try
+        {
+            await this.GetURL("http://" + gateway.address + "/index.shtml" + urlOptions, {});
+        }
+        catch (err)
+        {
+            this.log("Publish Form 2:", err);
+        }
+
+        // Post form 0 to reboot the gateway
+        urlOptions = '?';
+        urlOptions += 'flag=0';
+        try
+        {
+            await this.GetURL("http://" + gateway.address + "/index.shtml" + urlOptions, {});
+        }
+        catch (err)
+        {
+            this.log("Publish Form 3:", err);
+        }
+
+    }
+
     async updateDevicesMQTT(tapLinkData)
     {
         // Resume polling method if nothing received via MQTT withing the timeout period
-        this.restartPolling(120);
+        this.restartPolling(180);
 
         const promises = [];
         const drivers = this.homey.drivers.getDrivers();
@@ -156,85 +347,103 @@ class MyApp extends Homey.App
     async publishMQTTMessage(message)
     {
         const data = JSON.stringify(message);
+        this.homey.app.updateLog("publishMQTTMessage: " + data);
         this.client.publish('linktap/down_cmd', data);
     }
 
     restartPolling(initialDelay)
     {
         this.homey.clearTimeout(this.timerPollID);
-        this.timerPollID = this.homey.setTimeout(this.onDevicePoll, (1000 * initialDelay));
+        if (this.useInternet)
+        {
+            this.timerPollID = this.homey.setTimeout(this.onDevicePoll, (1000 * initialDelay));
+        }
     }
 
     async onDevicePoll()
     {
-        const searchData = await this.getDeviceData();
-        const promises = [];
-        const drivers = this.homey.drivers.getDrivers();
-        for (const driver in drivers)
+        if (this.useInternet)
         {
-            let devices = this.homey.drivers.getDriver(driver).getDevices();
-            let numDevices = devices.length;
-            for (var i = 0; i < numDevices; i++)
+            const searchData = await this.getDeviceData();
+            const promises = [];
+            const drivers = this.homey.drivers.getDrivers();
+            for (const driver in drivers)
             {
-                let device = devices[i];
-                if (device.updateDeviceValues)
+                let devices = this.homey.drivers.getDriver(driver).getDevices();
+                let numDevices = devices.length;
+                for (var i = 0; i < numDevices; i++)
                 {
-                    promises.push(device.updateDeviceValues(searchData));
+                    let device = devices[i];
+                    if (device.updateDeviceValues)
+                    {
+                        promises.push(device.updateDeviceValues(searchData));
+                    }
                 }
             }
+
+            await Promise.all(promises);
+
+            this.timerPollID = this.homey.setTimeout(this.onDevicePoll, (1000 * 60 * 5));
         }
-
-        await Promise.all(promises);
-
-        this.timerPollID = this.homey.setTimeout(this.onDevicePoll, (1000 * 60 * 5));
     }
 
     async getDeviceData()
     {
-        let searchData;
+        let searchData = null;
 
-        if (this.homey.settings.get('debugMode'))
+        if (this.useInternet)
         {
-            const simData = this.homey.settings.get('simData');
-            if (simData)
+            if (this.homey.settings.get('debugMode'))
             {
-                return JSON.parse(simData);
+                const simData = this.homey.settings.get('simData');
+                if (simData)
+                {
+                    return JSON.parse(simData);
+                }
+            }
+
+            if (!this.lastDetectionTime || (Date.now() - this.lastDetectionTime > (1000 * 60 * 5)))
+            {
+                try
+                {
+                    // More than 5 minutes since last request
+                    //https://www.link-tap.com/api/getAllDevices
+                    const url = "getAllDevices";
+                    let response = await this.PostURL(url, {});
+                    searchData = response.devices;
+                    this.detectedDevices = this.varToString(searchData);
+                    this.lastDetectionTime = Date.now();
+                    this.homey.settings.set('detectedDevices', this.detectedDevices);
+                    this.homey.settings.set('lastDetectionTime', this.lastDetectionTime);
+                    this.homey.api.realtime('com.linktap.detectedDevicesUpdated', { 'devices': this.detectedDevices });
+                }
+                catch (err)
+                {
+                    this.updateLog(this.varToString(err));
+                    return null;
+                }
+            }
+            else
+            {
+                searchData = JSON.parse(this.detectedDevices);
             }
         }
-
-        if (!this.lastDetectionTime || (Date.now() - this.lastDetectionTime > (1000 * 60 * 5)))
-        {
-            try
-            {
-                // More than 5 minutes since last request
-                //https://www.link-tap.com/api/getAllDevices
-                const url = "getAllDevices";
-                let response = await this.PostURL(url, {});
-                searchData = response.devices;
-                this.detectedDevices = this.varToString(searchData);
-                this.lastDetectionTime = Date.now();
-                this.homey.settings.set('detectedDevices', this.detectedDevices);
-                this.homey.settings.set('lastDetectionTime', this.lastDetectionTime);
-                this.homey.api.realtime('com.linktap.detectedDevicesUpdated', { 'devices': this.detectedDevices });
-            }
-            catch (err)
-            {
-                this.updateLog(this.varToString(err));
-                return null;
-            }
-        }
-        else
-        {
-            searchData = JSON.parse(this.detectedDevices);
-        }
-
         return searchData;
     }
 
     async getDevices()
     {
         const devices = [];
-        const searchData = await this.getDeviceData();
+        let searchData = null;
+
+        if (this.useInternet)
+        {
+            searchData = await this.getDeviceData();
+        }
+        else
+        {
+            searchData = this.mDNSGateways;
+        }
 
         if (searchData)
         {
@@ -363,6 +572,143 @@ class MyApp extends Homey.App
                 this.updateLog(this.varToString(err));
                 reject(new Error("HTTPS Catch: " + err));
                 return;
+            }
+        });
+    }
+
+    async PostFormData(url, headers, body)
+    {
+        let bodyText = JSON.stringify(body);
+
+        return new Promise((resolve, reject) =>
+        {
+            try
+            {
+                let http_options = {
+                    host: url,
+                    path: "",
+                    method: "POST",
+                    headers: headers
+                };
+
+                let req = http.request(http_options, (res) =>
+                {
+                    let body = [];
+                    res.on('data', (chunk) =>
+                    {
+                        //this.updateLog("Post: retrieve data");
+                        body.push(chunk);
+                    });
+
+                    res.on('end', () =>
+                    {
+                        if (res.statusCode === 200)
+                        {
+                            let returnData = Buffer.concat(body);
+                            if (returnData.length > 2)
+                            {
+                                returnData = JSON.parse(returnData);
+                            }
+                            resolve(returnData);
+                            return;
+                        }
+                        else
+                        {
+                            this.updateLog("HTTPS Error: " + res.statusCode);
+                            reject(new Error("HTTPS Error - " + res.statusCode));
+                            return;
+                        }
+                    });
+                });
+
+                req.on('error', (err) =>
+                {
+                    this.updateLog(err);
+                    reject(new Error("HTTPS Catch: " + err));
+                    return;
+                });
+
+                req.setTimeout(5000, function()
+                {
+                    req.destroy();
+                    reject(new Error("HTTP Catch: Timeout"));
+                    return;
+                });
+
+                req.write(bodyText);
+                req.end();
+            }
+            catch (err)
+            {
+                this.updateLog(this.varToString(err));
+                reject(new Error("HTTPS Catch: " + err));
+                return;
+            }
+        });
+    }
+
+    async GetURL(url, Options)
+    {
+        return new Promise((resolve, reject) =>
+        {
+            try
+            {
+                console.log("Checking: ", url);
+                http.get(url, Options, (res) =>
+                {
+                    if (res.statusCode === 200)
+                    {
+                        let body = [];
+                        res.on('data', (chunk) =>
+                        {
+                            body.push(chunk);
+                        });
+                        res.on('end', () =>
+                        {
+                            resolve(
+                                Buffer.concat(body).toString()
+                            );
+                        });
+                    }
+                    else
+                    {
+                        let message = "";
+                        if (res.statusCode === 204)
+                        {
+                            message = "No Data Found";
+                        }
+                        else if (res.statusCode === 302)
+                        {
+                            message = res.headers.location;
+                        }
+                        else if (res.statusCode === 400)
+                        {
+                            message = "Bad request";
+                        }
+                        else if (res.statusCode === 401)
+                        {
+                            message = "Unauthorized";
+                        }
+                        else if (res.statusCode === 403)
+                        {
+                            message = "Forbidden";
+                        }
+                        else if (res.statusCode === 404)
+                        {
+                            message = "Not Found";
+                        }
+                        reject({ source: "HTTPS Error", code: res.statusCode, message: message });
+                    }
+                }).on('error', (err) =>
+                {
+                    console.log("HTTPS Catch: ", err);
+                    reject({ source: "HTTPS Catch", err: err });
+                });
+            }
+            catch (e)
+            {
+                console.log(e);
+                reject({ source: "HTTPS Try Catch", err: e });
             }
         });
     }

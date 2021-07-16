@@ -1,9 +1,7 @@
 {
     "settings": {
-        "settings": "Einstellungen",
         "detected": "Erkannt",
         "diagnosticsLog": "Diagnoseprotokoll",
-        "subtitle": "Programmeinstellungen",
         "accountDetails": "Kontodetails",
         "userName": "Benutzername",
         "apiKey": "API Key",

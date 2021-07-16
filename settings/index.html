@@ -4,6 +4,14 @@
 <head>
     <link rel="stylesheet" type="text/css" href="lwsa.css">
     <link rel="stylesheet" type="text/css" href="busy_indicator.css" />
+    <style>
+        label.a {
+            display: inline-block;
+            width: 225px;
+            height: 15px;
+            padding: 5px;
+        }
+    </style>
 
     <style type="text/css">
         .fog_div {
@@ -36,6 +44,7 @@
     <!-- Tab links -->
     <div class="tab">
         <button class="tablinks" onclick="setPage(event, 'settings')" id="defaultOpen"><span data-i18n="settings.settings"></span></button>
+        <button class="tablinks" onclick="setPage(event, 'gateways')"><span data-i18n="settings.gateways"></span></button>
         <button class="tablinks" onclick="setPage(event, 'detected')"><span data-i18n="settings.detected"></span></button>
         <button class="tablinks" onclick="setPage(event, 'log')"><span data-i18n="settings.diagnosticsLog"></span></button>
         <button class="tablinks" onclick="setPage(event, 'simulator')" id="simLogTab" style="visibility:hidden">Simulation Data</button>
@@ -47,6 +56,10 @@
         <p data-i18n="settings.subtitle"></p>
 
         <fieldset>
+            <div class="field row">
+                <label for="useInternet"><span data-i18n="settings.useInternet"></span></label>
+                <input id="useInternet" type="checkbox" value="useInternet" />
+            </div>
             <legend><span data-i18n="settings.accountDetails"></span></legend>
             <fieldset>
                 <div class="field row">
@@ -78,6 +91,23 @@
         </fieldset>
         <fieldset>
             <p><button id="save" class="right"><span data-i18n="settings.saveChanges"></span></button></p>
+        </fieldset>
+    </div>
+
+    <!-- GATEWAYS PAGE -->
+    <div id="gateways" class="tabcontent">
+        <p data-i18n="settings.localGateways"></p>
+        <fieldset>
+            <legend><span data-i18n="settings.gatways"></span></legend>
+            <div class="field row">
+                <label for="autoConfig"><span data-i18n="settings.autoConfig"></span></label>
+                <input id="autoConfig" type="checkbox" value="notify" />
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Available Gateways</legend>
+            <div id="gatewaySection"></div>
         </fieldset>
     </div>
 
@@ -126,11 +156,14 @@
         // Create the busy indicator
         var busyi = new busy_indicator(document.getElementById("busybox"), document.querySelector("#busybox div"));
 
+        var useInternetElement = document.getElementById('useInternet');
         var UserNameElement = document.getElementById('UserName');
         var APITokenElement = document.getElementById('APIToken');
         var passwordElement = document.getElementById('password');
         var getKeyElement = document.getElementById('getKey');
         var saveElement = document.getElementById('save');
+
+        var autoConfigElement = document.getElementById('autoConfig');
 
         var detectedDevicesElement = document.getElementById('detectedDevices');
         var diagLogElement = document.getElementById('diagLog');
@@ -158,6 +191,25 @@
             });
 
             document.getElementById("defaultOpen").click();
+
+            Homey.get('useInternet', function(err, useInternet)
+            {
+                if (err) return Homey.alert(err);
+                useInternetElement.checked = useInternet;
+            });
+
+            Homey.get('autoConfig', function(err, autoConfig)
+            {
+                if (err) return Homey.alert(err);
+                autoConfigElement.checked = autoConfig;
+            });
+
+            Homey.on('com.linktap.GatewaysUpdated', function (data) {
+                if (data.status){
+                    Homey.alert(data.status);
+                }
+                getGateways();
+            });
 
             Homey.on('com.linktap.logupdated', function(data)
             {
@@ -257,7 +309,7 @@
                         {
                             if (err) return Homey.alert(err);
                         });
-                        
+
                         Homey.set('UserName', UserNameElement.value, function(err)
                         {
                             if (err) return Homey.alert(err);
@@ -265,6 +317,14 @@
 
                         return Homey.alert(Homey.__('settings.saved'));
                     }
+                });
+            });
+
+            useInternetElement.addEventListener('click', function(e)
+            {
+                Homey.set('useInternet', useInternetElement.checked, function(err)
+                {
+                    if (err) return Homey.alert(err);
                 });
             });
 
@@ -282,6 +342,10 @@
                 });
 
                 return Homey.alert(Homey.__('settings.saved'));
+            });
+
+            autoConfigElement.addEventListener('click', function (e) {
+                Homey.set('autoConfig', autoConfigElement.checked);
             });
 
             logEnabledElement.addEventListener('click', function(e)
@@ -427,7 +491,11 @@
             document.getElementById(tabPage).style.display = "block";
             evt.currentTarget.className += " active";
 
-            if (tabPage == 'log')
+            if (tabPage == 'gateways')
+            {
+                getGateways();
+            }
+            else if (tabPage == 'log')
             {
                 // Refresh the log data
                 Homey.get('logEnabled', function(err, logEnabled)
@@ -469,6 +537,39 @@
             {
                 busyi.hide();
             }
+        }
+
+        function addGateway(gateway)
+        {
+            console.log("addApp");
+            var section = document.getElementById('gatewaySection').innerHTML;
+
+            document.getElementById('gatewaySection').innerHTML = section +
+                '<div class="field row"><p><label class="a">' +
+                gateway.id + ' (Model:' + gateway.model + ') </label><button onClick="Homey.openURL(' + "'http://" + gateway.address + "'" + ')">View</button></p></div>';
+
+        }
+
+        function getGateways()
+        {
+            document.getElementById('gatewaySection').innerHTML = "";
+            Homey.get('gateways', function(err, gatewayList)
+            {
+                if (err) return Homey.alert(err);
+
+                if (gatewayList.length == 0)
+                {
+                    document.getElementById('gatewaySection').innerHTML = "No gateways";
+                }
+                else
+                {
+                    document.getElementById('gatewaySection').innerHTML = "";
+                    gatewayList.forEach(element =>
+                    {
+                        addGateway(element);
+                    });
+                }
+            });
         }
     </script>
 

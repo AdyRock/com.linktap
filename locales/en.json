@@ -1,9 +1,9 @@
 {
     "settings": {
-        "settings": "Settings",
+        "settings": "Internet",
         "detected": "Detected",
         "diagnosticsLog": "Diagnostics Log",
-        "subtitle": "Application Settings",
+        "subtitle": "Account Settings",
         "accountDetails": "Account Details",
         "userName": "LinkTap User Name ( NOT your email )",
         "apiKey": "API Key",
@@ -23,7 +23,11 @@
         "note": "Note",
         "noteText": "If you generate a new key it will invalidate the old key and the anything using it will stop working.",
         "missingUsername": "You need to enter your LinTap Username",
-        "missingPassword": "You need to enter your LinTap Password"
+        "missingPassword": "You need to enter your LinTap Password",
+        "gateways": "Local",
+        "autoConfig": "Auto Configure for local access",
+        "localGateways": "Gateways",
+        "useInternet": "Use Internet Connection"
     },
     "timeRemaining": "Time Remaining",
     "timeActive": "Time Active"
