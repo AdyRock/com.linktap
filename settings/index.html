@@ -7,7 +7,7 @@
     <style>
         label.a {
             display: inline-block;
-            width: 225px;
+            width: 200px;
             height: 15px;
             padding: 5px;
         }
@@ -52,45 +52,45 @@
 
     <!-- SETTINGS PAGE -->
     <div id="settings" class="tabcontent">
-
-        <p data-i18n="settings.subtitle"></p>
-
         <fieldset>
+            <legend><span data-i18n="settings.subtitle"></span></legend>
             <div class="field row">
                 <label for="useInternet"><span data-i18n="settings.useInternet"></span></label>
                 <input id="useInternet" type="checkbox" value="useInternet" />
             </div>
-            <legend><span data-i18n="settings.accountDetails"></span></legend>
-            <fieldset>
-                <div class="field row">
-                    <label for="UserName"><span data-i18n="settings.userName"></span></label>
-                    <input id="UserName" type="text" value="" />
-                </div>
-            </fieldset>
-            <fieldset>
-                <div class="field row">
-                    <label for="APIToken"><span data-i18n="settings.apiKey"></span></label>
-                    <input id="APIToken" type="text" value="" />
-                </div>
-                <div class="field row">
-                    <p></p>
-                    <p><b><span data-i18n="settings.getKeyInstruction1"></span>:</b></p>
-                    <p><span data-i18n="settings.getKeyInstruction2"></span></p>
-                    <p>
-                        <b><span data-i18n="settings.note"></span>:</b> <span data-i18n="settings.noteText"></span>
-                    </p>
-                </div>
-                <div class="field row">
-                    <label for="password"><span data-i18n="settings.password"></span></label>
-                    <input id="password" type="text" value="" />
-                </div>
-                <div class="field row">
-                    <p><button id="getKey" class="right"><span data-i18n="settings.getKey"></span></button></p>
-                </div>
-            </fieldset>
-        </fieldset>
-        <fieldset>
-            <p><button id="save" class="right"><span data-i18n="settings.saveChanges"></span></button></p>
+            <div id="iNetSettings">
+                <fieldset>
+                    <legend><span data-i18n="settings.accountDetails"></span></legend>
+                    <fieldset>
+                        <div class="field row">
+                            <label for="UserName"><span data-i18n="settings.userName"></span></label>
+                            <input id="UserName" type="text" value="" />
+                        </div>
+                    </fieldset>
+                    <fieldset>
+                        <div class="field row">
+                            <label for="APIToken"><span data-i18n="settings.apiKey"></span></label>
+                            <input id="APIToken" type="text" value="" />
+                        </div>
+                        <div class="field row">
+                            <p></p>
+                            <p><b><span data-i18n="settings.getKeyInstruction1"></span>:</b></p>
+                            <p><span data-i18n="settings.getKeyInstruction2"></span></p>
+                            <p>
+                                <b><span data-i18n="settings.note"></span>:</b> <span data-i18n="settings.noteText"></span>
+                            </p>
+                        </div>
+                        <div class="field row">
+                            <label for="password"><span data-i18n="settings.password"></span></label>
+                            <input id="password" type="text" value="" />
+                        </div>
+                        <div class="field row">
+                            <p><button id="getKey" class="right"><span data-i18n="settings.getKey"></span></button></p>
+                        </div>
+                    </fieldset>
+                    <p><button id="save" class="right"><span data-i18n="settings.saveChanges"></span></button></p>
+                </fieldset>
+            </div>
         </fieldset>
     </div>
 
@@ -196,6 +196,14 @@
             {
                 if (err) return Homey.alert(err);
                 useInternetElement.checked = useInternet;
+                if (useInternet)
+                {
+                    document.getElementById('iNetSettings').style.visibility = 'visible';
+                }
+                else
+                {
+                    document.getElementById('iNetSettings').style.visibility = 'hidden';
+                }
             });
 
             Homey.get('autoConfig', function(err, autoConfig)
@@ -204,8 +212,10 @@
                 autoConfigElement.checked = autoConfig;
             });
 
-            Homey.on('com.linktap.GatewaysUpdated', function (data) {
-                if (data.status){
+            Homey.on('com.linktap.GatewaysUpdated', function(data)
+            {
+                if (data.status)
+                {
                     Homey.alert(data.status);
                 }
                 getGateways();
@@ -326,6 +336,15 @@
                 {
                     if (err) return Homey.alert(err);
                 });
+                if (useInternetElement.checked)
+                {
+                    document.getElementById('iNetSettings').style.visibility = 'visible';
+                }
+                else
+                {
+                    document.getElementById('iNetSettings').style.visibility = 'hidden';
+                }
+
             });
 
             saveElement.addEventListener('click', function(e)
@@ -344,7 +363,8 @@
                 return Homey.alert(Homey.__('settings.saved'));
             });
 
-            autoConfigElement.addEventListener('click', function (e) {
+            autoConfigElement.addEventListener('click', function(e)
+            {
                 Homey.set('autoConfig', autoConfigElement.checked);
             });
 
@@ -546,7 +566,7 @@
 
             document.getElementById('gatewaySection').innerHTML = section +
                 '<div class="field row"><p><label class="a">' +
-                gateway.id + ' (Model:' + gateway.model + ') </label><button onClick="Homey.openURL(' + "'http://" + gateway.address + "'" + ')">View</button></p></div>';
+                gateway.gatewayId + ' (Model:' + gateway.model + ') </label><button onClick="Homey.openURL(' + "'http://" + gateway.address + "'" + ')">View</button></p></div>';
 
         }
 

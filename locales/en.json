@@ -3,7 +3,7 @@
         "settings": "Internet",
         "detected": "Detected",
         "diagnosticsLog": "Diagnostics Log",
-        "subtitle": "Account Settings",
+        "subtitle": "Internet Settings",
         "accountDetails": "Account Details",
         "userName": "LinkTap User Name ( NOT your email )",
         "apiKey": "API Key",
