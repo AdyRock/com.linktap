@@ -3,7 +3,8 @@
         "type": "group",
         "label": {
             "en": "Instant Mode settings",
-            "de": "Sofort-Modus Einstellungen"
+            "de": "Sofort-Modus Einstellungen",
+            "nl": "Instant Modus instellingen"
         },
         "children": [
             {
@@ -11,13 +12,15 @@
                 "type": "number",
                 "label": {
                     "en": "Duration",
-                    "de": "Dauer"
+                    "de": "Dauer",
+                    "nl": "Duratie"
                 },
                 "value": 4,
                 "units": "Minutes",
                 "hint": {
                     "en": "The length of time to active the Instant mode",
-                    "de": "Die Zeitdauer zum Aktivieren des Sofort-Modus"
+                    "de": "Die Zeitdauer zum Aktivieren des Sofort-Modus",
+                    "nl": "De tijdsduur voor het activeren van Instant modus"
                 }
             },
             {
@@ -25,12 +28,14 @@
                 "type": "checkbox",
                 "label": {
                     "en": "Eco Mode",
-                    "de": "Eco-Modus"
+                    "de": "Eco-Modus",
+                    "nl": "Eco-Modus"
                 },
                 "value": false,
                 "hint": {
                     "en": "Enable Eco mode so the water switches off and on during while Instant mode is active",
-                    "de": "Aktivieren Sie den Eco-Modus, damit das Wasser während des Sofort-Modus aus- und wieder eingeschaltet wird"
+                    "de": "Aktivieren Sie den Eco-Modus, damit das Wasser während des Sofort-Modus aus- und wieder eingeschaltet wird",
+                    "nl": "Activeer Eco-Modus, zodat watertoevoer aan en uit wordt gezet wanneer Instant modus actief is"
                 }
             },
             {
@@ -38,13 +43,15 @@
                 "type": "number",
                 "label": {
                     "en": "On Time",
-                    "de": "Einschaltzeit"
+                    "de": "Einschaltzeit",
+                    "nl": "Op tijd"
                 },
                 "value": 1,
                 "units": "Minutes",
                 "hint": {
                     "en": "The length of time to switch the water on in Eco mode",
-                    "de": "Die Zeitdauer zum Einschalten des Wassers im Eco-Modus"
+                    "de": "Die Zeitdauer zum Einschalten des Wassers im Eco-Modus",
+                    "nl": "De tijdsduur voor hoe lang het water wordt aangezet in Eco-Modus"
                 }
             },
             {
@@ -52,13 +59,15 @@
                 "type": "number",
                 "label": {
                     "en": "Off Time",
-                    "de": "Ausschaltzeit"
+                    "de": "Ausschaltzeit",
+                    "nl": "Afsluittijd"
                 },
                 "value": 2,
                 "units": "Minutes",
                 "hint": {
                     "en": "The length of time to switch the water off in Eco mode",
-                    "de": "Die Zeitdauer zum Ausschalten des Wassers im Eco-Modus"
+                    "de": "Die Zeitdauer zum Ausschalten des Wassers im Eco-Modus",
+                    "nl": "De tijdsduur om water af te sluiten in Eco-Modus"
                 }
             },
             {
@@ -66,12 +75,14 @@
                 "type": "checkbox",
                 "label": {
                     "en": "Revert to previous plan",
-                    "de": "Zurück zum vorherigen Plan"
+                    "de": "Zurück zum vorherigen Plan",
+                    "nl": "Keer terug naar vorig plan"
                 },
                 "value": true,
                 "hint": {
                     "en": "Revert to previous plan when instant mode has finished",
-                    "de": "Zurück zum vorherigen Plan wenn der Sofort-Modus beendet ist"
+                    "de": "Zurück zum vorherigen Plan wenn der Sofort-Modus beendet ist",
+                    "nl": "Keer terug naar vorig plan wanneer instant modus is beëindigt"
                 }
             }
         ]
