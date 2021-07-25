@@ -2,7 +2,8 @@
     "type": "boolean",
     "title": {
         "en": "Water On",
-        "de": "Wasser an"
+        "de": "Wasser an",
+        "nl": "Water aan"
     },
     "getable": true,
     "setable": false,
@@ -10,10 +11,12 @@
     "insights": true,
     "insightsTitleTrue": {
         "en": "Water Turned on",
-        "de": "Wasser angestellt"
+        "de": "Wasser angestellt",
+        "nl": "Water aangezet"
     },
     "insightsTitleFalse": {
         "en": "Water Turned off",
-        "de": "Wasser ausgestellt"
+        "de": "Wasser ausgestellt",
+        "nl": "Water uitgezet"
     }
 }

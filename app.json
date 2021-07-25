@@ -603,7 +603,8 @@
       "type": "boolean",
       "title": {
         "en": "Broken Alarm",
-        "de": "Bruch Alarm"
+        "de": "Bruch Alarm",
+        "nl": "Kapot Alarm"
       },
       "getable": true,
       "setable": false,
@@ -613,7 +614,8 @@
       "type": "boolean",
       "title": {
         "en": "Fallen Alarm",
-        "de": "Fall Alarm"
+        "de": "Fall Alarm",
+        "nl": "Gevallen Alarm"
       },
       "getable": true,
       "setable": false,
@@ -623,7 +625,8 @@
       "type": "number",
       "title": {
         "en": "Cycles Remaining",
-        "de": "Verbleibende Zyklen"
+        "de": "Verbleibende Zyklen",
+        "nl": "Resterende cyclus"
       },
       "getable": true,
       "setable": false,
@@ -633,7 +636,8 @@
       "type": "number",
       "title": {
         "en": "Signal Strength",
-        "de": "Signalstärke"
+        "de": "Signalstärke",
+        "nl": "Signaalsterkte"
       },
       "getable": true,
       "setable": false,
@@ -644,7 +648,8 @@
       "type": "number",
       "title": {
         "en": "Time Remaining",
-        "de": "Verbleibende Zeit"
+        "de": "Verbleibende Zeit",
+        "nl": "Resterende tijd"
       },
       "units": "Minutes",
       "getable": true,
@@ -655,7 +660,8 @@
       "type": "boolean",
       "title": {
         "en": "Water On",
-        "de": "Wasser an"
+        "de": "Wasser an",
+        "nl": "Water aan"
       },
       "getable": true,
       "setable": false,
@@ -663,18 +669,21 @@
       "insights": true,
       "insightsTitleTrue": {
         "en": "Water Turned on",
-        "de": "Wasser angestellt"
+        "de": "Wasser angestellt",
+        "nl": "Water aangezet"
       },
       "insightsTitleFalse": {
         "en": "Water Turned off",
-        "de": "Wasser ausgestellt"
+        "de": "Wasser ausgestellt",
+        "nl": "Water uitgezet"
       }
     },
     "watering": {
       "type": "boolean",
       "title": {
         "en": "Watering",
-        "de": "Bewässerung"
+        "de": "Bewässerung",
+        "nl": "Irrigratie"
       },
       "getable": true,
       "setable": false,
@@ -682,11 +691,13 @@
       "insights": true,
       "insightsTitleTrue": {
         "en": "Watering Started",
-        "de": "Bewässerung gestartet"
+        "de": "Bewässerung gestartet",
+        "nl": "Irrigratie gestart"
       },
       "insightsTitleFalse": {
         "en": "Watering Finished",
-        "de": "Bewässerung beendet"
+        "de": "Bewässerung beendet",
+        "nl": "Irrigratie beëindigd"
       }
     },
     "watering_mode": {
@@ -696,42 +707,48 @@
       "uiComponent": "picker",
       "title": {
         "en": "Watering Mode",
-        "de": "Bewässerungsmodus"
+        "de": "Bewässerungsmodus",
+        "nl": "Irrigratiemodus"
       },
       "values": [
         {
           "id": "M",
           "title": {
             "en": "Instant Mode",
-            "de": "Sofort-Modus"
+            "de": "Sofort-Modus",
+            "nl": "Instant-Modus"
           }
         },
         {
           "id": "I",
           "title": {
             "en": "Interval Mode",
-            "de": "Intervall-Modus"
+            "de": "Intervall-Modus",
+            "nl": "Interval-Modus"
           }
         },
         {
           "id": "O",
           "title": {
             "en": "Odd and Even Mode",
-            "de": "Ungerade- und Gerade-Modus"
+            "de": "Ungerade- und Gerade-Modus",
+            "nl": "Oneven en even modus"
           }
         },
         {
           "id": "T",
           "title": {
             "en": "Seven Day Mode",
-            "de": "Sieben-Tage-Modus"
+            "de": "Sieben-Tage-Modus",
+            "nl": "Zeven dagen modus"
           }
         },
         {
           "id": "Y",
           "title": {
             "en": "Month Mode",
-            "de": "Monats-Modus"
+            "de": "Monats-Modus",
+            "nl": "Maand modus"
           }
         }
       ]

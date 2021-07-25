@@ -5,42 +5,48 @@
     "uiComponent": "picker",
     "title": {
         "en": "Watering Mode",
-        "de": "Bewässerungsmodus"
+        "de": "Bewässerungsmodus",
+        "nl": "Irrigratiemodus"
     },
     "values": [
         {
             "id": "M",
             "title": {
                 "en": "Instant Mode",
-                "de": "Sofort-Modus"
+                "de": "Sofort-Modus",
+                "nl": "Instant-Modus"
             }
         },
         {
             "id": "I",
             "title": {
                 "en": "Interval Mode",
-                "de": "Intervall-Modus"
+                "de": "Intervall-Modus",
+                "nl": "Interval-Modus"
             }
         },
         {
             "id": "O",
             "title": {
                 "en": "Odd and Even Mode",
-                "de": "Ungerade- und Gerade-Modus"
+                "de": "Ungerade- und Gerade-Modus",
+                "nl": "Oneven en even modus"
             }
         },
         {
             "id": "T",
             "title": {
                 "en": "Seven Day Mode",
-                "de": "Sieben-Tage-Modus"
+                "de": "Sieben-Tage-Modus",
+                "nl": "Zeven dagen modus"
             }
         },
         {
             "id": "Y",
             "title": {
                 "en": "Month Mode",
-                "de": "Monats-Modus"
+                "de": "Monats-Modus",
+                "nl": "Maand modus"
             }
         }
     ]
