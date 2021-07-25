@@ -31,5 +31,8 @@
     },
     "0.0.12": {
         "en": "Added a button to obtain an API key"
+    },
+    "0.0.13": {
+        "en": "Added Dutch translation courtesy of Roy Kokkelkoren"
     }
 }
