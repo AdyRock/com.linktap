@@ -2,7 +2,8 @@
     "type": "boolean",
     "title": {
         "en": "Watering",
-        "de": "Bewässerung"
+        "de": "Bewässerung",
+        "nl": "Irrigratie"
     },
     "getable": true,
     "setable": false,
@@ -10,10 +11,12 @@
     "insights": true,
     "insightsTitleTrue": {
         "en": "Watering Started",
-        "de": "Bewässerung gestartet"
+        "de": "Bewässerung gestartet",
+        "nl": "Irrigratie gestart"
     },
     "insightsTitleFalse": {
         "en": "Watering Finished",
-        "de": "Bewässerung beendet"
+        "de": "Bewässerung beendet",
+        "nl": "Irrigratie beëindigd"
     }
 }

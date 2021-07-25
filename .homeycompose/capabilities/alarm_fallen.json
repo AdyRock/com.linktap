@@ -2,7 +2,8 @@
     "type": "boolean",
     "title": {
         "en": "Fallen Alarm",
-        "de": "Fall Alarm"
+        "de": "Fall Alarm",
+        "nl": "Gevallen Alarm"
     },
     "getable": true,
     "setable": false,

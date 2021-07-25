@@ -2,7 +2,8 @@
     "type": "boolean",
     "title": {
         "en": "Broken Alarm",
-        "de": "Bruch Alarm"
+        "de": "Bruch Alarm",
+        "nl": "Kapot Alarm"
     },
     "getable": true,
     "setable": false,

@@ -2,7 +2,8 @@
     "type": "number",
     "title": {
         "en": "Cycles Remaining",
-        "de": "Verbleibende Zyklen"
+        "de": "Verbleibende Zyklen",
+        "nl": "Resterende cyclus"
     },
     "getable": true,
     "setable": false,

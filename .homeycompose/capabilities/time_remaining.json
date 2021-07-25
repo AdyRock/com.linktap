@@ -2,7 +2,8 @@
     "type": "number",
     "title": {
         "en": "Time Remaining",
-        "de": "Verbleibende Zeit"
+        "de": "Verbleibende Zeit",
+        "nl": "Resterende tijd"
     },
     "units": "Minutes",
     "getable": true,
