@@ -98,7 +98,7 @@
             "title": {
                 "en": "Valve !{{has|hasn't}} fallen",
                 "de": "Ventil !{{ist|ist nicht}} gefallen",
-                "en": "Kraan !{{is|is niet}} gevallen"
+                "nl": "Kraan !{{is|is niet}} gevallen"
             },
             "hint": {
                 "en": "This Flow will continue if the valve has/has not fallen down.",
@@ -214,7 +214,7 @@
                     "title": {
                         "en": "Action at end",
                         "de": "Aktion am Ende",
-                        "de": "Actie aan het einde"
+                        "nl": "Actie aan het einde"
                     },
                     "values": [
                         {

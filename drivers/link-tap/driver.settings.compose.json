@@ -4,7 +4,7 @@
         "label": {
             "en": "Instant Mode settings",
             "de": "Sofort-Modus Einstellungen",
-            "en": "Instant Modus instellingen"
+            "nl": "Instant Modus instellingen"
         },
         "children": [
             {
@@ -13,7 +13,7 @@
                 "label": {
                     "en": "Duration",
                     "de": "Dauer",
-                    "en": "Duratie"
+                    "nl": "Duratie"
                 },
                 "value": 4,
                 "units": "Minutes",
@@ -35,7 +35,7 @@
                 "hint": {
                     "en": "Enable Eco mode so the water switches off and on during while Instant mode is active",
                     "de": "Aktivieren Sie den Eco-Modus, damit das Wasser während des Sofort-Modus aus- und wieder eingeschaltet wird",
-                    "en": "Activeer Eco-Modus, zodat watertoevoer aan en uit wordt gezet wanneer Instant modus actief is"
+                    "nl": "Activeer Eco-Modus, zodat watertoevoer aan en uit wordt gezet wanneer Instant modus actief is"
                 }
             },
             {
@@ -44,7 +44,7 @@
                 "label": {
                     "en": "On Time",
                     "de": "Einschaltzeit",
-                    "en": "Op tijd"
+                    "nl": "Op tijd"
                 },
                 "value": 1,
                 "units": "Minutes",
@@ -60,7 +60,7 @@
                 "label": {
                     "en": "Off Time",
                     "de": "Ausschaltzeit",
-                    "en": "Afsluittijd"
+                    "nl": "Afsluittijd"
                 },
                 "value": 2,
                 "units": "Minutes",
@@ -76,7 +76,7 @@
                 "label": {
                     "en": "Revert to previous plan",
                     "de": "Zurück zum vorherigen Plan",
-                    "en": "Keer terug naar vorig plan"
+                    "nl": "Keer terug naar vorig plan"
                 },
                 "value": true,
                 "hint": {

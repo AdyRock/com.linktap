@@ -216,8 +216,9 @@
       {
         "id": "alarm_fallen",
         "title": {
-          "en": "Kraan !{{is|is niet}} gevallen",
-          "de": "Ventil !{{ist|ist nicht}} gefallen"
+          "en": "Valve !{{has|hasn't}} fallen",
+          "de": "Ventil !{{ist|ist nicht}} gefallen",
+          "nl": "Kraan !{{is|is niet}} gevallen"
         },
         "hint": {
           "en": "This Flow will continue if the valve has/has not fallen down.",
@@ -351,7 +352,8 @@
             "type": "dropdown",
             "title": {
               "en": "Action at end",
-              "de": "Actie aan het einde"
+              "de": "Aktion am Ende",
+              "nl": "Actie aan het einde"
             },
             "values": [
               {
@@ -508,16 +510,18 @@
         {
           "type": "group",
           "label": {
-            "en": "Instant Modus instellingen",
-            "de": "Sofort-Modus Einstellungen"
+            "en": "Instant Mode settings",
+            "de": "Sofort-Modus Einstellungen",
+            "nl": "Instant Modus instellingen"
           },
           "children": [
             {
               "id": "watering_duration",
               "type": "number",
               "label": {
-                "en": "Duratie",
-                "de": "Dauer"
+                "en": "Duration",
+                "de": "Dauer",
+                "nl": "Duratie"
               },
               "value": 4,
               "units": "Minutes",
@@ -537,16 +541,18 @@
               },
               "value": false,
               "hint": {
-                "en": "Activeer Eco-Modus, zodat watertoevoer aan en uit wordt gezet wanneer Instant modus actief is",
-                "de": "Aktivieren Sie den Eco-Modus, damit das Wasser während des Sofort-Modus aus- und wieder eingeschaltet wird"
+                "en": "Enable Eco mode so the water switches off and on during while Instant mode is active",
+                "de": "Aktivieren Sie den Eco-Modus, damit das Wasser während des Sofort-Modus aus- und wieder eingeschaltet wird",
+                "nl": "Activeer Eco-Modus, zodat watertoevoer aan en uit wordt gezet wanneer Instant modus actief is"
               }
             },
             {
               "id": "on_duration",
               "type": "number",
               "label": {
-                "en": "Op tijd",
-                "de": "Einschaltzeit"
+                "en": "On Time",
+                "de": "Einschaltzeit",
+                "nl": "Op tijd"
               },
               "value": 1,
               "units": "Minutes",
@@ -560,8 +566,9 @@
               "id": "off_duration",
               "type": "number",
               "label": {
-                "en": "Afsluittijd",
-                "de": "Ausschaltzeit"
+                "en": "Off Time",
+                "de": "Ausschaltzeit",
+                "nl": "Afsluittijd"
               },
               "value": 2,
               "units": "Minutes",
@@ -575,8 +582,9 @@
               "id": "revert",
               "type": "checkbox",
               "label": {
-                "en": "Keer terug naar vorig plan",
-                "de": "Zurück zum vorherigen Plan"
+                "en": "Revert to previous plan",
+                "de": "Zurück zum vorherigen Plan",
+                "nl": "Keer terug naar vorig plan"
               },
               "value": true,
               "hint": {
