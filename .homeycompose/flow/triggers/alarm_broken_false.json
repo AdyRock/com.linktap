@@ -1,0 +1,17 @@
+{
+    "title": {
+        "en": "The valve is repaired",
+        "de": "Das Ventil ist repariert"
+    },
+    "hint": {
+        "en": "When the valve in not broken",
+        "de": "Wenn das Ventil nicht defekt ist"
+    },
+    "args": [
+      {
+        "type": "device",
+        "name": "device",
+        "filter": "driver_id=link-tap|link-tap-local"
+      }
+    ]
+}

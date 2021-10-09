@@ -1,0 +1,96 @@
+{
+    "actions": [
+        {
+            "id": "activate_instant_mode_local",
+            "title": {
+                "en": "Activate Instant Mode",
+                "de": "Sofort-Modus aktivieren"
+            },
+            "titleFormatted": {
+                "en": "Activate Instant Mode for [[water_duration]] minutes",
+                "de": "Sofort-Modus für [[water_duration]] Minuten aktivieren."
+            },
+            "args": [
+                {
+                    "name": "water_duration",
+                    "type": "number",
+                    "min": 1,
+                    "max": 60,
+                    "placeholder": {
+                        "en": "Minutes",
+                        "de": "Minuten"
+                    },
+                    "title": {
+                        "en": "Duration",
+                        "de": "Dauer"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "turn_off_instant_mode_local",
+            "title": {
+                "en": "Turn Off Instant Mode",
+                "de": "Sofort-Modus ausschalten"
+            }
+        },
+        {
+            "id": "activate_watering_mode_local",
+            "title": {
+                "en": "Activate Watering Mode",
+                "de": "Bewässerungsmodus aktivieren"
+            },
+            "titleFormatted": {
+                "en": "Activate [[mode]] Watering Mode",
+                "de": "Bewässerungsmodus aktivieren '[[mode]]'"
+            },
+            "args": [
+                {
+                    "name": "mode",
+                    "type": "dropdown",
+                    "title": {
+                        "en": "Watering",
+                        "de": "Bewässerungsmodus"
+                    },
+                    "values": [
+                        {
+                            "id": "M",
+                            "label": {
+                                "en": "Manual",
+                                "de": ""
+                            }
+                        },
+                        {
+                            "id": "I",
+                            "label": {
+                                "en": "Interval",
+                                "de": "Intervall-Modus"
+                            }
+                        },
+                        {
+                            "id": "O",
+                            "label": {
+                                "en": "Odd and Even",
+                                "de": "Ungerade- und Gerade-Modus"
+                            }
+                        },
+                        {
+                            "id": "T",
+                            "label": {
+                                "en": "Seven day",
+                                "de": "Sieben-Tage-Modus"
+                            }
+                        },
+                        {
+                            "id": "Y",
+                            "label": {
+                                "en": "Month",
+                                "de": "Monats-Modus"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

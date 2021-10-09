@@ -1,0 +1,17 @@
+{
+    "title": {
+        "en": "Watering has finished",
+        "de": "Bewässerung ist beendet"
+    },
+    "hint": {
+        "en": "When the watering has finished",
+        "de": "Wenn die Bewässerung beendet ist"
+    },
+    "args": [
+      {
+        "type": "device",
+        "name": "device",
+        "filter": "driver_id=link-tap|link-tap-local"
+      }
+    ]
+}

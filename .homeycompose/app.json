@@ -1,67 +1,73 @@
 {
-    "id": "com.linktap",
-    "version": "0.0.12",
-    "compatibility": ">=5.0.0",
-    "sdk": 3,
-    "brandColor": "#FF7D4B",
-    "name": {
-        "en": "LinkTap"
-    },
-    "description": {
-        "en": "A water timer that gives you total peace of mind.",
-        "de": "Ein Bewässerungssystem, das Ihnen absolute Sicherheit gibt."
-    },
-    "category": [
-        "climate"
-    ],
-    "permissions": [],
-    "contributing": {
-        "donate": {
-            "paypal": {
-                "username": "adyrock"
-            }
-        }
-    },
-    "bugs": {
-        "url": "https://github.com/AdyRock/com.linktap/issues"
-    },
-    "source": "https://github.com/AdyRock/com.linktap",
-    "homeyCommunityTopicId": 43963,
-    "images": {
-        "large": "/assets/images/large.jpg",
-        "small": "/assets/images/small.jpg"
-    },
-    "author": {
-        "name": "Adrian Rockall",
-        "email": "ady@rockall.plus.com"
-    },
-    "api": {
-        "getLog": {
-            "method": "get",
-            "path": "/getLog/"
-        },
-        "getDetect": {
-            "method": "get",
-            "path": "/getDetect/"
-        },
-        "getAPIKey": {
-            "method": "post",
-            "path": "/getAPIKey/"
-        },
-        "clearLog": {
-            "method": "post",
-            "path": "/clearLog/"
-        },
-        "sendLog": {
-            "method": "post",
-            "path": "/sendLog/"
-        }
-    },
-    "contributors": {
-        "translators": [
-            {
-                "name": "Dirk Göbel"
-            }
-        ]
+  "id": "com.linktap",
+  "version": "0.1.0",
+  "compatibility": ">=5.0.0",
+  "platforms": [
+    "local",
+    "cloud"
+  ],
+  "sdk": 3,
+  "brandColor": "#ff7d4b",
+  "name": {
+    "en": "LinkTap"
+  },
+  "description": {
+    "en": "A water timer that gives you total peace of mind.",
+    "de": "Ein Bewässerungssystem, das Ihnen absolute Sicherheit gibt."
+  },
+  "category": [
+    "climate"
+  ],
+  "permissions": [],
+  "support": "https://github.com/AdyRock/com.linktap/issues",
+  "homepage": "https://www.link-tap.com/",
+  "contributing": {
+    "donate": {
+      "paypal": {
+        "username": "adyrock"
+      }
     }
+  },
+  "bugs": {
+    "url": "https://github.com/AdyRock/com.linktap/issues"
+  },
+  "source": "https://github.com/AdyRock/com.linktap",
+  "homeyCommunityTopicId": 43963,
+  "images": {
+    "large": "/assets/images/large.jpg",
+    "small": "/assets/images/small.jpg"
+  },
+  "author": {
+    "name": "Adrian Rockall",
+    "email": "ady@rockall.plus.com"
+  },
+  "api": {
+    "getLog": {
+      "method": "get",
+      "path": "/getLog/"
+    },
+    "getDetect": {
+      "method": "get",
+      "path": "/getDetect/"
+    },
+    "getAPIKey": {
+      "method": "post",
+      "path": "/getAPIKey/"
+    },
+    "clearLog": {
+      "method": "post",
+      "path": "/clearLog/"
+    },
+    "sendLog": {
+      "method": "post",
+      "path": "/sendLog/"
+    }
+  },
+  "contributors": {
+    "translators": [
+      {
+        "name": "Dirk Göbel"
+      }
+    ]
+  }
 }

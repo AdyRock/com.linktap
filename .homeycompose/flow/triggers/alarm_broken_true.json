@@ -1,0 +1,17 @@
+{
+    "title": {
+        "en": "The valve is broken",
+        "de": "Das Ventil ist defekt"
+    },
+    "hint": {
+        "en": "When the valve fails",
+        "de": "Wenn das Ventil ausfällt"
+    },
+    "args": [
+      {
+        "type": "device",
+        "name": "device",
+        "filter": "driver_id=link-tap|link-tap-local"
+      }
+    ]
+}

@@ -13,17 +13,10 @@ const http = require("http");
 const nodemailer = require("nodemailer");
 
 const aedes = require('aedes')();
-const server = require('net').createServer(aedes.handle);
+const net = require('net')
+//const server = require('net').createServer(aedes.handle);
 const port = 49876;
-aedes.authenticate = function(client, username, password, callback)
-{
-    callback(null, (username === 'homeyApp') && (password.toString() === 'fred69'));
-};
-server.listen(port, function()
-{
-    console.log('server started and listening on port ', port);
-});
-var mqtt = require('mqtt');
+const mqtt = require('mqtt');
 
 class MyApp extends Homey.App
 {
@@ -34,27 +27,9 @@ class MyApp extends Homey.App
     {
         this.log('MyApp has been initialized');
         this.diagLog = "";
-        this.useInternet = this.homey.settings.get('useInternet');
+        this.homeyIP = null;
 
-        this.mDNSGateways = this.homey.settings.get('gateways');
-//        if (!this.mDNSGateways)
-        {
-            this.mDNSGateways = [];
-        }
-
-        this.autoConfigGateway = this.homey.settings.get('autoConfig');
-
-        this.discoveryStrategy = this.homey.discovery.getStrategy("link_tap");
-
-        let result = this.discoveryStrategy.getDiscoveryResults();
-        this.log("Got mDNS result:", result);
-        //this.mDNSGatewaysUpdate(result);
-
-        this.discoveryStrategy.on("result", discoveryResult =>
-        {
-            this.log("Got mDNS result:", discoveryResult);
-            this.mDNSGatewaysUpdate(discoveryResult);
-        });
+        await this.setupLocalAccess();
 
         if (process.env.DEBUG === '1')
         {
@@ -65,7 +40,61 @@ class MyApp extends Homey.App
             this.homey.settings.set('debugMode', false);
         }
 
-        this.homey.settings.on('set', (key) =>
+        const activateInstantMode = this.homey.flow.getActionCard('activate_instant_mode');
+        activateInstantMode
+            .registerRunListener(async (args, state) =>
+            {
+                this.log("activate_instant_mode");
+                return args.device.activateInstantMode(true, args.water_duration, (args.eco_mode === 'on'), args.on_time, args.off_time, (args.revert === 'on'));
+            });
+
+        const turnOffInstantMode = this.homey.flow.getActionCard("turn_off_instant_mode");
+        turnOffInstantMode
+            .registerRunListener(async (args, state) =>
+            {
+                this.log("turn_off_instant_mode");
+                return args.device.activateInstantMode(false);
+            });
+
+        const activateWateringMode = this.homey.flow.getActionCard("activate_watering_mode");
+        activateWateringMode
+            .registerRunListener(async (args, state) =>
+            {
+                this.log("activate_watering_mode");
+                return args.device.activateWateringMode(true, args.mode);
+            });
+
+        let wateringCondition = this.homey.flow.getConditionCard('is_watering');
+        wateringCondition.registerRunListener(async (args, state) =>
+        {
+            return args.device.isWatering; // true or false
+        });
+
+        const activateInstantModeLocal = this.homey.flow.getActionCard('activate_instant_mode_local');
+        activateInstantModeLocal
+            .registerRunListener(async (args, state) =>
+            {
+                this.log("activate_instant_mode");
+                return args.device.onCapabilityOnOff(true, { duration: args.water_duration });
+            });
+
+        const turnOffInstantModeLocal = this.homey.flow.getActionCard("turn_off_instant_mode_local");
+        turnOffInstantModeLocal
+            .registerRunListener(async (args, state) =>
+            {
+                this.log("turn_off_instant_mode");
+                return args.device.onCapabilityOnOff(false);
+            });
+
+        const activateWateringModeLocal = this.homey.flow.getActionCard("activate_watering_mode_local");
+        activateWateringModeLocal
+            .registerRunListener(async (args, state) =>
+            {
+                this.log("activate_watering_mode");
+                return args.device.onCapabilityWateringMode(args.mode);
+            });
+
+        this.homey.settings.on('set', async (key) =>
         {
             if (key === 'APIToken')
             {
@@ -83,10 +112,6 @@ class MyApp extends Homey.App
                     this.checkGatewaysConfiguration();
                 }
             }
-            else if (key === 'useInternet')
-            {
-                this.useInternet = this.homey.settings.get('useInternet');
-            }
         });
 
         this.APIToken = this.homey.settings.get('APIToken');
@@ -96,6 +121,54 @@ class MyApp extends Homey.App
 
         this.onDevicePoll = this.onDevicePoll.bind(this);
         this.restartPolling(60);
+
+    }
+
+    async setupLocalAccess()
+    {
+        let homeyLocalURL = null;
+        try
+        {
+            homeyLocalURL = await this.homey.cloud.getLocalAddress();
+            this.cloudOnly = false;
+        }
+        catch (err)
+        {
+            this.cloudOnly = true;
+            return false;
+        }
+
+        const server = net.createServer(aedes.handle);
+        server.listen(port, function()
+        {
+            console.log('server started and listening on port ', port);
+        });
+        aedes.authenticate = function(client, username, password, callback)
+        {
+            callback(null, (username === 'homeyApp') && (password.toString() === 'fred69'));
+        };
+
+        this.homeyIP = await homeyLocalURL.split(":")[0];
+
+        this.mDNSGateways = this.homey.settings.get('gateways');
+        this.mDNSGateways = [];
+
+        this.autoConfigGateway = this.homey.settings.get('autoConfig');
+
+        this.discoveryStrategy = this.homey.discovery.getStrategy("link_tap");
+
+        let discoveryResult = this.discoveryStrategy.getDiscoveryResults();
+        this.log("Got initial mDNS result:", discoveryResult);
+        if (discoveryResult && discoveryResult.address)
+        {
+            this.mDNSGatewaysUpdate(discoveryResult);
+        }
+
+        this.discoveryStrategy.on("result", discoveryResult =>
+        {
+            this.log("Got mDNS result:", discoveryResult);
+            this.mDNSGatewaysUpdate(discoveryResult);
+        });
 
         let _this = this;
         this.client = mqtt.connect('mqtt://localhost:49876', { clientId: "homeyLinkTapApp", username: "homeyApp", password: "fred69" });
@@ -164,6 +237,8 @@ class MyApp extends Homey.App
                 console.log(topic, err);
             }
         });
+
+        return true;
     }
 
     updateDetectedDevices(tapLinkData)
@@ -191,7 +266,7 @@ class MyApp extends Homey.App
                     let newTapLinker = {
                         "location": "",
                         "taplinkerName": tapLinker1.dev_id,
-                        "taplinkerId": tapLinker1.dev_id,                
+                        "taplinkerId": tapLinker1.dev_id,
                     };
                     gatewayTapLinkers.push(newTapLinker);
                     this.homey.settings.set('gateways', this.mDNSGateways);
@@ -248,7 +323,6 @@ class MyApp extends Homey.App
     async checkGatewayConfiguration(gateway)
     {
         // Check if gateway already configured
-        const homeyIP = await (await this.homey.cloud.getLocalAddress()).split(":")[0];
         const res = await this.GetURL("http://" + gateway.address, {});
         const hostPos = res.search("#HOST");
         if (hostPos > 0)
@@ -258,10 +332,10 @@ class MyApp extends Homey.App
             hostValue = hostValue.split('"');
             hostValue = hostValue[1];
 
-            if (hostValue !== homeyIP)
+            if (hostValue !== this.homeyIP)
             {
                 // the gateway needs to be configured for local access
-                this.updateGatewayConfiguration(gateway, homeyIP);
+                this.updateGatewayConfiguration(gateway, this.homeyIP);
             }
         }
     }
@@ -328,7 +402,7 @@ class MyApp extends Homey.App
         const drivers = this.homey.drivers.getDrivers();
         for (const driver in drivers)
         {
-            let devices = this.homey.drivers.getDriver(driver).getDevices();
+            let devices = this.homey.drivers.getDriver(driver).getDevices(false);
             let numDevices = devices.length;
             for (var i = 0; i < numDevices; i++)
             {
@@ -354,7 +428,7 @@ class MyApp extends Homey.App
     restartPolling(initialDelay)
     {
         this.homey.clearTimeout(this.timerPollID);
-        if (this.useInternet)
+        if (this.APIToken)
         {
             this.timerPollID = this.homey.setTimeout(this.onDevicePoll, (1000 * initialDelay));
         }
@@ -362,81 +436,78 @@ class MyApp extends Homey.App
 
     async onDevicePoll()
     {
-        if (this.useInternet)
+        const searchData = await this.getDeviceData();
+        const promises = [];
+        const drivers = this.homey.drivers.getDrivers();
+        for (const driver in drivers)
         {
-            const searchData = await this.getDeviceData();
-            const promises = [];
-            const drivers = this.homey.drivers.getDrivers();
-            for (const driver in drivers)
+            let devices = this.homey.drivers.getDriver(driver).getDevices(true);
+            let numDevices = devices.length;
+            for (var i = 0; i < numDevices; i++)
             {
-                let devices = this.homey.drivers.getDriver(driver).getDevices();
-                let numDevices = devices.length;
-                for (var i = 0; i < numDevices; i++)
+                let device = devices[i];
+                if (device.updateDeviceValues)
                 {
-                    let device = devices[i];
-                    if (device.updateDeviceValues)
-                    {
-                        promises.push(device.updateDeviceValues(searchData));
-                    }
+                    promises.push(device.updateDeviceValues(searchData));
                 }
             }
-
-            await Promise.all(promises);
-
-            this.timerPollID = this.homey.setTimeout(this.onDevicePoll, (1000 * 60 * 5));
         }
+
+        await Promise.all(promises);
+
+        this.timerPollID = this.homey.setTimeout(this.onDevicePoll, (1000 * 60 * 5));
     }
 
     async getDeviceData()
     {
         let searchData = null;
 
-        if (this.useInternet)
+        if (this.homey.settings.get('debugMode'))
         {
-            if (this.homey.settings.get('debugMode'))
+            const simData = this.homey.settings.get('simData');
+            if (simData)
             {
-                const simData = this.homey.settings.get('simData');
-                if (simData)
-                {
-                    return JSON.parse(simData);
-                }
+                return JSON.parse(simData);
             }
+        }
 
-            if (!this.lastDetectionTime || (Date.now() - this.lastDetectionTime > (1000 * 60 * 5)))
+        if (!this.lastDetectionTime || (Date.now() - this.lastDetectionTime > (1000 * 60 * 5)))
+        {
+            try
             {
-                try
+                // More than 5 minutes since last request
+                //https://www.link-tap.com/api/getAllDevices
+                const url = "getAllDevices";
+                let response = await this.PostURL(url, {});
+                searchData = response.devices;
+                this.detectedDevices = this.varToString(searchData);
+                this.lastDetectionTime = Date.now();
+                this.homey.settings.set('detectedDevices', this.detectedDevices);
+                this.homey.settings.set('lastDetectionTime', this.lastDetectionTime);
+                if (!this.cloudOnly)
                 {
-                    // More than 5 minutes since last request
-                    //https://www.link-tap.com/api/getAllDevices
-                    const url = "getAllDevices";
-                    let response = await this.PostURL(url, {});
-                    searchData = response.devices;
-                    this.detectedDevices = this.varToString(searchData);
-                    this.lastDetectionTime = Date.now();
-                    this.homey.settings.set('detectedDevices', this.detectedDevices);
-                    this.homey.settings.set('lastDetectionTime', this.lastDetectionTime);
                     this.homey.api.realtime('com.linktap.detectedDevicesUpdated', { 'devices': this.detectedDevices });
                 }
-                catch (err)
-                {
-                    this.updateLog(this.varToString(err));
-                    return null;
-                }
             }
-            else
+            catch (err)
             {
-                searchData = JSON.parse(this.detectedDevices);
+                this.updateLog(this.varToString(err));
+                return null;
             }
+        }
+        else
+        {
+            searchData = JSON.parse(this.detectedDevices);
         }
         return searchData;
     }
 
-    async getDevices()
+    async getDevices(useInternet)
     {
         const devices = [];
         let searchData = null;
 
-        if (this.useInternet)
+        if (useInternet)
         {
             searchData = await this.getDeviceData();
         }
@@ -798,7 +869,10 @@ class MyApp extends Homey.App
             {
                 this.diagLog = this.diagLog.substr(this.diagLog.length - 60000);
             }
-            this.homey.api.realtime('com.linktap.logupdated', { 'log': this.diagLog });
+            if (!this.cloudOnly)
+            {
+                this.homey.api.realtime('com.linktap.logupdated', { 'log': this.diagLog });
+            }
         }
     }
 

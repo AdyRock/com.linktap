@@ -1,14 +1,14 @@
 {
-  "id": "link-tap",
+  "id": "link-tap-local",
   "name": {
-    "en": "LinkTap (cloud)"
+    "en": "LinkTap (local)"
   },
+  "deprecated": true,
   "platforms": [
-    "local",
-    "cloud"
+    "local"
   ],
   "connectivity": [
-    "cloud"
+    "lan"
   ],
   "class": "other",
   "energy": {
@@ -19,6 +19,7 @@
   },
   "capabilities": [
     "onoff",
+    "clear_alarms",
     "measure_battery",
     "watering_mode",
     "alarm_fallen",
@@ -39,9 +40,6 @@
   },
   "pair": [
     {
-      "id": "my_connect"
-    },
-    {
       "id": "list_my_devices",
       "template": "list_devices",
       "navigation": {
@@ -51,11 +49,6 @@
     {
       "id": "add_my_devices",
       "template": "add_devices"
-    }
-  ],
-  "repair": [
-    {
-      "id": "my_repair"
     }
   ],
   "images": {

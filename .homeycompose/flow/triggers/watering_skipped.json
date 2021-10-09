@@ -1,0 +1,33 @@
+{
+    "title": {
+        "en": "The watering cycle has been skipped"
+    },
+    "hint": {
+        "en": "When the watering cycle has been skipped due to rain"
+    },
+    "tokens":[
+        {
+            "name": "past_rainfall",
+            "type": "number",
+            "title": {
+                "en": "Past Rainfall"
+            },
+            "example": 2.5
+        },
+        {
+            "name": "forecast_rainfall",
+            "type": "number",
+            "title": {
+                "en": "Forecast Rainfall"
+            },
+            "example": 2.5
+        }
+    ],
+    "args": [
+      {
+        "type": "device",
+        "name": "device",
+        "filter": "driver_id=link-tap|link-tap-local"
+      }
+    ]
+}

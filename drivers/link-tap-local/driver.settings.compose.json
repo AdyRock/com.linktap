@@ -1,0 +1,25 @@
+[
+    {
+        "type": "group",
+        "label": {
+            "en": "Instant Mode settings",
+            "de": "Sofort-Modus Einstellungen"
+        },
+        "children": [
+            {
+                "id": "watering_duration",
+                "type": "number",
+                "label": {
+                    "en": "Duration",
+                    "de": "Dauer"
+                },
+                "value": 4,
+                "units": "Minutes",
+                "hint": {
+                    "en": "The length of time to active the Instant mode",
+                    "de": "Die Zeitdauer zum Aktivieren des Sofort-Modus"
+                }
+            }
+        ]
+    }
+]

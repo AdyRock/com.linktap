@@ -1,0 +1,17 @@
+{
+    "title": {
+        "en": "Watering !{{is|isn't}} in progress",
+        "de": "Bewässerung !{{ist|ist nicht}} aktiv"
+    },
+    "hint": {
+        "en": "This Flow will continue if watering is/is not currently in progress.",
+        "de": "Dieser Flow wird fortgeführt, wenn die Bewässerung derzeit aktiv/nicht aktiv ist."
+    },
+    "args": [
+      {
+        "type": "device",
+        "name": "device",
+        "filter": "driver_id=link-tap|link-tap-local"
+      }
+    ]
+}

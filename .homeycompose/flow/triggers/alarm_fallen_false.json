@@ -1,0 +1,17 @@
+{
+    "title": {
+        "en": "The valve has been put back",
+        "de": "Das Ventil wurde wieder angeschlossen"
+    },
+    "hint": {
+        "en": "When the valve has been put back",
+        "de": "Wenn das Ventil wieder angeschlossen wurde"
+    },
+    "args": [
+      {
+        "type": "device",
+        "name": "device",
+        "filter": "driver_id=link-tap|link-tap-local"
+      }
+    ]
+}

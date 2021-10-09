@@ -54,10 +54,6 @@
     <div id="settings" class="tabcontent">
         <fieldset>
             <legend><span data-i18n="settings.subtitle"></span></legend>
-            <div class="field row">
-                <label for="useInternet"><span data-i18n="settings.useInternet"></span></label>
-                <input id="useInternet" type="checkbox" value="useInternet" />
-            </div>
             <div id="iNetSettings">
                 <fieldset>
                     <legend><span data-i18n="settings.accountDetails"></span></legend>
@@ -156,7 +152,6 @@
         // Create the busy indicator
         var busyi = new busy_indicator(document.getElementById("busybox"), document.querySelector("#busybox div"));
 
-        var useInternetElement = document.getElementById('useInternet');
         var UserNameElement = document.getElementById('UserName');
         var APITokenElement = document.getElementById('APIToken');
         var passwordElement = document.getElementById('password');
@@ -191,20 +186,6 @@
             });
 
             document.getElementById("defaultOpen").click();
-
-            Homey.get('useInternet', function(err, useInternet)
-            {
-                if (err) return Homey.alert(err);
-                useInternetElement.checked = useInternet;
-                if (useInternet)
-                {
-                    document.getElementById('iNetSettings').style.visibility = 'visible';
-                }
-                else
-                {
-                    document.getElementById('iNetSettings').style.visibility = 'hidden';
-                }
-            });
 
             Homey.get('autoConfig', function(err, autoConfig)
             {
@@ -328,23 +309,6 @@
                         return Homey.alert(Homey.__('settings.saved'));
                     }
                 });
-            });
-
-            useInternetElement.addEventListener('click', function(e)
-            {
-                Homey.set('useInternet', useInternetElement.checked, function(err)
-                {
-                    if (err) return Homey.alert(err);
-                });
-                if (useInternetElement.checked)
-                {
-                    document.getElementById('iNetSettings').style.visibility = 'visible';
-                }
-                else
-                {
-                    document.getElementById('iNetSettings').style.visibility = 'hidden';
-                }
-
             });
 
             saveElement.addEventListener('click', function(e)

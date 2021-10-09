@@ -1,10 +1,14 @@
 {
   "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
   "id": "com.linktap",
-  "version": "0.0.12",
+  "version": "0.1.0",
   "compatibility": ">=5.0.0",
+  "platforms": [
+    "local",
+    "cloud"
+  ],
   "sdk": 3,
-  "brandColor": "#FF7D4B",
+  "brandColor": "#ff7d4b",
   "name": {
     "en": "LinkTap"
   },
@@ -16,6 +20,8 @@
     "climate"
   ],
   "permissions": [],
+  "support": "https://github.com/AdyRock/com.linktap/issues",
+  "homepage": "https://www.link-tap.com/",
   "contributing": {
     "donate": {
       "paypal": {
@@ -68,61 +74,6 @@
   "flow": {
     "triggers": [
       {
-        "id": "alarm_fallen_true",
-        "title": {
-          "en": "The valve has fallen",
-          "de": "Das Ventil ist gefallen"
-        },
-        "hint": {
-          "en": "When the valve falls down",
-          "de": "Wenn das Ventil herunterfällt"
-        },
-        "args": [
-          {
-            "type": "device",
-            "name": "device",
-            "filter": "driver_id=link-tap"
-          }
-        ]
-      },
-      {
-        "id": "alarm_fallen_false",
-        "title": {
-          "en": "The valve has been put back",
-          "de": "Das Ventil wurde wieder angeschlossen"
-        },
-        "hint": {
-          "en": "When the valve has been put back",
-          "de": "Wenn das Ventil wieder angeschlossen wurde"
-        },
-        "args": [
-          {
-            "type": "device",
-            "name": "device",
-            "filter": "driver_id=link-tap"
-          }
-        ]
-      },
-      {
-        "id": "alarm_broken_true",
-        "title": {
-          "en": "The valve is broken",
-          "de": "Das Ventil ist defekt"
-        },
-        "hint": {
-          "en": "When the valve fails",
-          "de": "Wenn das Ventil ausfällt"
-        },
-        "args": [
-          {
-            "type": "device",
-            "name": "device",
-            "filter": "driver_id=link-tap"
-          }
-        ]
-      },
-      {
-        "id": "alarm_broken_false",
         "title": {
           "en": "The valve is repaired",
           "de": "Das Ventil ist repariert"
@@ -135,12 +86,84 @@
           {
             "type": "device",
             "name": "device",
-            "filter": "driver_id=link-tap"
+            "filter": "driver_id=link-tap|link-tap-local"
           }
-        ]
+        ],
+        "id": "alarm_broken_false"
       },
       {
-        "id": "watering_skipped",
+        "title": {
+          "en": "The valve is broken",
+          "de": "Das Ventil ist defekt"
+        },
+        "hint": {
+          "en": "When the valve fails",
+          "de": "Wenn das Ventil ausfällt"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=link-tap|link-tap-local"
+          }
+        ],
+        "id": "alarm_broken_true"
+      },
+      {
+        "title": {
+          "en": "The valve has been put back",
+          "de": "Das Ventil wurde wieder angeschlossen"
+        },
+        "hint": {
+          "en": "When the valve has been put back",
+          "de": "Wenn das Ventil wieder angeschlossen wurde"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=link-tap|link-tap-local"
+          }
+        ],
+        "id": "alarm_fallen_false"
+      },
+      {
+        "title": {
+          "en": "The valve has fallen",
+          "de": "Das Ventil ist gefallen"
+        },
+        "hint": {
+          "en": "When the valve falls down",
+          "de": "Wenn das Ventil herunterfällt"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=link-tap|link-tap-local"
+          }
+        ],
+        "id": "alarm_fallen_true"
+      },
+      {
+        "title": {
+          "en": "Watering has finished",
+          "de": "Bewässerung ist beendet"
+        },
+        "hint": {
+          "en": "When the watering has finished",
+          "de": "Wenn die Bewässerung beendet ist"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=link-tap|link-tap-local"
+          }
+        ],
+        "id": "watering_finished"
+      },
+      {
         "title": {
           "en": "The watering cycle has been skipped"
         },
@@ -169,12 +192,12 @@
           {
             "type": "device",
             "name": "device",
-            "filter": "driver_id=link-tap"
+            "filter": "driver_id=link-tap|link-tap-local"
           }
-        ]
+        ],
+        "id": "watering_skipped"
       },
       {
-        "id": "watering_started",
         "title": {
           "en": "Watering has started",
           "de": "Bewässerung hat begonnen"
@@ -187,68 +210,14 @@
           {
             "type": "device",
             "name": "device",
-            "filter": "driver_id=link-tap"
+            "filter": "driver_id=link-tap|link-tap-local"
           }
-        ]
-      },
-      {
-        "id": "watering_finished",
-        "title": {
-          "en": "Watering has finished",
-          "de": "Bewässerung ist beendet"
-        },
-        "hint": {
-          "en": "When the watering has finished",
-          "de": "Wenn die Bewässerung beendet ist"
-        },
-        "args": [
-          {
-            "type": "device",
-            "name": "device",
-            "filter": "driver_id=link-tap"
-          }
-        ]
+        ],
+        "id": "watering_started"
       }
     ],
     "conditions": [
       {
-        "id": "is_watering",
-        "title": {
-          "en": "Watering !{{is|isn't}} in progress",
-          "de": "Bewässerung !{{ist|ist nicht}} aktiv"
-        },
-        "hint": {
-          "en": "This Flow will continue if watering is/is not currently in progress.",
-          "de": "Dieser Flow wird fortgeführt, wenn die Bewässerung derzeit aktiv/nicht aktiv ist."
-        },
-        "args": [
-          {
-            "type": "device",
-            "name": "device",
-            "filter": "driver_id=link-tap"
-          }
-        ]
-      },
-      {
-        "id": "alarm_fallen",
-        "title": {
-          "en": "Valve !{{has|hasn't}} fallen",
-          "de": "Ventil !{{ist|ist nicht}} gefallen"
-        },
-        "hint": {
-          "en": "This Flow will continue if the valve has/has not fallen down.",
-          "de": "Dieser Flow wird fortgeführt, wenn das Ventil gefallen/nicht gefallen ist."
-        },
-        "args": [
-          {
-            "type": "device",
-            "name": "device",
-            "filter": "driver_id=link-tap"
-          }
-        ]
-      },
-      {
-        "id": "alarm_broken",
         "title": {
           "en": "Valve !{{has|hasn't}} failed",
           "de": "Ventil !{{ist|ist nicht}} ausgefallen"
@@ -261,9 +230,46 @@
           {
             "type": "device",
             "name": "device",
-            "filter": "driver_id=link-tap"
+            "filter": "driver_id=link-tap|link-tap-local"
           }
-        ]
+        ],
+        "id": "alarm_broken"
+      },
+      {
+        "title": {
+          "en": "Valve !{{has|hasn't}} fallen",
+          "de": "Ventil !{{ist|ist nicht}} gefallen"
+        },
+        "hint": {
+          "en": "This Flow will continue if the valve has/has not fallen down.",
+          "de": "Dieser Flow wird fortgeführt, wenn das Ventil gefallen/nicht gefallen ist."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=link-tap|link-tap-local"
+          }
+        ],
+        "id": "alarm_fallen"
+      },
+      {
+        "title": {
+          "en": "Watering !{{is|isn't}} in progress",
+          "de": "Bewässerung !{{ist|ist nicht}} aktiv"
+        },
+        "hint": {
+          "en": "This Flow will continue if watering is/is not currently in progress.",
+          "de": "Dieser Flow wird fortgeführt, wenn die Bewässerung derzeit aktiv/nicht aktiv ist."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=link-tap|link-tap-local"
+          }
+        ],
+        "id": "is_watering"
       }
     ],
     "actions": [
@@ -444,6 +450,115 @@
             ]
           }
         ]
+      },
+      {
+        "id": "activate_instant_mode_local",
+        "title": {
+          "en": "Activate Instant Mode",
+          "de": "Sofort-Modus aktivieren"
+        },
+        "titleFormatted": {
+          "en": "Activate Instant Mode for [[water_duration]] minutes",
+          "de": "Sofort-Modus für [[water_duration]] Minuten aktivieren."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=link-tap-local"
+          },
+          {
+            "name": "water_duration",
+            "type": "number",
+            "min": 1,
+            "max": 60,
+            "placeholder": {
+              "en": "Minutes",
+              "de": "Minuten"
+            },
+            "title": {
+              "en": "Duration",
+              "de": "Dauer"
+            }
+          }
+        ]
+      },
+      {
+        "id": "turn_off_instant_mode_local",
+        "title": {
+          "en": "Turn Off Instant Mode",
+          "de": "Sofort-Modus ausschalten"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=link-tap-local"
+          }
+        ]
+      },
+      {
+        "id": "activate_watering_mode_local",
+        "title": {
+          "en": "Activate Watering Mode",
+          "de": "Bewässerungsmodus aktivieren"
+        },
+        "titleFormatted": {
+          "en": "Activate [[mode]] Watering Mode",
+          "de": "Bewässerungsmodus aktivieren '[[mode]]'"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=link-tap-local"
+          },
+          {
+            "name": "mode",
+            "type": "dropdown",
+            "title": {
+              "en": "Watering",
+              "de": "Bewässerungsmodus"
+            },
+            "values": [
+              {
+                "id": "M",
+                "label": {
+                  "en": "Manual",
+                  "de": ""
+                }
+              },
+              {
+                "id": "I",
+                "label": {
+                  "en": "Interval",
+                  "de": "Intervall-Modus"
+                }
+              },
+              {
+                "id": "O",
+                "label": {
+                  "en": "Odd and Even",
+                  "de": "Ungerade- und Gerade-Modus"
+                }
+              },
+              {
+                "id": "T",
+                "label": {
+                  "en": "Seven day",
+                  "de": "Sieben-Tage-Modus"
+                }
+              },
+              {
+                "id": "Y",
+                "label": {
+                  "en": "Month",
+                  "de": "Monats-Modus"
+                }
+              }
+            ]
+          }
+        ]
       }
     ]
   },
@@ -451,8 +566,15 @@
     {
       "id": "link-tap",
       "name": {
-        "en": "LinkTap"
+        "en": "LinkTap (cloud)"
       },
+      "platforms": [
+        "local",
+        "cloud"
+      ],
+      "connectivity": [
+        "cloud"
+      ],
       "class": "other",
       "energy": {
         "batteries": [
@@ -462,7 +584,6 @@
       },
       "capabilities": [
         "onoff",
-        "clear_alarms",
         "measure_battery",
         "watering_mode",
         "alarm_fallen",
@@ -483,6 +604,9 @@
       },
       "pair": [
         {
+          "id": "my_connect"
+        },
+        {
           "id": "list_my_devices",
           "template": "list_devices",
           "navigation": {
@@ -492,6 +616,11 @@
         {
           "id": "add_my_devices",
           "template": "add_devices"
+        }
+      ],
+      "repair": [
+        {
+          "id": "my_repair"
         }
       ],
       "images": {
@@ -572,6 +701,89 @@
               "hint": {
                 "en": "Revert to previous plan when instant mode has finished",
                 "de": "Zurück zum vorherigen Plan wenn der Sofort-Modus beendet ist"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "link-tap-local",
+      "name": {
+        "en": "LinkTap (local)"
+      },
+      "deprecated": true,
+      "platforms": [
+        "local"
+      ],
+      "connectivity": [
+        "lan"
+      ],
+      "class": "other",
+      "energy": {
+        "batteries": [
+          "AA",
+          "AA"
+        ]
+      },
+      "capabilities": [
+        "onoff",
+        "clear_alarms",
+        "measure_battery",
+        "watering_mode",
+        "alarm_fallen",
+        "alarm_broken",
+        "alarm_water",
+        "signal_strength",
+        "measure_water",
+        "meter_water",
+        "time_remaining",
+        "cycles_remaining",
+        "watering",
+        "water_on"
+      ],
+      "capabilitiesOptions": {
+        "meter_water": {
+          "units": "L"
+        }
+      },
+      "pair": [
+        {
+          "id": "list_my_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_my_devices"
+          }
+        },
+        {
+          "id": "add_my_devices",
+          "template": "add_devices"
+        }
+      ],
+      "images": {
+        "large": "/drivers/link-tap/assets/images/large.jpg",
+        "small": "/drivers/link-tap/assets/images/small.jpg"
+      },
+      "settings": [
+        {
+          "type": "group",
+          "label": {
+            "en": "Instant Mode settings",
+            "de": "Sofort-Modus Einstellungen"
+          },
+          "children": [
+            {
+              "id": "watering_duration",
+              "type": "number",
+              "label": {
+                "en": "Duration",
+                "de": "Dauer"
+              },
+              "value": 4,
+              "units": "Minutes",
+              "hint": {
+                "en": "The length of time to active the Instant mode",
+                "de": "Die Zeitdauer zum Aktivieren des Sofort-Modus"
               }
             }
           ]

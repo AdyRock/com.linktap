@@ -12,58 +12,28 @@ class LinkTapDriver extends Homey.Driver
     {
         this.log('LinkTapDriver has been initialized');
 
-        const activateInstantMode = this.homey.flow.getActionCard('activate_instant_mode');
-        activateInstantMode
-            .registerRunListener(async (args, state) =>
-            {
-                this.log("activate_instant_mode");
-                return args.device.activateInstantMode(true, args.water_duration, (args.eco_mode === 'on'), args.on_time, args.off_time, (args.revert === 'on'));
-            });
-
-        const turnOffInstantMode = this.homey.flow.getActionCard("turn_off_instant_mode");
-        turnOffInstantMode
-            .registerRunListener(async (args, state) =>
-            {
-                this.log("turn_off_instant_mode");
-                return args.device.activateInstantMode(false);
-            });
-
-        const activateWateringMode = this.homey.flow.getActionCard("activate_watering_mode");
-        activateWateringMode
-            .registerRunListener(async (args, state) =>
-            {
-                this.log("activate_watering_mode");
-                return args.device.activateWateringMode(true, args.mode);
-            });
-
-        let wateringCondition = this.homey.flow.getConditionCard('is_watering');
-        wateringCondition.registerRunListener(async (args, state) =>
-        {
-            return args.device.isWatering; // true or false
-        });
-
         this.wateringStartedTrigger = this.homey.flow.getDeviceTriggerCard('watering_started');
         this.wateringFinishedTrigger = this.homey.flow.getDeviceTriggerCard('watering_finished');
         this.wateringSkippedTrigger = this.homey.flow.getDeviceTriggerCard('watering_skipped');
     }
 
-    triggerWateringStarted(device, tokens, state)
+    triggerWateringStarted(device)
     {
-        this.wateringStartedTrigger.trigger(device, tokens, state)
+        this.wateringStartedTrigger.trigger(device, {}, {})
             .then(this.log)
             .catch(this.error);
     }
 
-    triggerWateringFinished(device, tokens, state)
+    triggerWateringFinished(device)
     {
-        this.wateringFinishedTrigger.trigger(device, tokens, state)
+        this.wateringFinishedTrigger.trigger(device, {}, {})
             .then(this.log)
             .catch(this.error);
     }
 
-    triggerWateringSkipped(device, tokens, state)
+    triggerWateringSkipped(device)
     {
-        this.wateringSkippedTrigger.trigger(device, tokens, state)
+        this.wateringSkippedTrigger.trigger(device, {}, {})
             .then(this.log)
             .catch(this.error);
     }
@@ -74,7 +44,102 @@ class LinkTapDriver extends Homey.Driver
      */
     async onPairListDevices()
     {
-        return this.homey.app.getDevices();
+        return this.homey.app.getDevices(true);
+    }
+
+    async onPair(session)
+    {
+        let oldAPICode = this.homey.app.APIToken;
+        let oldUserName = this.homey.app.UserName;
+
+        session.setHandler("list_devices", async () =>
+        {
+            try
+            {
+                let devices = await this.onPairListDevices();
+                this.homey.settings.set('APIToken', this.homey.app.APIToken);
+                this.homey.settings.set('UserName', this.homey.app.UserName);
+                return devices;
+            }
+            catch (err)
+            {
+                this.homey.app.BearerToken = oldAPICode;
+                this.homey.app.UserName = oldUserName;
+                throw new Error(err.message);
+            }
+        });
+
+        session.setHandler('connection_setup', async () =>
+        {
+            return { APIToken: this.homey.app.APIToken, userName: this.homey.app.UserName };
+        });
+
+        session.setHandler('api_connection', async (data) =>
+        {
+            if (!data.userName)
+            {
+                return { ok: false, err: this.homey.__("missingUsername") };
+            }
+            if (!data.APIToken && !data.password)
+            {
+                return { ok: false, err: this.homey.__("missingAPIToken") };
+            }
+
+            if (!data.APIToken)
+            {
+                try
+                {
+                    await this.homey.app.getAPIKey(data);
+                }
+                catch (err)
+                {
+                    return { ok: false, err: err.message };
+                }
+            }
+
+            this.homey.app.APIToken = data.APIToken;
+            this.homey.app.UserName = data.userName;
+            return { ok: true };
+        });
+    }
+
+    async onRepair(session, device)
+    {
+        // Argument socket is an EventEmitter, similar to Driver.onPair
+        // Argument device is a Homey.Device that's being repaired
+
+        session.setHandler('connection_setup', async () =>
+        {
+            return { APIToken: this.homey.app.APIToken, userName: this.homey.app.UserName };
+        });
+
+        session.setHandler('api_connection', async (data) =>
+        {
+            if (!data.userName)
+            {
+                return { ok: false, err: this.homey.__("missingUsername") };
+            }
+            if (!data.APIToken && !data.password)
+            {
+                return { ok: false, err: this.homey.__("missingAPIToken") };
+            }
+
+            if (!data.APIToken)
+            {
+                try
+                {
+                    await this.homey.app.getAPIKey(data);
+                }
+                catch (err)
+                {
+                    return { ok: false, err: err.message };
+                }
+            }
+
+            this.homey.app.APIToken = data.APIToken;
+            this.homey.app.UserName = data.UserName;
+            return { ok: true };
+        });
     }
 }
 

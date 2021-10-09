@@ -21,14 +21,24 @@
         "getKeyInstruction1": "If you don't have an API key",
         "getKeyInstruction2": "Enter your LinkTap password below and click the 'Get a new API key' button",
         "note": "Note",
-        "noteText": "If you generate a new key it will invalidate the old key and the anything using it will stop working.",
-        "missingUsername": "You need to enter your LinTap Username",
-        "missingPassword": "You need to enter your LinTap Password",
+        "noteText": "You can only have one active API key so if you generate a new key it will invalidate the old key and then anything using it will stop working.",
+        "missingUsername": "You need to enter your LinkTap Username",
+        "missingPassword": "You need to enter your LinkTap Password",
+        "missingAPIToken": "You need to enter either the API Token or your LinkTap Password",
         "gateways": "Local",
         "autoConfig": "Auto Configure for local access",
         "localGateways": "Gateways",
         "useInternet": "Use Internet Connection"
     },
     "timeRemaining": "Time Remaining",
-    "timeActive": "Time Active"
+    "timeActive": "Time Active",
+    "pair": {
+        "title": "Connection Details",
+        "getKeyInstruction2": "Enter your LinkTap password below instead",
+        "login": "Connect",
+        "checking": "Checking connection",
+        "try_again": "Try again",
+        "correct": "Successful",
+        "adding": "Adding device(s)"
+    }
 }
