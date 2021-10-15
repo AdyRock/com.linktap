@@ -120,10 +120,9 @@ class MyApp extends Homey.App
         this.lastDetectionTime = this.homey.settings.get('lastDetectionTime');
         this.detectedDevices = this.homey.settings.get('detectedDevices');
 
-        this.setupWebhook();
-
         this.onDevicePoll = this.onDevicePoll.bind(this);
-        this.restartPolling(60);
+
+        this.setupWebhook();
 
         this.homey.on('unload', async () =>
         {
@@ -210,8 +209,6 @@ class MyApp extends Homey.App
 
                 if ((tapLinkData.cmd === 0) || (tapLinkData.cmd === 13))
                 {
-                    _this.restartPolling(180);
-
                     // Return date and time
                     const t = new Date();
                     const date = ('0' + t.getDate()).slice(-2);
@@ -403,9 +400,6 @@ class MyApp extends Homey.App
 
     async updateDevicesMQTT(tapLinkData)
     {
-        // Resume polling method if nothing received via MQTT withing the timeout period
-        this.restartPolling(180);
-
         const promises = [];
         const drivers = this.homey.drivers.getDrivers();
         for (const driver in drivers)
@@ -557,6 +551,24 @@ class MyApp extends Homey.App
         }
     }
 
+    async processWebhookMessage(message)
+    {
+        const drivers = this.homey.drivers.getDrivers();
+        for (const driver in drivers)
+        {
+            let devices = this.homey.drivers.getDriver(driver).getDevices(true);
+            let numDevices = devices.length;
+            for (var i = 0; i < numDevices; i++)
+            {
+                let device = devices[i];
+                if (device.processWebhookMessage)
+                {
+                    device.processWebhookMessage(message);
+                }
+            }
+        }
+    }
+
     async setupWebhook()
     {
         try
@@ -569,11 +581,8 @@ class MyApp extends Homey.App
 
             myWebhook.on('message', args =>
             {
-                this.log('Got a webhook message!');
-                this.log('headers:', args.headers);
-                this.log('query:', args.query);
-                this.log('body:', args.body);
-
+                this.updateLog('Got a webhook message!' + this.varToString(args.body), 0);
+                this.processWebhookMessage( args.body );
             });
 
             //https://www.link-tap.com/api/setWebHookUrl
@@ -584,6 +593,8 @@ class MyApp extends Homey.App
                 this.updateLog("setWebHookURL error: " + this.varToString(response.message), 0);
                 return false;
             }
+
+            this.restartPolling(60);
         }
         catch (err)
         {

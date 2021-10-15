@@ -151,19 +151,21 @@ class LinkTapLocalDevice extends Homey.Device
                                 {
                                     this.isWatering = true;
                                     this.setCapabilityValue('onoff', true).catch(this.error);
+                                    this.setCapabilityValue('watering', true).catch(this.error);
 
                                     this.driver.triggerWateringStarted(this);
                                 }
-                                this.setCapabilityValue('watering', true).catch(this.error);
+                                this.setCapabilityValue('watering_on', true).catch(this.error);
                                 this.setCapabilityValue('time_remaining', Math.ceil(tapLinker.remain_duration / 60)).catch(this.error);
                             }
                             else
                             {
-                                this.setCapabilityValue('watering', false).catch(this.error);
+                                this.setCapabilityValue('watering_on', false).catch(this.error);
                                 if (this.isWatering && tapLinker.is_final)
                                 {
                                     // The final cycle has completed
                                     this.isWatering = false;
+                                    this.setCapabilityValue('watering', false).catch(this.error);
                                     this.setCapabilityValue('onoff', false).catch(this.error);
                                     this.driver.triggerWateringFinished(this);
                                     this.cycles = 0;
