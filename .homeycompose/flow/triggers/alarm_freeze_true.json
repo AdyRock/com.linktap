@@ -1,0 +1,17 @@
+{
+    "title": {
+        "en": "Freeze Alarm",
+        "de": "Frostalarm"
+    },
+    "hint": {
+        "en": "When there is a chance of freezing",
+        "de": "Bei Frostgefahr"
+    },
+    "args": [
+      {
+        "type": "device",
+        "name": "device",
+        "filter": "driver_id=link-tap"
+      }
+    ]
+}

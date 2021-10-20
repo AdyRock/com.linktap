@@ -1,19 +1,19 @@
 {
     "type": "boolean",
     "title": {
-        "en": "Watering",
-        "de": "Bewässerung"
+        "en": "Watering Plan Active",
+        "de": "Bewässerungsplan aktiv"
     },
     "getable": true,
     "setable": false,
-    "uiComponent": null,
     "insights": true,
     "insightsTitleTrue": {
-        "en": "Watering Started",
-        "de": "Bewässerung gestartet"
+        "en": "Watering Plan Started",
+        "de": "Bewässerungsplan gestartet"
     },
     "insightsTitleFalse": {
-        "en": "Watering Finished",
-        "de": "Bewässerung beendet"
-    }
+        "en": "Watering Plan Finished",
+        "de": "Bewässerungsplan beendet"
+    },
+    "icon": "/assets/watering.svg"
 }

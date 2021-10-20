@@ -24,11 +24,18 @@ class MyApp extends Homey.App
      */
     async onInit()
     {
-        this.log('MyApp has been initialized');
+        this.log('MyApp initialising');
         this.diagLog = "";
         this.homeyIP = null;
 
-        await this.setupLocalAccess();
+        try
+        {
+            await this.setupLocalAccess();
+        }
+        catch(err)
+        {
+            this.updateLog("Error setting up local access: " + err.message );
+        }
 
         if (process.env.DEBUG === '1')
         {
@@ -98,19 +105,19 @@ class MyApp extends Homey.App
             if (key === 'APIToken')
             {
                 this.APIToken = this.homey.settings.get('APIToken');
-                this.setupWebhook();
+                this.setupWebhook().catch(this.error);
             }
             else if (key === 'UserName')
             {
                 this.UserName = this.homey.settings.get('UserName');
-                this.setupWebhook();
+                this.setupWebhook().catch(this.error);
             }
             else if (key === 'autoConfig')
             {
                 this.autoConfigGateway = this.homey.settings.get('autoConfig');
                 if (this.autoConfigGateway)
                 {
-                    this.checkGatewaysConfiguration();
+                    this.checkGatewaysConfiguration().catch(this.error);
                 }
             }
         });
@@ -120,14 +127,14 @@ class MyApp extends Homey.App
         this.lastDetectionTime = this.homey.settings.get('lastDetectionTime');
         this.detectedDevices = this.homey.settings.get('detectedDevices');
 
-        this.onDevicePoll = this.onDevicePoll.bind(this);
-
-        this.setupWebhook();
+        this.setupWebhook().catch(this.error);
 
         this.homey.on('unload', async () =>
         {
             await this.unregisterWebhook();
         });
+
+        this.log('MyApp has been initialized');
     }
 
     async setupLocalAccess()
@@ -178,17 +185,17 @@ class MyApp extends Homey.App
             this.mDNSGatewaysUpdate(discoveryResult);
         });
 
-        this.client = mqtt.connect('mqtt://localhost:49876', { clientId: "homeyLinkTapApp", username: "homeyApp", password: "fred69" });
-        this.client.on('connect', function()
+        this.MQTTclient = mqtt.connect('mqtt://localhost:49876', { clientId: "homeyLinkTapApp", username: "homeyApp", password: "fred69" });
+        this.MQTTclient.on('connect', function()
         {
-            _this.client.subscribe('linktap/up_cmd', function(err)
+            _this.MQTTclient.subscribe('linktap/up_cmd', function(err)
             {
                 if (err)
                 {
                     _this.updateLog("setupLocalAccess.onConnect 'linktap/up_cmd' error: " * _this.varToString(err), 0);
                 }
             });
-            _this.client.subscribe('linktap/down_cmd_ack', function(err)
+            _this.MQTTclient.subscribe('linktap/down_cmd_ack', function(err)
             {
                 if (err)
                 {
@@ -197,7 +204,7 @@ class MyApp extends Homey.App
             });
         });
 
-        this.client.on('message', function(topic, message)
+        this.MQTTclient.on('message', function(topic, message)
         {
             // message is Buffer
             //console.log(topic, message.toString());
@@ -229,100 +236,109 @@ class MyApp extends Homey.App
 
                     const data = JSON.stringify(reply);
 
-                    _this.client.publish('linktap/up_cmd_ack', data);
+                    _this.MQTTclient.publish('linktap/up_cmd_ack', data);
                 }
                 else if ((tapLinkData.cmd === 3) || (tapLinkData.cmd === 9))
                 {
-                    _this.updateDetectedDevices(tapLinkData);
+                    _this.updateDetectedMQTTDevices(tapLinkData);
                     _this.updateDevicesMQTT(tapLinkData);
                 }
             }
             catch (err)
             {
-                console.log(topic, err);
+                _this.homey.app.updateLog("MQTT Client error: " + topic + ": " + err.message);
             }
         });
 
         return true;
     }
 
-    updateDetectedDevices(tapLinkData)
+    updateDetectedMQTTDevices(tapLinkData)
     {
-        // find the gateway
-        let index = this.mDNSGateways.findIndex((gateway) =>
+        if (tapLinkData.dev_stat && this.mDNSGateways)
         {
-            return gateway.gatewayId === tapLinkData.gw_id;
-        });
-
-        if (index >= 0)
-        {
-            // Found the gateway so look for the taplinkers
-            let gatewayTapLinkers = this.mDNSGateways[index].taplinker;
-            tapLinkData.dev_stat.forEach(tapLinker1 =>
+            try
             {
-                let index2 = gatewayTapLinkers.findIndex((tapLinker2) =>
+                // find the gateway
+                let index = this.mDNSGateways.findIndex((gateway) =>
                 {
-                    return tapLinker2.taplinkerId === tapLinker1.dev_id;
+                    return gateway.gatewayId === tapLinkData.gw_id;
                 });
 
-                if (index2 < 0)
+                if (index >= 0)
                 {
-                    // No match found so add this tapLinker
-                    let newTapLinker = {
-                        "location": "",
-                        "taplinkerName": tapLinker1.dev_id,
-                        "taplinkerId": tapLinker1.dev_id,
-                    };
-                    gatewayTapLinkers.push(newTapLinker);
-                    this.homey.settings.set('gateways', this.mDNSGateways);
-                    this.homey.app.updateLog("MQTTDevice: " + this.homey.app.varToString(this.mDNSGateways));
+                    // Found the gateway so look for the taplinkers
+                    let gatewayTapLinkers = this.mDNSGateways[index].taplinker;
+                    tapLinkData.dev_stat.forEach(tapLinker1 =>
+                    {
+                        let index2 = gatewayTapLinkers.findIndex((tapLinker2) =>
+                        {
+                            return tapLinker2.taplinkerId === tapLinker1.dev_id;
+                        });
+
+                        if (index2 < 0)
+                        {
+                            // No match found so add this tapLinker
+                            let newTapLinker = {
+                                "location": "",
+                                "taplinkerName": tapLinker1.dev_id,
+                                "taplinkerId": tapLinker1.dev_id,
+                            };
+                            gatewayTapLinkers.push(newTapLinker);
+                            this.homey.settings.set('gateways', this.mDNSGateways);
+                            this.homey.app.updateLog("MQTTDevice: " + this.homey.app.varToString(this.mDNSGateways));
+                        }
+                    });
                 }
-            });
+            }
+            catch(err)
+            {
+                this.homey.app.updateLog("updateDetectedMQTTDevices error: " + err.message);
+            }
         }
     }
 
     mDNSGatewaysUpdate(discoveryResult)
     {
-        const address = discoveryResult.address;
-        const id = discoveryResult.id;
-        const model = discoveryResult.txt.model;
-
-        let index = this.mDNSGateways.findIndex((gateway) =>
+        try
         {
-            return gateway.gatewayId === id;
-        });
+            const address = discoveryResult.address;
+            const id = discoveryResult.id;
+            const model = discoveryResult.txt.model;
 
-        if (index >= 0)
-        {
-            this.mDNSGateways[index].address = address;
+            let index = this.mDNSGateways.findIndex((gateway) =>
+            {
+                return gateway.gatewayId === id;
+            });
+
+            if (index >= 0)
+            {
+                this.mDNSGateways[index].address = address;
+            }
+            else
+            {
+                const gateway = {
+                    gatewayId: id,
+                    address: address,
+                    model: model,
+                    taplinker: []
+                };
+
+                this.mDNSGateways.push(gateway);
+                index = this.mDNSGateways.length - 1;
+            }
+
+            this.homey.settings.set('gateways', this.mDNSGateways);
+
+            if (this.autoConfigGateway)
+            {
+                this.checkGatewayConfiguration(this.mDNSGateways[index]);
+            }
         }
-        else
+        catch(err)
         {
-            const gateway = {
-                gatewayId: id,
-                address: address,
-                model: model,
-                taplinker: []
-            };
-
-            this.mDNSGateways.push(gateway);
-            index = this.mDNSGateways.length - 1;
+            this.homey.app.updateLog("mDNSGatewaysUpdate error: " + err.message);
         }
-
-        this.homey.settings.set('gateways', this.mDNSGateways);
-
-        if (this.autoConfigGateway)
-        {
-            this.checkGatewayConfiguration(this.mDNSGateways[index]);
-        }
-    }
-
-    async checkGatewaysConfiguration()
-    {
-        this.mDNSGateways.forEach(async gateway =>
-        {
-            await this.checkGatewayConfiguration(gateway);
-        });
     }
 
     async checkGatewayConfiguration(gateway)
@@ -365,7 +381,7 @@ class MyApp extends Homey.App
         }
         catch (err)
         {
-            this.homey.app.updateLog("Publish Form 1:" + err.message, 0);
+            this.homey.app.updateLog("Publish Form 1 error:" + err.message, 0);
         }
 
         // Post form 3 data to configure the MQTT topics settings
@@ -381,7 +397,7 @@ class MyApp extends Homey.App
         }
         catch (err)
         {
-            this.homey.app.updateLog("Publish Form 2:" + err);
+            this.homey.app.updateLog("Publish Form 2 error:" + err.message);
         }
 
         // Post form 0 to reboot the gateway
@@ -393,9 +409,8 @@ class MyApp extends Homey.App
         }
         catch (err)
         {
-            this.homey.app.updateLog("Publish Form 3:" + err.message, 0);
+            this.homey.app.updateLog("Publish Form 3 error:" + err.message, 0);
         }
-
     }
 
     async updateDevicesMQTT(tapLinkData)
@@ -417,47 +432,13 @@ class MyApp extends Homey.App
         }
 
         await Promise.all(promises);
-
     }
 
     async publishMQTTMessage(message)
     {
         const data = JSON.stringify(message);
         this.homey.app.updateLog("publishMQTTMessage: " + data);
-        this.client.publish('linktap/down_cmd', data);
-    }
-
-    restartPolling(initialDelay)
-    {
-        this.homey.clearTimeout(this.timerPollID);
-        if (this.APIToken)
-        {
-            this.timerPollID = this.homey.setTimeout(this.onDevicePoll, (1000 * initialDelay));
-        }
-    }
-
-    async onDevicePoll()
-    {
-        const searchData = await this.getDeviceData();
-        const promises = [];
-        const drivers = this.homey.drivers.getDrivers();
-        for (const driver in drivers)
-        {
-            let devices = this.homey.drivers.getDriver(driver).getDevices(true);
-            let numDevices = devices.length;
-            for (var i = 0; i < numDevices; i++)
-            {
-                let device = devices[i];
-                if (device.updateDeviceValues)
-                {
-                    promises.push(device.updateDeviceValues(searchData));
-                }
-            }
-        }
-
-        await Promise.all(promises);
-
-        this.timerPollID = this.homey.setTimeout(this.onDevicePoll, (1000 * 60 * 5));
+        this.MQTTclient.publish('linktap/down_cmd', data);
     }
 
     async getDeviceData()
@@ -563,7 +544,7 @@ class MyApp extends Homey.App
                 let device = devices[i];
                 if (device.processWebhookMessage)
                 {
-                    device.processWebhookMessage(message);
+                    device.processWebhookMessage(message).catch(this.error);
                 }
             }
         }
@@ -573,28 +554,29 @@ class MyApp extends Homey.App
     {
         try
         {
-            const homeyId = await this.homey.cloud.getHomeyId();
-            const id = Homey.env.WEBHOOK_ID;
-            const secret = Homey.env.WEBHOOK_SECRET;
-            const webhookUrl = `https://webhooks.athom.com/webhook/${id}?homey=${homeyId}`;
-            const myWebhook = await this.homey.cloud.createWebhook(id, secret, {});
-
-            myWebhook.on('message', args =>
+            if (this.APIToken && this.UserName)
             {
-                this.updateLog('Got a webhook message!' + this.varToString(args.body), 0);
-                this.processWebhookMessage( args.body );
-            });
+                const homeyId = await this.homey.cloud.getHomeyId();
+                const id = Homey.env.WEBHOOK_ID;
+                const secret = Homey.env.WEBHOOK_SECRET;
+                const webhookUrl = `https://webhooks.athom.com/webhook/${id}?homey=${homeyId}`;
+                const myWebhook = await this.homey.cloud.createWebhook(id, secret, {});
 
-            //https://www.link-tap.com/api/setWebHookUrl
-            const url = "setWebHookUrl";
-            let response = await this.PostURL(url, { webHookUrl: webhookUrl }, false);
-            if (response.result === 'error')
-            {
-                this.updateLog("setWebHookURL error: " + this.varToString(response.message), 0);
-                return false;
+                myWebhook.on('message', args =>
+                {
+                    this.updateLog('Got a webhook message!' + this.varToString(args.body), 0);
+                    this.processWebhookMessage( args.body ).catch(this.error);
+                });
+
+                //https://www.link-tap.com/api/setWebHookUrl
+                const url = "setWebHookUrl";
+                let response = await this.PostURL(url, { webHookUrl: webhookUrl }, false);
+                if (response.result === 'error')
+                {
+                    this.updateLog("setWebHookURL error: " + this.varToString(response.message), 0);
+                    return false;
+                }
             }
-
-            this.restartPolling(60);
         }
         catch (err)
         {
@@ -709,7 +691,7 @@ class MyApp extends Homey.App
             catch (err)
             {
                 //this.updateLog(this.varToString(err), 0);
-                reject(new Error("HTTPS Catch: " + err));
+                reject(new Error("HTTPS Catch: " + err.message));
                 return;
             }
         });
@@ -779,8 +761,8 @@ class MyApp extends Homey.App
             }
             catch (err)
             {
-                this.updateLog(this.varToString(err), 0);
-                reject(new Error("HTTPS Catch: " + err));
+                this.updateLog(err.message, 0);
+                reject(new Error("HTTPS Catch: " + err.message));
                 return;
             }
         });
@@ -897,7 +879,7 @@ class MyApp extends Homey.App
         }
         catch (err)
         {
-            this.log("VarToString Error: ", err);
+            this.updateLog("VarToString Error: " +  err.message);
         }
 
         return source.toString();
@@ -909,37 +891,44 @@ class MyApp extends Homey.App
         {
             console.log(newMessage);
 
-            const nowTime = new Date(Date.now());
+            try
+            {
+                const nowTime = new Date(Date.now());
 
-            this.diagLog += "\r\n* ";
-            this.diagLog += (nowTime.getHours());
-            this.diagLog += ":";
-            this.diagLog += nowTime.getMinutes();
-            this.diagLog += ":";
-            this.diagLog += nowTime.getSeconds();
-            this.diagLog += ".";
-            let milliSeconds = nowTime.getMilliseconds().toString();
-            if (milliSeconds.length == 2)
-            {
-                this.diagLog += '0';
-            }
-            else if (milliSeconds.length == 1)
-            {
-                this.diagLog += '00';
-            }
-            this.diagLog += milliSeconds;
-            this.diagLog += ": ";
-            this.diagLog += "\r\n";
+                this.diagLog += "\r\n* ";
+                this.diagLog += (nowTime.getHours());
+                this.diagLog += ":";
+                this.diagLog += nowTime.getMinutes();
+                this.diagLog += ":";
+                this.diagLog += nowTime.getSeconds();
+                this.diagLog += ".";
+                let milliSeconds = nowTime.getMilliseconds().toString();
+                if (milliSeconds.length == 2)
+                {
+                    this.diagLog += '0';
+                }
+                else if (milliSeconds.length == 1)
+                {
+                    this.diagLog += '00';
+                }
+                this.diagLog += milliSeconds;
+                this.diagLog += ": ";
+                this.diagLog += "\r\n";
 
-            this.diagLog += newMessage;
-            this.diagLog += "\r\n";
-            if (this.diagLog.length > 60000)
-            {
-                this.diagLog = this.diagLog.substr(this.diagLog.length - 60000);
+                this.diagLog += newMessage;
+                this.diagLog += "\r\n";
+                if (this.diagLog.length > 60000)
+                {
+                    this.diagLog = this.diagLog.substr(this.diagLog.length - 60000);
+                }
+                if (!this.cloudOnly)
+                {
+                    this.homey.api.realtime('com.linktap.logupdated', { 'log': this.diagLog });
+                }
             }
-            if (!this.cloudOnly)
+            catch(err)
             {
-                this.homey.api.realtime('com.linktap.logupdated', { 'log': this.diagLog });
+                console.log(err);
             }
         }
     }
@@ -1023,7 +1012,7 @@ class MyApp extends Homey.App
             }
             catch (err)
             {
-                this.updateLog("Send log error: " + err.stack, 0);
+                this.updateLog("Send log error: " + err.message, 0);
             }
         }
 

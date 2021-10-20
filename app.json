@@ -147,6 +147,114 @@
       },
       {
         "title": {
+          "en": "Freeze Alarm has cleared",
+          "de": "Frostalarm wurde gelöscht"
+        },
+        "hint": {
+          "en": "When there is no longer a chance of freezing",
+          "de": "Wenn keine Frostgefahr mehr besteht"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=link-tap"
+          }
+        ],
+        "id": "alarm_freeze_false"
+      },
+      {
+        "title": {
+          "en": "Freeze Alarm",
+          "de": "Frostalarm"
+        },
+        "hint": {
+          "en": "When there is a chance of freezing",
+          "de": "Bei Frostgefahr"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=link-tap"
+          }
+        ],
+        "id": "alarm_freeze_true"
+      },
+      {
+        "title": {
+          "en": "High Water Flow Alarm Cleared",
+          "de": "Alarm für hohen Wasserdurchfluss gelöscht"
+        },
+        "hint": {
+          "en": "The leak is fixed",
+          "de": "Das Leck ist behoben"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=link-tap"
+          }
+        ],
+        "id": "alarm_hi_flow_false"
+      },
+      {
+        "title": {
+          "en": "High Water Flow Alarm",
+          "de": "hoher Wasserdurchfluss Alarm"
+        },
+        "hint": {
+          "en": "When there is a leak",
+          "de": "Wenn es ein Leck gibt"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=link-tap"
+          }
+        ],
+        "id": "alarm_hi_flow_true"
+      },
+      {
+        "title": {
+          "en": "Low Water Flow Alarm",
+          "de": "Alarm für niedrigen Wasserdurchfluss"
+        },
+        "hint": {
+          "en": "When there is a blockage",
+          "de": "Wenn es eine Blockade gibt"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=link-tap"
+          }
+        ],
+        "id": "alarm_lo_flow_true"
+      },
+      {
+        "title": {
+          "en": "Low Water Flow Alarm Cleared",
+          "de": "Alarm für niedrigen Wasserdurchfluss gelöscht"
+        },
+        "hint": {
+          "en": "The blockage is clear",
+          "de": "Die Blockade ist klar"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=link-tap"
+          }
+        ],
+        "id": "alarm_low_flow_false"
+      },
+      {
+        "title": {
           "en": "Watering has finished",
           "de": "Bewässerung ist beendet"
         },
@@ -584,12 +692,15 @@
       },
       "capabilities": [
         "onoff",
-        "measure_battery",
+        "clear_alarms",
+        "alarm_battery",
         "watering_mode",
         "alarm_fallen",
         "alarm_broken",
         "alarm_water",
-        "signal_strength",
+        "alarm_freeze",
+        "alarm_high_flow",
+        "alarm_low_flow",
         "measure_water",
         "meter_water",
         "time_remaining",
@@ -812,14 +923,45 @@
       "setable": false,
       "icon": "/assets/fallen.svg"
     },
+    "alarm_freeze": {
+      "type": "boolean",
+      "title": {
+        "en": "Freezing Alarm"
+      },
+      "getable": true,
+      "setable": false,
+      "icon": "/assets/freezing.svg"
+    },
+    "alarm_high_flow": {
+      "type": "boolean",
+      "title": {
+        "en": "High Water Flow Alarm",
+        "de": "hoher Wasserdurchfluss Alarm"
+      },
+      "getable": true,
+      "setable": false,
+      "icon": "/assets/high_flow.svg"
+    },
+    "alarm_low_flow": {
+      "type": "boolean",
+      "title": {
+        "en": "Low Water Flow Alarm",
+        "de": "geringer Wasserdurchfluss"
+      },
+      "getable": true,
+      "setable": false,
+      "icon": "/assets/blocked_hose.svg"
+    },
     "clear_alarms": {
       "type": "boolean",
       "getable": false,
       "setable": true,
       "uiComponent": "button",
       "title": {
-        "en": "Clear Alarms"
-      }
+        "en": "Clear Alarms",
+        "de": "Alarme löschen"
+      },
+      "icon": "/assets/clear_alarm.svg"
     },
     "cycles_remaining": {
       "type": "number",
@@ -861,7 +1003,6 @@
       },
       "getable": true,
       "setable": false,
-      "uiComponent": null,
       "insights": true,
       "insightsTitleTrue": {
         "en": "Water Turned on",
@@ -870,26 +1011,27 @@
       "insightsTitleFalse": {
         "en": "Water Turned off",
         "de": "Wasser ausgestellt"
-      }
+      },
+      "icon": "/assets/water_on.svg"
     },
     "watering": {
       "type": "boolean",
       "title": {
-        "en": "Watering",
-        "de": "Bewässerung"
+        "en": "Watering Plan Active",
+        "de": "Bewässerungsplan aktiv"
       },
       "getable": true,
       "setable": false,
-      "uiComponent": null,
       "insights": true,
       "insightsTitleTrue": {
-        "en": "Watering Started",
-        "de": "Bewässerung gestartet"
+        "en": "Watering Plan Started",
+        "de": "Bewässerungsplan gestartet"
       },
       "insightsTitleFalse": {
-        "en": "Watering Finished",
-        "de": "Bewässerung beendet"
-      }
+        "en": "Watering Plan Finished",
+        "de": "Bewässerungsplan beendet"
+      },
+      "icon": "/assets/watering.svg"
     },
     "watering_mode": {
       "type": "enum",

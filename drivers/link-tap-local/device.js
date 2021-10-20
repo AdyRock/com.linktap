@@ -10,7 +10,7 @@ class LinkTapLocalDevice extends Homey.Device
      */
     async onInit()
     {
-        this.log('LinkTapDevice has been initialized');
+        this.log('LinkTapLocalDevice initialising');
         this.isWatering = false;
         this.OnOffChanged = false;
         this.OnOffChangedTimeout = null;
@@ -41,6 +41,8 @@ class LinkTapLocalDevice extends Homey.Device
         this.setCapabilityValue('onoff', this.isWatering).catch(this.error);
         this.setCapabilityValue('cycles_remaining', 0).catch(this.error);
         this.setCapabilityValue('time_remaining', 0).catch(this.error);
+
+        this.log('LinkTapLocalDevice has been initialized');
     }
 
     /**
@@ -48,7 +50,7 @@ class LinkTapLocalDevice extends Homey.Device
      */
     async onAdded()
     {
-        this.log('LinkTapDevice has been added');
+        this.log('LinkTapLocalDevice has been added');
     }
 
     /**
@@ -61,7 +63,7 @@ class LinkTapLocalDevice extends Homey.Device
      */
     async onSettings({ oldSettings, newSettings, changedKeys })
     {
-        this.log('LinkTapDevice settings where changed');
+        this.log('LinkTapLocalDevice settings where changed');
     }
 
     /**
@@ -71,7 +73,7 @@ class LinkTapLocalDevice extends Homey.Device
      */
     async onRenamed(name)
     {
-        this.log('LinkTapDevice was renamed');
+        this.log('LinkTapLocalDevice was renamed');
     }
 
     /**
@@ -79,7 +81,7 @@ class LinkTapLocalDevice extends Homey.Device
      */
     async onDeleted()
     {
-        this.log('LinkTapDevice has been deleted');
+        this.log('LinkTapLocalDevice has been deleted');
     }
 
     async updateDeviceMQTT(tapLinkData)
@@ -124,7 +126,7 @@ class LinkTapLocalDevice extends Homey.Device
                             return;
                         }
 
-                        await this.setAvailable();
+                        this.setAvailable().catch(this.error);
 
                         if (tapLinker.is_manual_mode)
                         {
@@ -155,12 +157,12 @@ class LinkTapLocalDevice extends Homey.Device
 
                                     this.driver.triggerWateringStarted(this);
                                 }
-                                this.setCapabilityValue('watering_on', true).catch(this.error);
+                                this.setCapabilityValue('water_on', true).catch(this.error);
                                 this.setCapabilityValue('time_remaining', Math.ceil(tapLinker.remain_duration / 60)).catch(this.error);
                             }
                             else
                             {
-                                this.setCapabilityValue('watering_on', false).catch(this.error);
+                                this.setCapabilityValue('water_on', false).catch(this.error);
                                 if (this.isWatering && tapLinker.is_final)
                                 {
                                     // The final cycle has completed
@@ -213,7 +215,7 @@ class LinkTapLocalDevice extends Homey.Device
         }
         catch (err)
         {
-            this.homey.app.updateLog("updateDeviceValues (" + dd.id + ") Error: " + this.homey.app.varToString(err), 0);
+            this.homey.app.updateLog("updateDeviceValues (" + dd.id + ") Error: " + err.message, 0);
         }
     }
 

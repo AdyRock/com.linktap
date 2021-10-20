@@ -1,0 +1,10 @@
+{
+    "type": "boolean",
+    "title": {
+        "en": "Low Water Flow Alarm",
+        "de": "geringer Wasserdurchfluss"
+    },
+    "getable": true,
+    "setable": false,
+    "icon": "/assets/blocked_hose.svg"
+}

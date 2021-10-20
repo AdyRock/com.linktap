@@ -1,0 +1,17 @@
+{
+    "title": {
+        "en": "High Water Flow Alarm",
+        "de": "hoher Wasserdurchfluss Alarm"
+    },
+    "hint": {
+        "en": "When there is a leak",
+        "de": "Wenn es ein Leck gibt"
+    },
+    "args": [
+      {
+        "type": "device",
+        "name": "device",
+        "filter": "driver_id=link-tap"
+      }
+    ]
+}

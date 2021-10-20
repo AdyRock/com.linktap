@@ -10,11 +10,13 @@ class LinkTapLocalDriver extends Homey.Driver
      */
     async onInit()
     {
-        this.log('LinkTapDriver has been initialized');
+        this.log('LinkTapLocalDriver initialising');
 
         this.wateringStartedTrigger = this.homey.flow.getDeviceTriggerCard('watering_started');
         this.wateringFinishedTrigger = this.homey.flow.getDeviceTriggerCard('watering_finished');
         this.wateringSkippedTrigger = this.homey.flow.getDeviceTriggerCard('watering_skipped');
+
+        this.log('LinkTapLocalDriver has been initialized');
     }
 
     triggerWateringStarted(device)
