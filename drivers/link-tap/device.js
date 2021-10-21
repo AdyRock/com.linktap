@@ -156,6 +156,9 @@ class LinkTapDevice extends Homey.Device
 
             this.setCapabilityValue('watering_mode', tapLinker.workMode != 'N' ? tapLinker.workMode : null).catch(this.error);
             this.setCapabilityValue('alarm_battery', parseInt(tapLinker.batteryStatus) < 30).catch(this.error);
+            this.setCapabilityValue('watering', tapLinker.watering === true).catch(this.error);
+            this.setCapabilityValue('water_on', tapLinker.watering === true).catch(this.error);
+            this.setCapabilityValue('alarm_freeze', false).catch(this.error);
 
             if (typeof tapLinker.fall !== "undefined")
             {
@@ -175,6 +178,7 @@ class LinkTapDevice extends Homey.Device
                 this.setCapabilityValue('alarm_broken', tapLinker.valveBroken).catch(this.error);
                 this.setCapabilityValue('alarm_water', tapLinker.noWater).catch(this.error);
                 this.setCapabilityValue('measure_water', tapLinker.vel / 1000).catch(this.error);
+                this.setCapabilityValue('meter_water', 0).catch(this.error);
                 this.setCapabilityValue('alarm_high_flow', tapLinker.leakFlag).catch(this.error);
                 this.setCapabilityValue('alarm_low_flow', tapLinker.clogFlag).catch(this.error);
             }
@@ -240,6 +244,8 @@ class LinkTapDevice extends Homey.Device
             body.alarm = 'pbFlag';
             this.homey.app.PostURL(url, body).catch(this.Error);
         }
+
+        this.setCapabilityValue('alarm_freeze', false);
     }
 
     async onCapabilityOnOff(value)
