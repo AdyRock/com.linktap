@@ -27,14 +27,19 @@ class MyApp extends Homey.App
         this.log('MyApp initialising');
         this.diagLog = "";
         this.homeyIP = null;
+        this.cloudOnly = true;
+        this.enableLocal = this.homey.settings.get('enableLocal'); // Set to true when a local access device is added
 
-        try
+        if (this.enableLocal)
         {
-            await this.setupLocalAccess();
-        }
-        catch(err)
-        {
-            this.updateLog("Error setting up local access: " + err.message );
+            try
+            {
+                await this.setupLocalAccess();
+            }
+            catch (err)
+            {
+                this.updateLog("Error setting up local access: " + err.message);
+            }
         }
 
         if (process.env.DEBUG === '1')
@@ -291,7 +296,7 @@ class MyApp extends Homey.App
                     });
                 }
             }
-            catch(err)
+            catch (err)
             {
                 this.homey.app.updateLog("updateDetectedMQTTDevices error: " + err.message);
             }
@@ -335,7 +340,7 @@ class MyApp extends Homey.App
                 this.checkGatewayConfiguration(this.mDNSGateways[index]);
             }
         }
-        catch(err)
+        catch (err)
         {
             this.homey.app.updateLog("mDNSGatewaysUpdate error: " + err.message);
         }
@@ -441,7 +446,7 @@ class MyApp extends Homey.App
         this.MQTTclient.publish('linktap/down_cmd', data);
     }
 
-    async getDeviceData()
+    async getDeviceData(UseDirtyCache)
     {
         let searchData = null;
 
@@ -464,6 +469,7 @@ class MyApp extends Homey.App
                 let response = await this.PostURL(url, {});
                 searchData = response.devices;
                 this.detectedDevices = this.varToString(searchData);
+                this.cacheClean = true;
                 this.lastDetectionTime = Date.now();
                 this.homey.settings.set('detectedDevices', this.detectedDevices);
                 this.homey.settings.set('lastDetectionTime', this.lastDetectionTime);
@@ -478,7 +484,7 @@ class MyApp extends Homey.App
                 return null;
             }
         }
-        else
+        else if (UseDirtyCache || this.cacheClean)
         {
             searchData = JSON.parse(this.detectedDevices);
         }
@@ -492,7 +498,7 @@ class MyApp extends Homey.App
 
         if (useInternet)
         {
-            searchData = await this.getDeviceData();
+            searchData = await this.getDeviceData(true);
         }
         else
         {
@@ -534,6 +540,7 @@ class MyApp extends Homey.App
 
     async processWebhookMessage(message)
     {
+        this.cacheClean = false;
         const drivers = this.homey.drivers.getDrivers();
         for (const driver in drivers)
         {
@@ -565,7 +572,7 @@ class MyApp extends Homey.App
                 myWebhook.on('message', args =>
                 {
                     this.updateLog('Got a webhook message!' + this.varToString(args.body), 0);
-                    this.processWebhookMessage( args.body ).catch(this.error);
+                    this.processWebhookMessage(args.body).catch(this.error);
                 });
 
                 //https://www.link-tap.com/api/setWebHookUrl
@@ -879,7 +886,7 @@ class MyApp extends Homey.App
         }
         catch (err)
         {
-            this.updateLog("VarToString Error: " +  err.message);
+            this.updateLog("VarToString Error: " + err.message);
         }
 
         return source.toString();
@@ -926,7 +933,7 @@ class MyApp extends Homey.App
                     this.homey.api.realtime('com.linktap.logupdated', { 'log': this.diagLog });
                 }
             }
-            catch(err)
+            catch (err)
             {
                 console.log(err);
             }
