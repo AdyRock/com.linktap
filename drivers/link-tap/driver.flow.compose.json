@@ -1,137 +1,14 @@
 {
-    "triggers": [
-        {
-            "id": "alarm_fallen_true",
-            "title": {
-                "en": "The valve has fallen",
-                "de": "Das Ventil ist gefallen",
-                "nl": "De kraan is gevallen"
-            },
-            "hint": {
-                "en": "When the valve falls down",
-                "de": "Wenn das Ventil herunterfällt",
-                "nl": "Wanneer de kraan is gevallen"
-            }
-        },
-        {
-            "id": "alarm_fallen_false",
-            "title": {
-                "en": "The valve has been put back",
-                "de": "Das Ventil wurde wieder angeschlossen",
-                "nl": "De kraan is teruggeplaatst"
-            },
-            "hint": {
-                "en": "When the valve has been put back",
-                "de": "Wenn das Ventil wieder angeschlossen wurde",
-                "nl": "Wanneer de kraan weer is teruggeplaatst"
-            }
-        },
-        {
-            "id": "alarm_broken_true",
-            "title": {
-                "en": "The valve is broken",
-                "de": "Das Ventil ist defekt",
-                "nl": "De kraan is kapot"
-            },
-            "hint": {
-                "en": "When the valve fails",
-                "de": "Wenn das Ventil ausfällt",
-                "nl": "Wanneer de kraan kapot is"
-            }
-        },
-        {
-            "id": "alarm_broken_false",
-            "title": {
-                "en": "The valve is repaired",
-                "de": "Das Ventil ist repariert",
-                "nl": "De kraan is gerepareerd"
-            },
-            "hint": {
-                "en": "When the valve in not broken",
-                "de": "Wenn das Ventil nicht defekt ist",
-                "nl": "Wanneer de kraan weer gerepareerd is"
-            }
-        },
-        {
-            "id": "watering_started",
-            "title": {
-                "en": "Watering has started",
-                "de": "Bewässerung hat begonnen",
-                "nl": "Irrigratie is begonnen"
-            },
-            "hint": {
-                "en": "When the watering has started",
-                "de": "Wenn die Bewässerung begonnen hat",
-                "nl": "Wanneer irrigratie is begonnen"
-            }
-        },
-        {
-            "id": "watering_finished",
-            "title": {
-                "en": "Watering has finished",
-                "de": "Bewässerung ist beendet",
-                "nl": "Irrigratie is beëindigd"
-            },
-            "hint": {
-                "en": "When the watering has finished",
-                "de": "Wenn die Bewässerung beendet ist",
-                "nl": "Wanneeer irrigratie is beëindigd"
-            }
-        }
-    ],
-    "conditions": [
-        {
-            "id": "is_watering",
-            "title": {
-                "en": "Watering !{{is|isn't}} in progress",
-                "de": "Bewässerung !{{ist|ist nicht}} aktiv",
-                "nl": "Irrigratie !{{is|is niet}} actief"
-            },
-            "hint": {
-                "en": "This Flow will continue if watering is/is not currently in progress.",
-                "de": "Dieser Flow wird fortgeführt, wenn die Bewässerung derzeit aktiv/nicht aktiv ist.",
-                "nl": "Deze flow zal verder gaan als het wel/niet bezig is met irrigreren."
-            }
-        },
-        {
-            "id": "alarm_fallen",
-            "title": {
-                "en": "Valve !{{has|hasn't}} fallen",
-                "de": "Ventil !{{ist|ist nicht}} gefallen",
-                "nl": "Kraan !{{is|is niet}} gevallen"
-            },
-            "hint": {
-                "en": "This Flow will continue if the valve has/has not fallen down.",
-                "de": "Dieser Flow wird fortgeführt, wenn das Ventil gefallen/nicht gefallen ist.",
-                "nl": "Deze flow zal verder gaan indien de kraan wel/niet gevallen is."
-            }
-        },
-        {
-            "id": "alarm_broken",
-            "title": {
-                "en": "Valve !{{has|hasn't}} failed",
-                "de": "Ventil !{{ist|ist nicht}} ausgefallen",
-                "nl": "Kraan !{{is|is niet}} uitgevallen"
-            },
-            "hint": {
-                "en": "This Flow will continue if the valve has/has not failed.",
-                "de": "Dieser Flow wird fortgeführt, wenn das Ventil ausgefallen/nicht ausgefallen ist.",
-                "nl": "Deze flow zal verder gaan indien de kraan wel/niet uitgevallen is."
-            }
-        }
-    ],
     "actions": [
         {
             "id": "activate_instant_mode",
             "title": {
                 "en": "Activate Instant Mode",
-                "de": "Sofort-Modus aktivieren",
-                "nl": "Activeer instant modus"
+                "de": "Sofort-Modus aktivieren"
             },
             "titleFormatted": {
                 "en": "Activate Instant Mode for [[water_duration]] minutes. Eco mode is [[eco_mode]] using [[on_time]] minute On and [[off_time]] minute off times. At the end the mode will [[revert]]",
-                "de": "Sofort-Modus für [[water_duration]] Minuten aktivieren. Eco-Modus [[eco_mode]] verwendet [[on_time]] Minuten Ein- und [[off_time]] Minuten Ausschaltzeiten. Am Ende wird die Betriebsart [[revert]]",
-                "nl": "Activeer instant modus voor [[water_duration]] minuten. Eco-Modus [[eco_mode]] staat [[on_time]] minuten Aan en [[off_time]] minuten uit. Aan het einde zal modus worden [[revert]]"
+                "de": "Sofort-Modus für [[water_duration]] Minuten aktivieren. Eco-Modus [[eco_mode]] verwendet [[on_time]] Minuten Ein- und [[off_time]] Minuten Ausschaltzeiten. Am Ende wird die Betriebsart [[revert]]"
             },
             "args": [
                 {
@@ -141,13 +18,11 @@
                     "max": 60,
                     "placeholder": {
                         "en": "Minutes",
-                        "de": "Minuten",
-                        "nl": "Minuten"
+                        "de": "Minuten"
                     },
                     "title": {
                         "en": "Duration",
-                        "de": "Dauer",
-                        "nl": "Duratie"
+                        "de": "Dauer"
                     }
                 },
                 {
@@ -157,8 +32,7 @@
                     "max": 60,
                     "placeholder": {
                         "en": "Minutes",
-                        "de": "Minuten",
-                        "nl": "Minuten"
+                        "de": "Minuten"
                     },
                     "title": {
                         "en": "Eco On Time",
@@ -172,13 +46,11 @@
                     "max": 60,
                     "placeholder": {
                         "en": "Minutes",
-                        "de": "Minuten",
-                        "nl": "Minuten"
+                        "de": "Minuten"
                     },
                     "title": {
                         "en": "Eco Off Time",
-                        "de": "Eco Ausschaltzeit",
-                        "nl": "Eco eind tijd"
+                        "de": "Eco Ausschaltzeit"
                     }
                 },
                 {
@@ -186,24 +58,21 @@
                     "type": "dropdown",
                     "title": {
                         "en": "Eco mode",
-                        "de": "Eco-Modus",
-                        "nl": "Eco-Modus"
+                        "de": "Eco-Modus"
                     },
                     "values": [
                         {
                             "id": "on",
                             "label": {
                                 "en": "On",
-                                "de": "An",
-                                "nl": "Aan"
+                                "de": "An"
                             }
                         },
                         {
                             "id": "off",
                             "label": {
                                 "en": "Off",
-                                "de": "Aus",
-                                "nl": "Uit"
+                                "de": "Aus"
                             }
                         }
                     ]
@@ -213,24 +82,21 @@
                     "type": "dropdown",
                     "title": {
                         "en": "Action at end",
-                        "de": "Aktion am Ende",
-                        "nl": "Actie aan het einde"
+                        "de": "Aktion am Ende"
                     },
                     "values": [
                         {
                             "id": "on",
                             "label": {
                                 "en": "Revert to previous mode",
-                                "de": "Zurück zum vorherigen Modus",
-                                "nl": "Zet vorige modus terug"
+                                "de": "Zurück zum vorherigen Modus"
                             }
                         },
                         {
                             "id": "off",
                             "label": {
                                 "en": "Keep as current mode",
-                                "de": "Als aktuellen Modus beibehalten",
-                                "nl": "Behoud huidige modus"
+                                "de": "Als aktuellen Modus beibehalten"
                             }
                         }
                     ]
@@ -241,21 +107,18 @@
             "id": "turn_off_instant_mode",
             "title": {
                 "en": "Turn Off Instant Mode",
-                "de": "Sofort-Modus ausschalten",
-                "nl": "Zet instant modus uit"
+                "de": "Sofort-Modus ausschalten"
             }
         },
         {
             "id": "activate_watering_mode",
             "title": {
                 "en": "Activate Watering Mode",
-                "de": "Bewässerungsmodus aktivieren",
-                "nl": "Activeer irrigratie modus"
+                "de": "Bewässerungsmodus aktivieren"
             },
             "titleFormatted": {
                 "en": "Activate [[mode]] Watering Mode",
-                "de": "Bewässerungsmodus aktivieren '[[mode]]'",
-                "nl": "Activeer [[mode]] irrigratie modus"
+                "de": "Bewässerungsmodus aktivieren '[[mode]]'"
             },
             "args": [
                 {
@@ -263,40 +126,35 @@
                     "type": "dropdown",
                     "title": {
                         "en": "Watering",
-                        "de": "Bewässerungsmodus",
-                        "nl": "Irrigratie modus"
+                        "de": "Bewässerungsmodus"
                     },
                     "values": [
                         {
                             "id": "I",
                             "label": {
                                 "en": "Interval",
-                                "de": "Intervall-Modus",
-                                "nl": "Interval"
+                                "de": "Intervall-Modus"
                             }
                         },
                         {
                             "id": "O",
                             "label": {
                                 "en": "Odd and Even",
-                                "de": "Ungerade- und Gerade-Modus",
-                                "nl": "Oneven en even"
+                                "de": "Ungerade- und Gerade-Modus"
                             }
                         },
                         {
                             "id": "T",
                             "label": {
                                 "en": "Seven day",
-                                "de": "Sieben-Tage-Modus",
-                                "nl": "Zeven dagen"
+                                "de": "Sieben-Tage-Modus"
                             }
                         },
                         {
                             "id": "Y",
                             "label": {
                                 "en": "Month",
-                                "de": "Monats-Modus",
-                                "nl": "Maand"
+                                "de": "Monats-Modus"
                             }
                         }
                     ]

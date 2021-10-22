@@ -1,22 +1,22 @@
 {
     "type": "boolean",
     "title": {
-        "en": "Watering",
-        "de": "Bewässerung",
-        "nl": "Irrigratie"
+        "en": "Watering Plan Active",
+        "de": "Bewässerungsplan aktiv",
+        "nl": "Irrigatieplan actief"
     },
     "getable": true,
     "setable": false,
-    "uiComponent": null,
     "insights": true,
     "insightsTitleTrue": {
-        "en": "Watering Started",
-        "de": "Bewässerung gestartet",
-        "nl": "Irrigratie gestart"
+        "en": "Watering Plan Started",
+        "de": "Bewässerungsplan gestartet",
+        "nl": "Irrigatieplan gestart"
     },
     "insightsTitleFalse": {
-        "en": "Watering Finished",
-        "de": "Bewässerung beendet",
-        "nl": "Irrigratie beëindigd"
-    }
+        "en": "Watering Plan Finished",
+        "de": "Bewässerungsplan beendet",
+        "nl": "Irrigatieplan beëindigd"
+    },
+    "icon": "/assets/watering.svg"
 }

@@ -1,0 +1,17 @@
+{
+    "title": {
+        "en": "Freeze Alarm has cleared",
+        "de": "Frostalarm wurde gelöscht"
+    },
+    "hint": {
+        "en": "When there is no longer a chance of freezing",
+        "de": "Wenn keine Frostgefahr mehr besteht"
+    },
+    "args": [
+      {
+        "type": "device",
+        "name": "device",
+        "filter": "driver_id=link-tap"
+      }
+    ]
+}

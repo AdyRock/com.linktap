@@ -1,0 +1,17 @@
+{
+    "title": {
+        "en": "Low Water Flow Alarm Cleared",
+        "de": "Alarm für niedrigen Wasserdurchfluss gelöscht"
+    },
+    "hint": {
+        "en": "The blockage is clear",
+        "de": "Die Blockade ist klar"
+    },
+    "args": [
+      {
+        "type": "device",
+        "name": "device",
+        "filter": "driver_id=link-tap"
+      }
+    ]
+}

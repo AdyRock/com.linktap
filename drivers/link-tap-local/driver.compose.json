@@ -1,14 +1,14 @@
 {
-  "id": "link-tap",
+  "id": "link-tap-local",
   "name": {
-    "en": "LinkTap (cloud)"
+    "en": "LinkTap (local)"
   },
+  "deprecated": true,
   "platforms": [
-    "local",
-    "cloud"
+    "local"
   ],
   "connectivity": [
-    "cloud"
+    "lan"
   ],
   "class": "other",
   "energy": {
@@ -20,20 +20,18 @@
   "capabilities": [
     "onoff",
     "clear_alarms",
-    "alarm_battery",
+    "measure_battery",
     "watering_mode",
-    "watering",
-    "water_on",
-    "time_remaining",
-    "cycles_remaining",
     "alarm_fallen",
     "alarm_broken",
-    "alarm_freeze",
     "alarm_water",
-    "alarm_high_flow",
-    "alarm_low_flow",
+    "signal_strength",
     "measure_water",
-    "meter_water"
+    "meter_water",
+    "time_remaining",
+    "cycles_remaining",
+    "watering",
+    "water_on"
   ],
   "capabilitiesOptions": {
     "meter_water": {
@@ -41,9 +39,6 @@
     }
   },
   "pair": [
-    {
-      "id": "my_connect"
-    },
     {
       "id": "list_my_devices",
       "template": "list_devices",
@@ -56,13 +51,8 @@
       "template": "add_devices"
     }
   ],
-  "repair": [
-    {
-      "id": "my_repair"
-    }
-  ],
   "images": {
-    "large": "/drivers/link-tap/assets/images/large.jpg",
-    "small": "/drivers/link-tap/assets/images/small.jpg"
+    "large": "/drivers/link-tap-local/assets/images/large.jpg",
+    "small": "/drivers/link-tap-local/assets/images/small.jpg"
   }
 }

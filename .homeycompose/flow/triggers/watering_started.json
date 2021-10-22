@@ -1,0 +1,17 @@
+{
+    "title": {
+        "en": "Watering has started",
+        "de": "Bewässerung hat begonnen"
+    },
+    "hint": {
+        "en": "When the watering has started",
+        "de": "Wenn die Bewässerung begonnen hat"
+    },
+    "args": [
+      {
+        "type": "device",
+        "name": "device",
+        "filter": "driver_id=link-tap|link-tap-local"
+      }
+    ]
+}

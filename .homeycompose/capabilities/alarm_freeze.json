@@ -1,0 +1,9 @@
+{
+    "type": "boolean",
+    "title": {
+        "en": "Freezing Alarm"
+    },
+    "getable": true,
+    "setable": false,
+    "icon": "/assets/freezing.svg"
+}

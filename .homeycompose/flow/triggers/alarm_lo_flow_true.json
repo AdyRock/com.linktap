@@ -1,0 +1,17 @@
+{
+    "title": {
+        "en": "Low Water Flow Alarm",
+        "de": "Alarm für niedrigen Wasserdurchfluss"
+    },
+    "hint": {
+        "en": "When there is a blockage",
+        "de": "Wenn es eine Blockade gibt"
+    },
+    "args": [
+      {
+        "type": "device",
+        "name": "device",
+        "filter": "driver_id=link-tap"
+      }
+    ]
+}

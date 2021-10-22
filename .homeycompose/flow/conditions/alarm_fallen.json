@@ -1,0 +1,17 @@
+{
+    "title": {
+        "en": "Valve !{{has|hasn't}} fallen",
+        "de": "Ventil !{{ist|ist nicht}} gefallen"
+    },
+    "hint": {
+        "en": "This Flow will continue if the valve has/has not fallen down.",
+        "de": "Dieser Flow wird fortgeführt, wenn das Ventil gefallen/nicht gefallen ist."
+    },
+    "args": [
+      {
+        "type": "device",
+        "name": "device",
+        "filter": "driver_id=link-tap|link-tap-local"
+      }
+    ]
+}

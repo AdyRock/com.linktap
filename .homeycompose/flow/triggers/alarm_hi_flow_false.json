@@ -1,0 +1,17 @@
+{
+    "title": {
+        "en": "High Water Flow Alarm Cleared",
+        "de": "Alarm für hohen Wasserdurchfluss gelöscht"
+    },
+    "hint": {
+        "en": "The leak is fixed",
+        "de": "Das Leck ist behoben"
+    },
+    "args": [
+      {
+        "type": "device",
+        "name": "device",
+        "filter": "driver_id=link-tap"
+      }
+    ]
+}

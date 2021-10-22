@@ -7,7 +7,6 @@
     },
     "getable": true,
     "setable": false,
-    "uiComponent": null,
     "insights": true,
     "insightsTitleTrue": {
         "en": "Water Turned on",
@@ -18,5 +17,6 @@
         "en": "Water Turned off",
         "de": "Wasser ausgestellt",
         "nl": "Water uitgezet"
-    }
+    },
+    "icon": "/assets/water_on.svg"
 }

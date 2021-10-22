@@ -4,6 +4,14 @@
 <head>
     <link rel="stylesheet" type="text/css" href="lwsa.css">
     <link rel="stylesheet" type="text/css" href="busy_indicator.css" />
+    <style>
+        label.a {
+            display: inline-block;
+            width: 200px;
+            height: 15px;
+            padding: 5px;
+        }
+    </style>
 
     <style type="text/css">
         .fog_div {
@@ -36,6 +44,7 @@
     <!-- Tab links -->
     <div class="tab">
         <button class="tablinks" onclick="setPage(event, 'settings')" id="defaultOpen"><span data-i18n="settings.settings"></span></button>
+        <button class="tablinks" onclick="setPage(event, 'gateways')"><span data-i18n="settings.gateways"></span></button>
         <button class="tablinks" onclick="setPage(event, 'detected')"><span data-i18n="settings.detected"></span></button>
         <button class="tablinks" onclick="setPage(event, 'log')"><span data-i18n="settings.diagnosticsLog"></span></button>
         <button class="tablinks" onclick="setPage(event, 'simulator')" id="simLogTab" style="visibility:hidden">Simulation Data</button>
@@ -43,41 +52,58 @@
 
     <!-- SETTINGS PAGE -->
     <div id="settings" class="tabcontent">
-
-        <p data-i18n="settings.subtitle"></p>
-
         <fieldset>
-            <legend><span data-i18n="settings.accountDetails"></span></legend>
-            <fieldset>
-                <div class="field row">
-                    <label for="UserName"><span data-i18n="settings.userName"></span></label>
-                    <input id="UserName" type="text" value="" />
-                </div>
-            </fieldset>
-            <fieldset>
-                <div class="field row">
-                    <label for="APIToken"><span data-i18n="settings.apiKey"></span></label>
-                    <input id="APIToken" type="text" value="" />
-                </div>
-                <div class="field row">
-                    <p></p>
-                    <p><b><span data-i18n="settings.getKeyInstruction1"></span>:</b></p>
-                    <p><span data-i18n="settings.getKeyInstruction2"></span></p>
-                    <p>
-                        <b><span data-i18n="settings.note"></span>:</b> <span data-i18n="settings.noteText"></span>
-                    </p>
-                </div>
-                <div class="field row">
-                    <label for="password"><span data-i18n="settings.password"></span></label>
-                    <input id="password" type="text" value="" />
-                </div>
-                <div class="field row">
-                    <p><button id="getKey" class="right"><span data-i18n="settings.getKey"></span></button></p>
-                </div>
-            </fieldset>
+            <legend><span data-i18n="settings.subtitle"></span></legend>
+            <div id="iNetSettings">
+                <fieldset>
+                    <legend><span data-i18n="settings.accountDetails"></span></legend>
+                    <fieldset>
+                        <div class="field row">
+                            <label for="UserName"><span data-i18n="settings.userName"></span></label>
+                            <input id="UserName" type="text" value="" />
+                        </div>
+                    </fieldset>
+                    <fieldset>
+                        <div class="field row">
+                            <label for="APIToken"><span data-i18n="settings.apiKey"></span></label>
+                            <input id="APIToken" type="text" value="" />
+                        </div>
+                        <div class="field row">
+                            <p></p>
+                            <p><b><span data-i18n="settings.getKeyInstruction1"></span>:</b></p>
+                            <p><span data-i18n="settings.getKeyInstruction2"></span></p>
+                            <p>
+                                <b><span data-i18n="settings.note"></span>:</b> <span data-i18n="settings.noteText"></span>
+                            </p>
+                        </div>
+                        <div class="field row">
+                            <label for="password"><span data-i18n="settings.password"></span></label>
+                            <input id="password" type="text" value="" />
+                        </div>
+                        <div class="field row">
+                            <p><button id="getKey" class="right"><span data-i18n="settings.getKey"></span></button></p>
+                        </div>
+                    </fieldset>
+                    <p><button id="save" class="right"><span data-i18n="settings.saveChanges"></span></button></p>
+                </fieldset>
+            </div>
         </fieldset>
+    </div>
+
+    <!-- GATEWAYS PAGE -->
+    <div id="gateways" class="tabcontent">
+        <p data-i18n="settings.localGateways"></p>
         <fieldset>
-            <p><button id="save" class="right"><span data-i18n="settings.saveChanges"></span></button></p>
+            <legend><span data-i18n="settings.gatways"></span></legend>
+            <div class="field row">
+                <label for="autoConfig"><span data-i18n="settings.autoConfig"></span></label>
+                <input id="autoConfig" type="checkbox" value="notify" />
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Available Gateways</legend>
+            <div id="gatewaySection"></div>
         </fieldset>
     </div>
 
@@ -132,6 +158,8 @@
         var getKeyElement = document.getElementById('getKey');
         var saveElement = document.getElementById('save');
 
+        var autoConfigElement = document.getElementById('autoConfig');
+
         var detectedDevicesElement = document.getElementById('detectedDevices');
         var diagLogElement = document.getElementById('diagLog');
         var logEnabledElement = document.getElementById('logEnabled');
@@ -158,6 +186,21 @@
             });
 
             document.getElementById("defaultOpen").click();
+
+            Homey.get('autoConfig', function(err, autoConfig)
+            {
+                if (err) return Homey.alert(err);
+                autoConfigElement.checked = autoConfig;
+            });
+
+            Homey.on('com.linktap.GatewaysUpdated', function(data)
+            {
+                if (data.status)
+                {
+                    Homey.alert(data.status);
+                }
+                getGateways();
+            });
 
             Homey.on('com.linktap.logupdated', function(data)
             {
@@ -257,7 +300,7 @@
                         {
                             if (err) return Homey.alert(err);
                         });
-                        
+
                         Homey.set('UserName', UserNameElement.value, function(err)
                         {
                             if (err) return Homey.alert(err);
@@ -282,6 +325,11 @@
                 });
 
                 return Homey.alert(Homey.__('settings.saved'));
+            });
+
+            autoConfigElement.addEventListener('click', function(e)
+            {
+                Homey.set('autoConfig', autoConfigElement.checked);
             });
 
             logEnabledElement.addEventListener('click', function(e)
@@ -382,7 +430,7 @@
                 }
                 catch (err)
                 {
-                    return Homey.alert(err);
+                    return Homey.alert(err.message);
                 }
             });
 
@@ -427,7 +475,11 @@
             document.getElementById(tabPage).style.display = "block";
             evt.currentTarget.className += " active";
 
-            if (tabPage == 'log')
+            if (tabPage == 'gateways')
+            {
+                getGateways();
+            }
+            else if (tabPage == 'log')
             {
                 // Refresh the log data
                 Homey.get('logEnabled', function(err, logEnabled)
@@ -469,6 +521,39 @@
             {
                 busyi.hide();
             }
+        }
+
+        function addGateway(gateway)
+        {
+            console.log("addApp");
+            var section = document.getElementById('gatewaySection').innerHTML;
+
+            document.getElementById('gatewaySection').innerHTML = section +
+                '<div class="field row"><p><label class="a">' +
+                gateway.gatewayId + ' (Model:' + gateway.model + ') </label><button onClick="Homey.openURL(' + "'http://" + gateway.address + "'" + ')">View</button></p></div>';
+
+        }
+
+        function getGateways()
+        {
+            document.getElementById('gatewaySection').innerHTML = "";
+            Homey.get('gateways', function(err, gatewayList)
+            {
+                if (err) return Homey.alert(err);
+
+                if (gatewayList.length == 0)
+                {
+                    document.getElementById('gatewaySection').innerHTML = "No gateways";
+                }
+                else
+                {
+                    document.getElementById('gatewaySection').innerHTML = "";
+                    gatewayList.forEach(element =>
+                    {
+                        addGateway(element);
+                    });
+                }
+            });
         }
     </script>
 

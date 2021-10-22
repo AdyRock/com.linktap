@@ -10,34 +10,68 @@ class LinkTapDevice extends Homey.Device
      */
     async onInit()
     {
-        this.log('LinkTapDevice has been initialized');
+        this.log('LinkTapDevice initialising');
         this.isWatering = false;
+        this.cycles = 0;
+
+        this.onDeviceUpdateVol = this.onDeviceUpdateVol.bind(this);
 
         if (!this.hasCapability('onoff'))
         {
-            this.addCapability('onoff');
+            this.addCapability('onoff')
+                .then(this.setCapabilityValue('onoff', false).catch(this.error))
+                .catch(this.error);
         }
+
+        if (!this.hasCapability('clear_alarms'))
+        {
+            this.addCapability('clear_alarms').catch(this.error);
+        }
+
+        if (!this.hasCapability('alarm_fallen'))
+        {
+            this.addCapability('alarm_fallen')
+                .then(this.setCapabilityValue('alarm_fallen', false).catch(this.error))
+                .catch(this.error);
+        }
+
+        if (!this.hasCapability('alarm_broken'))
+        {
+            this.addCapability('alarm_broken')
+                .then(this.setCapabilityValue('alarm_broken', false).catch(this.error))
+                .catch(this.error);
+        }
+
+        if (!this.hasCapability('alarm_freeze'))
+        {
+            this.addCapability('alarm_freeze')
+                .then(this.setCapabilityValue('alarm_freeze', false).catch(this.error))
+                .catch(this.error);
+        }
+
+        if (this.hasCapability('signal_strength'))
+        {
+            this.removeCapability('signal_strength').catch(this.error);
+        }
+
+        if (this.hasCapability('measure_battery'))
+        {
+            this.removeCapability('measure_battery').catch(this.error);
+            this.addCapability('alarm_battery')
+                .then(this.setCapabilityValue('alarm_battery', false).catch(this.error))
+                .catch(this.error);
+        }
+
+        this.setCapabilityValue('cycles_remaining', 0).catch(this.error);
+        this.setCapabilityValue('time_remaining', 0).catch(this.error);
 
         this.registerCapabilityListener('onoff', this.onCapabilityOnOff.bind(this));
+        this.registerCapabilityListener('clear_alarms', this.onCapabilityClearAlarms.bind(this));
         this.registerCapabilityListener('watering_mode', this.onCapabilityWateringMode.bind(this));
 
-        const searchData = await this.homey.app.getDeviceData();
-        this.updateDeviceValues(searchData);
+        this.updateDeviceValues();
 
-        this.onDeviceStatusPoll = this.onDeviceStatusPoll.bind(this);
-        this.timerPollID = this.homey.setTimeout(this.onDeviceStatusPoll, (1000 * 30));
-
-        if (this.hasCapability('alarm_fallen'))
-        {
-            await this.setCapabilityValue('alarm_fallen', false);
-            await this.setCapabilityValue('alarm_broken', false);
-            await this.setCapabilityValue('alarm_water', false);
-            await this.setCapabilityValue('measure_water', 0);
-        }
-
-        await this.setCapabilityValue('onoff', this.isWatering);
-        await this.setCapabilityValue('cycles_remaining', 0);
-        await this.setCapabilityValue('time_remaining', 0);
+        this.log('LinkTapDevice has been initialized');
     }
 
     /**
@@ -46,8 +80,8 @@ class LinkTapDevice extends Homey.Device
     async onAdded()
     {
         this.log('LinkTapDevice has been added');
-        const searchData = await this.homey.app.getDeviceData();
-        this.updateDeviceValues(searchData);
+
+        this.updateDeviceValues();
     }
 
     /**
@@ -82,8 +116,31 @@ class LinkTapDevice extends Homey.Device
         clearTimeout(this.timerPollID);
     }
 
-    async updateDeviceValues(devices)
+    async updateDeviceValues()
     {
+        this.__updateDeviceValues()
+            .then(success =>
+            {
+                if (!success)
+                {
+                    this.homey.setTimeout(async () =>
+                    {
+                        // Try again after 5 minutes as it could be failing with the cached data
+                        this.updateDeviceValues();
+                    }, 1000 * 60 * 5);
+                }
+            });
+    }
+
+    async __updateDeviceValues()
+    {
+        const devices = await this.homey.app.getDeviceData(false);
+
+        if (devices === null)
+        {
+            return false;
+        }
+
         const dd = this.getData();
 
         try
@@ -92,8 +149,8 @@ class LinkTapDevice extends Homey.Device
 
             if (gateway.status !== 'Connected')
             {
-                await this.setUnavailable("Gateway Offline");
-                return;
+                this.setUnavailable("Gateway Offline").catch(this.error);
+                return false;
             }
 
             const tapLinkers = gateway.taplinker;
@@ -102,52 +159,147 @@ class LinkTapDevice extends Homey.Device
 
             if (tapLinker.status !== 'Connected')
             {
-                await this.setUnavailable("LinkTap Offline");
-                return;
+                this.setUnavailable("LinkTap Offline").catch(this.error);
+                return false;
             }
 
             await this.setAvailable();
 
-            await this.setCapabilityValue('watering_mode', tapLinker.workMode);
-            await this.setCapabilityValue('measure_battery', parseInt(tapLinker.batteryStatus));
-            await this.setCapabilityValue('signal_strength', -tapLinker.signal);
+            // Standard capabilities available to all device types
+            this.setCapabilityValue('watering_mode', tapLinker.workMode != 'N' ? tapLinker.workMode : null).catch(this.error);
+            this.setCapabilityValue('alarm_battery', parseInt(tapLinker.batteryStatus) < 30).catch(this.error);
+            this.setCapabilityValue('alarm_freeze', false).catch(this.error);
+            this.setCapabilityValue('watering', tapLinker.watering === true).catch(this.error);
+            this.setCapabilityValue('water_on', tapLinker.watering === true).catch(this.error);
+            this.setCapabilityValue('alarm_fallen', tapLinker.fall).catch(this.error);
+            this.setCapabilityValue('alarm_broken', tapLinker.valveBroken).catch(this.error);
 
-            if (typeof tapLinker.fall !== "undefined")
-            {
-                if (!this.hasCapability('alarm_fallen'))
-                {
-                    this.addCapability('alarm_fallen');
-                    this.addCapability('alarm_broken');
-                    this.addCapability('alarm_water');
-                    this.addCapability('measure_water');
-                    this.addCapability('meter_water');
-                }
+            // Some capabilities are only available when a flow meter is fitted.
+            await this.setupFlowMeterCapabilities(tapLinker.flowMeterStatus);
 
-                await this.setCapabilityValue('alarm_fallen', tapLinker.fall);
-                await this.setCapabilityValue('alarm_broken', tapLinker.valveBroken);
-                await this.setCapabilityValue('alarm_water', tapLinker.noWater);
-                await this.setCapabilityValue('measure_water', tapLinker.vel / 1000);
-            }
-            else
+            if (tapLinker.flowMeterStatus === 'on')
             {
-                if (this.hasCapability('alarm_fallen'))
-                {
-                    this.removeCapability('alarm_fallen');
-                    this.removeCapability('alarm_broken');
-                    this.removeCapability('alarm_water');
-                    this.removeCapability('measure_water');
-                    this.removeCapability('meter_water');
-                }
+                this.setCapabilityValue('alarm_water', tapLinker.noWater).catch(this.error);
+                this.setCapabilityValue('measure_water', tapLinker.vel / 1000).catch(this.error);
+                this.setCapabilityValue('meter_water', 0).catch(this.error);
+                this.setCapabilityValue('alarm_high_flow', tapLinker.leakFlag).catch(this.error);
+                this.setCapabilityValue('alarm_low_flow', tapLinker.clogFlag).catch(this.error);
             }
         }
         catch (err)
         {
-            this.homey.app.updateLog("updateDeviceValues (" + dd.id + ") Error: " + this.homey.app.varToString(err), 0);
+            this.homey.app.updateLog("updateDeviceValues (" + dd.id + ") Error: " + err.message, 0);
         }
+
+        return true;
+    }
+
+    async setupFlowMeterCapabilities(FlowMeterConnected)
+    {
+        if (FlowMeterConnected === 'on')
+        {
+            // Flow meter is connected so make sure we have all the capabilities
+            if (!this.hasCapability('alarm_water'))
+            {
+                this.addCapability('alarm_water').catch(this.error);
+            }
+
+            if (!this.hasCapability('measure_water'))
+            {
+                this.addCapability('measure_water').catch(this.error);
+            }
+
+            if (!this.hasCapability('meter_water'))
+            {
+                this.addCapability('meter_water').catch(this.error);
+            }
+
+            if (!this.hasCapability('alarm_high_flow'))
+            {
+                this.addCapability('alarm_high_flow').catch(this.error);
+            }
+
+            if (!this.hasCapability('alarm_low_flow'))
+            {
+                this.addCapability('alarm_low_flow').catch(this.error);
+            }
+        }
+        else
+        {
+            if (this.hasCapability('alarm_water'))
+            {
+                this.removeCapability('alarm_water').catch(this.error);
+            }
+
+            if (this.hasCapability('measure_water'))
+            {
+                this.removeCapability('measure_water').catch(this.error);
+            }
+
+            if (this.hasCapability('meter_water'))
+            {
+                this.removeCapability('meter_water').catch(this.error);
+            }
+
+            if (this.hasCapability('alarm_high_flow'))
+            {
+                this.removeCapability('alarm_high_flow').catch(this.error);
+            }
+
+            if (this.hasCapability('alarm_low_flow'))
+            {
+                this.removeCapability('alarm_low_flow').catch(this.error);
+            }
+        }
+    }
+
+    async onCapabilityClearAlarms(value)
+    {
+        const dd = this.getData();
+        let url = "dismissAlarm";
+        let body = {
+            gatewayId: dd.gatewayId,
+            taplinkerId: dd.id,
+            alarm: ''
+        };
+
+        if (this.getCapabilityValue('alarm_water'))
+        {
+            body.alarm = 'noWater';
+            this.homey.app.PostURL(url, body).catch(this.Error);
+        }
+
+        if (this.getCapabilityValue('alarm_broken'))
+        {
+            body.alarm = 'valveBroken';
+            this.homey.app.PostURL(url, body).catch(this.Error);
+        }
+
+        if (this.getCapabilityValue('alarm_fallen'))
+        {
+            body.alarm = 'fallFlag';
+            this.homey.app.PostURL(url, body).catch(this.Error);
+        }
+
+        if (this.getCapabilityValue('alarm_low_flow'))
+        {
+            body.alarm = 'pcFlag';
+            this.homey.app.PostURL(url, body).catch(this.Error);
+        }
+
+        if (this.getCapabilityValue('alarm_high_flow'))
+        {
+            body.alarm = 'pbFlag';
+            this.homey.app.PostURL(url, body).catch(this.Error);
+        }
+
+        this.setCapabilityValue('alarm_freeze', false);
     }
 
     async onCapabilityOnOff(value)
     {
+        const dd = this.getData();
+
         //Instant mode
         const settings = this.getSettings();
         return this.activateInstantMode(value,
@@ -164,7 +316,7 @@ class LinkTapDevice extends Homey.Device
         {
             //Instant mode
             const settings = this.getSettings();
-            return this.activateInstantMode(true,
+            return await this.activateInstantMode(true,
                 settings.watering_duration,
                 settings.eco_mode,
                 settings.on_duration,
@@ -174,7 +326,7 @@ class LinkTapDevice extends Homey.Device
         else
         {
             // All other modes
-            this.activateWateringMode(value);
+            await this.activateWateringMode(value);
         }
     }
 
@@ -204,10 +356,17 @@ class LinkTapDevice extends Homey.Device
             url = "activateMonthMode";
         }
 
-        let response = await this.homey.app.PostURL(url, body);
-        if (response.result !== "ok")
+        try
         {
-            throw (new Error(response.result));
+            let response = await this.homey.app.PostURL(url, body);
+            if (response.result !== "ok")
+            {
+                throw (new Error(response.result));
+            }
+        }
+        catch (err)
+        {
+            throw (new Error(err.message));
         }
     }
 
@@ -248,31 +407,12 @@ class LinkTapDevice extends Homey.Device
                 this.cycles = 1;
                 body.eco = false;
             }
-
-            await this.setCapabilityValue('cycles_remaining', this.cycles);
-
-            if (this.hasCapability('meter_water'))
-            {
-                await this.setCapabilityValue('meter_water', 0);
-            }
             body.autoBack = autoBack;
         }
         else
         {
             body.action = false;
             body.duration = 1;
-
-            await this.setCapabilityValue('time_remaining', 0);
-            this.isWatering = false;
-            await this.setCapabilityValue('onoff', this.isWatering);
-            this.cycles = 0;
-            this.setCapabilityValue('cycles_remaining', this.cycles);
-
-            if (this.getCapabilityValue('water_on'))
-            {
-                await this.setCapabilityValue('water_on', false);
-                this.driver.triggerWateringFinished(this);
-            }
         }
 
         let response = await this.homey.app.PostURL(url, body);
@@ -282,113 +422,206 @@ class LinkTapDevice extends Homey.Device
         }
     }
 
-    async onDeviceStatusPoll()
+    async onDeviceUpdateVol()
+    {
+        let vel = this.getCapabilityValue('measure_water');
+        let vol = this.getCapabilityValue('meter_water');
+        vol += vel / 30;
+        this.setCapabilityValue('meter_water', vol);
+    }
+
+    async processWebhookMessage(message)
     {
         const dd = this.getData();
-
-        try
+        if ((dd.id === message.deviceId) && (dd.gatewayId === message.gatewayId))
         {
-            let body = {
-                taplinkerId: dd.id,
-            };
-
-            const url = "getWateringStatus";
-            let response = await this.homey.app.PostURL(url, body);
-            this.homey.app.updateLog("onDeviceStatusPoll (" + dd.id + ") response: " + this.homey.app.varToString(response));
-            if (response.status)
+            // message is for this device
+            if (message.event === 'watering start')
             {
-                if (!this.cycles)
-                {
-                    await this.setAvailable();
+                this.setCapabilityValue('watering_mode', message.workMode);
+                this.isWatering = true;
+                this.setCapabilityValue('onoff', this.isWatering).catch(this.error);
+                this.setCapabilityValue('watering', this.isWatering).catch(this.error);
+                this.driver.triggerWateringStarted(this);
+            }
+            else if ((message.msg === 'wateringOn') || (message.event === 'wateringOn'))
+            {
+                this.setCapabilityValue('water_on', true).catch(this.error);
+                this.setCapabilityValue('time_remaining', message.onMin).catch(this.error);
+                this.setCapabilityValue('watering', this.isWatering).catch(this.error);
 
-                    if (this.hasCapability('meter_water'))
+                if (message.ecoFlag === 1)
+                {
+                    this.cycles = Math.ceil(message.ecoTotal / message.totalMin);
+                    this.setCapabilityValue('cycles_remaining', this.cycles).catch(this.error);
+                    if (message.onMin === message.totalMin)
                     {
-                        await this.setCapabilityValue('meter_water', 0);
+                        this.setCapabilityOptions('time_remaining', { 'title': this.homey.__('timeRemaining') });
                     }
-                    
+                }
+                else if (message.ecoFlag !== 3)
+                {
                     this.cycles = 1;
-                    if (response.status.ecoTotal)
+                    this.setCapabilityValue('cycles_remaining', this.cycles).catch(this.error);
+                    if ((message.onMin === 0) && (message.totalMin === '-1'))
                     {
-                        // Eco mode is on
-                        this.cycles = Math.ceil(response.status.ecoTotal / response.status.ecoOn);
+                        // Turned on via the button
+                        this.setCapabilityOptions('time_remaining', { 'title': this.homey.__('timeActive') });
                     }
-                    this.setCapabilityValue('cycles_remaining', this.cycles);
                 }
 
-                if (!this.isWatering)
+                if (message.vol != undefined)
                 {
-                    this.isWatering = true;
-                    await this.setCapabilityValue('onoff', this.isWatering);
-                    await this.setCapabilityValue('watering', this.isWatering);
+                    this.setCapabilityValue('meter_water', message.vol / 1000).catch(this.error);
+                    this.setCapabilityValue('measure_water', message.vel / 1000).catch(this.error);
 
-                    this.driver.triggerWateringStarted(this);
-                }
-
-                if (!this.getCapabilityValue('water_on'))
-                {
-                    await this.setCapabilityValue('water_on', true);
-                }
-
-                if (response.status.total === '-1')
-                {
-                    // Turned on via the button
-                    //duration *= -1;
-                    this.setCapabilityOptions('time_remaining', { 'title': this.homey.__('timeActive') });
-                }
-                else
-                {
-                    this.setCapabilityOptions('time_remaining', { 'title': this.homey.__('timeRemaining') });
-                }
-
-                await this.setCapabilityValue('time_remaining', parseInt(response.status.onDuration));
-
-                if (response.status.vel && this.hasCapability('measure_water'))
-                {
-                    await this.setCapabilityValue('measure_water', parseInt(response.status.vel) / 1000);
-
-                    // let vol = this.getCapabilityValue('meter_water');
-                    // vol += (response.status.vel / 2000);
-                    // await this.setCapabilityValue('meter_water', vol);
-                }
-
-                if (response.status.vol && this.hasCapability('meter_water'))
-                {
-                    // let vol = this.getCapabilityValue('meter_water');
-                    // vol += (response.status.vol / 1000);
-                    await this.setCapabilityValue('meter_water', (response.status.vol / 1000));
+                    if (this.timerVolUpdate)
+                    {
+                        this.homey.clearInterval(this.timerVolUpdate);
+                    }
+                    this.timerVolUpdate = this.homey.setInterval(this.onDeviceUpdateVol, (1000 * 2));
                 }
             }
-            else
+            else if (message.msg === 'wateringOff')
             {
-                if (this.isWatering)
+                if (this.cycles > 0 && this.isWatering)
                 {
-                    if (this.getCapabilityValue('water_on'))
+                    if (this.timerVolUpdate)
                     {
-                        await this.setCapabilityValue('water_on', false);
-                        await this.setCapabilityValue('time_remaining', 0);
+                        this.homey.clearInterval(this.timerVolUpdate);
+                        this.timerVolUpdate = null;
+                    }
 
+                    this.setCapabilityValue('water_on', false).catch(this.error);
+                    this.setCapabilityValue('time_remaining', 0).catch(this.error);
+
+                    if (message.vol != undefined)
+                    {
+                        this.setCapabilityValue('meter_water', message.vol / 1000).catch(this.error);
+                        this.setCapabilityValue('measure_water', 0).catch(this.error);
+                    }
+
+                    if ((message.ecoFlag === 3) || (message.ecoFlag === 1))
+                    {
                         this.cycles--;
-                        this.setCapabilityValue('cycles_remaining', this.cycles);
-
-                        if (!this.cycles)
-                        {
-                            this.isWatering = false;
-                            await this.setCapabilityValue('onoff', this.isWatering);
-                            await this.setCapabilityValue('watering', this.isWatering);
-
-                            this.driver.triggerWateringFinished(this);
-                        }
+                        this.setCapabilityValue('cycles_remaining', this.cycles).catch(this.error);
                     }
                 }
             }
-        }
-        catch (err)
-        {
-            this.homey.app.updateLog("onDeviceStatusPoll (" + dd.id + ") error: " + this.homey.app.varToString(err), 0);
-        }
-        finally
-        {
-            this.timerPollID = this.homey.setTimeout(this.onDeviceStatusPoll, (1000 * 30));
+            else if (message.msg === 'flowMeterValue')
+            {
+                this.setCapabilityValue('measure_water', message.vel / 1000).catch(this.error);
+            }
+            else if (message.event === 'watering end')
+            {
+                if (this.timerVolUpdate)
+                {
+                    this.homey.clearInterval(this.timerVolUpdate);
+                    this.timerVolUpdate = null;
+                }
+
+                this.setCapabilityValue('water_on', false).catch(this.error);
+                this.setCapabilityValue('time_remaining', 0).catch(this.error);
+
+                this.cycles = 0;
+                this.setCapabilityValue('cycles_remaining', this.cycles).catch(this.error);
+
+                this.isWatering = false;
+                this.setCapabilityValue('watering', this.isWatering).catch(this.error);
+                this.setCapabilityValue('onoff', this.isWatering).catch(this.error);
+                let data = message.content.split(/[(,]+/);
+                if (data.length > 1)
+                {
+                    let vol = Number((data[1].split(' '))[0]);
+                    this.setCapabilityValue('meter_water', vol).catch(this.error);
+                }
+                this.setCapabilityValue('measure_water', 0).catch(this.error);
+                this.driver.triggerWateringFinished(this);
+            }
+            else if (message.event === 'watering cycle skipped')
+            {
+                this.driver.triggerWateringSkipped(this);
+            }
+            else if (message.msg === 'gatewayOnline')
+            {
+                this.setAvailable().catch(this.error);
+            }
+            else if (message.msg === 'gatewayOffline')
+            {
+                this.setUnavailable().catch(this.error);
+            }
+            else if (message.msg === 'deviceOffline')
+            {
+                this.setUnavailable().catch(this.error);
+            }
+            else if (message.msg === 'deviceOnline')
+            {
+                this.setAvailable().catch(this.error);
+            }
+            else if (message.event === 'battery low alert')
+            {
+                this.setCapabilityValue('alarm_battery', true).catch(this.error);
+            }
+            else if (message.event === 'battery good')
+            {
+                this.setCapabilityValue('alarm_battery', false).catch(this.error);
+            }
+            else if (message.event === 'water cut-off alert')
+            {
+                this.setCapabilityValue('alarm_water', true).catch(this.error);
+            }
+            else if (message.event === 'unusually high flow alert')
+            {
+                this.setCapabilityValue('alarm_high_flow', true).catch(this.error);
+            }
+            else if (message.event === 'unusually low flow alert')
+            {
+                this.setCapabilityValue('alarm_low_flow', true).catch(this.error);
+            }
+            else if (message.event === 'valve broken alert')
+            {
+                this.setCapabilityValue('alarm_broken', true).catch(this.error);
+            }
+            else if (message.event === 'device fall alert')
+            {
+                this.setCapabilityValue('alarm_fallen', true).catch(this.error);
+            }
+            else if (message.event === 'manual button pressed')
+            {
+
+            }
+            else if (message.event === 'freeze alert')
+            {
+                this.setCapabilityValue('alarm_freeze', true).catch(this.error);
+            }
+            else if (message.event === 'alarm clear')
+            {
+                if (message.title === 'noWater')
+                {
+                    this.setCapabilityValue('alarm_water', false).catch(this.error);
+                }
+                else if (message.title === 'valveBroken')
+                {
+                    this.setCapabilityValue('alarm_broken', false).catch(this.error);
+                }
+                else if (message.title === 'fallFlag')
+                {
+                    this.setCapabilityValue('alarm_fallen', false).catch(this.error);
+                }
+                else if (message.title === 'pcFlag')
+                {
+                    this.setCapabilityValue('alarm_low_flow', false).catch(this.error);
+                }
+                else if (message.title === 'pbFlag')
+                {
+                    this.setCapabilityValue('alarm_high_flow', false).catch(this.error);
+                }
+            }
+            else if (message.msg === 'flowMeterStatus')
+            {
+                this.setupFlowMeterCapabilities(message.status)
+                    .then(this.updateDeviceValues());
+            }
         }
     }
 }
