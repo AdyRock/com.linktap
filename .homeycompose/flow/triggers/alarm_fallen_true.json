@@ -1,11 +1,13 @@
 {
     "title": {
         "en": "The valve has fallen",
-        "de": "Das Ventil ist gefallen"
+        "de": "Das Ventil ist gefallen",
+        "nl": "De kraan is gevallen"
     },
     "hint": {
         "en": "When the valve falls down",
-        "de": "Wenn das Ventil herunterfällt"
+        "de": "Wenn das Ventil herunterfällt",
+        "nl": "Wanneer de kraan is gevallen"
     },
     "args": [
       {

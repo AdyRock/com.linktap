@@ -1,11 +1,13 @@
 {
     "title": {
         "en": "The valve is broken",
-        "de": "Das Ventil ist defekt"
+        "de": "Das Ventil ist defekt",
+        "nl": "De kraan is kapot"
     },
     "hint": {
         "en": "When the valve fails",
-        "de": "Wenn das Ventil ausfällt"
+        "de": "Wenn das Ventil ausfällt",
+        "nl": "Wanneer de kraan kapot is"
     },
     "args": [
       {

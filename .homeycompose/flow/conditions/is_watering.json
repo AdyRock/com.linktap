@@ -1,11 +1,13 @@
 {
     "title": {
         "en": "Watering !{{is|isn't}} in progress",
-        "de": "Bewässerung !{{ist|ist nicht}} aktiv"
+        "de": "Bewässerung !{{ist|ist nicht}} aktiv",
+        "nl": "Irrigratie !{{is|is niet}} actief"
     },
     "hint": {
         "en": "This Flow will continue if watering is/is not currently in progress.",
-        "de": "Dieser Flow wird fortgeführt, wenn die Bewässerung derzeit aktiv/nicht aktiv ist."
+        "de": "Dieser Flow wird fortgeführt, wenn die Bewässerung derzeit aktiv/nicht aktiv ist.",
+        "nl": "Deze flow zal verder gaan als het wel/niet bezig is met irrigreren."
     },
     "args": [
       {

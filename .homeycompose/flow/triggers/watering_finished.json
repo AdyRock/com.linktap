@@ -1,11 +1,13 @@
 {
     "title": {
         "en": "Watering has finished",
-        "de": "Bewässerung ist beendet"
+        "de": "Bewässerung ist beendet",
+        "nl": "Irrigratie is beëindigd"
     },
     "hint": {
         "en": "When the watering has finished",
-        "de": "Wenn die Bewässerung beendet ist"
+        "de": "Wenn die Bewässerung beendet ist",
+        "nl": "Wanneeer irrigratie is beëindigd"
     },
     "args": [
       {

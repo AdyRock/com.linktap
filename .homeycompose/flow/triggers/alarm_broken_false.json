@@ -1,11 +1,13 @@
 {
     "title": {
         "en": "The valve is repaired",
-        "de": "Das Ventil ist repariert"
+        "de": "Das Ventil ist repariert",
+        "nl": "De kraan is gerepareerd"
     },
     "hint": {
         "en": "When the valve in not broken",
-        "de": "Wenn das Ventil nicht defekt ist"
+        "de": "Wenn das Ventil nicht defekt ist",
+        "nl": "Wanneer de kraan weer gerepareerd is"
     },
     "args": [
       {

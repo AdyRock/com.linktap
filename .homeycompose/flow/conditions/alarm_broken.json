@@ -1,11 +1,13 @@
 {
     "title": {
         "en": "Valve !{{has|hasn't}} failed",
-        "de": "Ventil !{{ist|ist nicht}} ausgefallen"
+        "de": "Ventil !{{ist|ist nicht}} ausgefallen",
+        "nl": "Kraan !{{is|is niet}} uitgevallen"
     },
     "hint": {
         "en": "This Flow will continue if the valve has/has not failed.",
-        "de": "Dieser Flow wird fortgeführt, wenn das Ventil ausgefallen/nicht ausgefallen ist."
+        "de": "Dieser Flow wird fortgeführt, wenn das Ventil ausgefallen/nicht ausgefallen ist.",
+        "nl": "Deze flow zal verder gaan indien de kraan wel/niet uitgevallen is."
     },
     "args": [
       {

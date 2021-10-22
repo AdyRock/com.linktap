@@ -1,11 +1,13 @@
 {
     "title": {
         "en": "Watering has started",
-        "de": "Bewässerung hat begonnen"
+        "de": "Bewässerung hat begonnen",
+        "nl": "Irrigratie is begonnen"
     },
     "hint": {
         "en": "When the watering has started",
-        "de": "Wenn die Bewässerung begonnen hat"
+        "de": "Wenn die Bewässerung begonnen hat",
+        "nl": "Wanneer irrigratie is begonnen"
     },
     "args": [
       {

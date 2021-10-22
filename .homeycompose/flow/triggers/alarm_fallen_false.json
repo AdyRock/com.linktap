@@ -1,11 +1,13 @@
 {
     "title": {
         "en": "The valve has been put back",
-        "de": "Das Ventil wurde wieder angeschlossen"
+        "de": "Das Ventil wurde wieder angeschlossen",
+        "nl": "De kraan is teruggeplaatst"
     },
     "hint": {
         "en": "When the valve has been put back",
-        "de": "Wenn das Ventil wieder angeschlossen wurde"
+        "de": "Wenn das Ventil wieder angeschlossen wurde",
+        "nl": "Wanneer de kraan weer is teruggeplaatst"
     },
     "args": [
       {
