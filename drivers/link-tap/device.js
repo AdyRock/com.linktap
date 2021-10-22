@@ -172,8 +172,25 @@ class LinkTapDevice extends Homey.Device
             this.setCapabilityValue('alarm_freeze', false).catch(this.error);
             this.setCapabilityValue('watering', tapLinker.watering === true).catch(this.error);
             this.setCapabilityValue('water_on', tapLinker.watering === true).catch(this.error);
-            this.setCapabilityValue('alarm_fallen', tapLinker.fall).catch(this.error);
-            this.setCapabilityValue('alarm_broken', tapLinker.valveBroken).catch(this.error);
+
+            if (typeof tapLinker.fall !== "undefined")
+            {
+                if (!this.hasCapabilityValue('alarm_fallen'))
+                {
+                    this.addCapability('alarm_fallen').catch(this.error);
+                    this.addCapability('alarm_broken').catch(this.error);
+                }
+                this.setCapabilityValue('alarm_fallen', tapLinker.fall).catch(this.error);
+                this.setCapabilityValue('alarm_broken', tapLinker.valveBroken).catch(this.error);
+            }
+            else
+            {
+                if (this.hasCapabilityValue('alarm_fallen'))
+                {
+                    this.removeCapability('alarm_fallen').catch(this.error);
+                    this.removeCapability('alarm_broken').catch(this.error);
+                }
+            }
 
             // Some capabilities are only available when a flow meter is fitted.
             await this.setupFlowMeterCapabilities(tapLinker.flowMeterStatus);
