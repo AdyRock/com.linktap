@@ -1,6 +1,6 @@
 {
   "id": "com.linktap",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "compatibility": ">=5.0.0",
   "platforms": [
     "local",
@@ -13,7 +13,8 @@
   },
   "description": {
     "en": "A water timer that gives you total peace of mind.",
-    "de": "Ein Bewässerungssystem, das Ihnen absolute Sicherheit gibt."
+    "de": "Ein Bewässerungssystem, das Ihnen absolute Sicherheit gibt.",
+    "nl": "Een watertimer die je gemoedsrust geeft."
   },
   "category": [
     "climate"
