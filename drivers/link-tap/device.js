@@ -167,6 +167,7 @@ class LinkTapDevice extends Homey.Device
 
             // Standard capabilities available to all device types
             this.setCapabilityValue('watering_mode', tapLinker.workMode != 'N' ? tapLinker.workMode : null).catch(this.error);
+            this.setCapabilityValue('onoff', tapLinker.watering === true).catch(this.error);
             this.setCapabilityValue('alarm_battery', parseInt(tapLinker.batteryStatus) < 30).catch(this.error);
             this.setCapabilityValue('alarm_freeze', false).catch(this.error);
             this.setCapabilityValue('watering', tapLinker.watering === true).catch(this.error);
@@ -199,10 +200,6 @@ class LinkTapDevice extends Homey.Device
         if (FlowMeterConnected === 'on')
         {
             // Flow meter is connected so make sure we have all the capabilities
-            if (!this.hasCapability('alarm_water'))
-            {
-                this.addCapability('alarm_water').catch(this.error);
-            }
 
             if (!this.hasCapability('measure_water'))
             {
@@ -212,6 +209,11 @@ class LinkTapDevice extends Homey.Device
             if (!this.hasCapability('meter_water'))
             {
                 this.addCapability('meter_water').catch(this.error);
+            }
+
+            if (!this.hasCapability('alarm_water'))
+            {
+                this.addCapability('alarm_water').catch(this.error);
             }
 
             if (!this.hasCapability('alarm_high_flow'))

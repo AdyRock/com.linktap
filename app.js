@@ -29,6 +29,7 @@ class MyApp extends Homey.App
         this.homeyIP = null;
         this.cloudOnly = true;
         this.enableLocal = this.homey.settings.get('enableLocal'); // Set to true when a local access device is added
+        this.fetchingData = false;
 
         if (this.enableLocal)
         {
@@ -131,6 +132,7 @@ class MyApp extends Homey.App
         this.UserName = this.homey.settings.get('UserName');
         this.lastDetectionTime = this.homey.settings.get('lastDetectionTime');
         this.detectedDevices = this.homey.settings.get('detectedDevices');
+        this.cacheClean = false; // We have no idea what might have changed will the app wasn't running
 
         this.setupWebhook().catch(this.error);
 
@@ -459,8 +461,15 @@ class MyApp extends Homey.App
             }
         }
 
-        if (!this.lastDetectionTime || (Date.now() - this.lastDetectionTime > (1000 * 60 * 5)))
+        let maxWait = 30;
+        while (this.fetchingData && (maxWait-- > 0))
         {
+            await new Promise(resolve => this.homey.setTimeout(resolve, 1000));
+        }
+
+        if (!this.fetchingData && (!this.lastDetectionTime || (Date.now() - this.lastDetectionTime > (1000 * 60 * 5))))
+        {
+            this.fetchingData = true;
             try
             {
                 // More than 5 minutes since last request
@@ -482,6 +491,10 @@ class MyApp extends Homey.App
             {
                 this.updateLog("Get Device Data error: " + err.message, 0);
                 return null;
+            }
+            finally
+            {
+                this.fetchingData = false;
             }
         }
         else if (UseDirtyCache || this.cacheClean)

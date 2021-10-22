@@ -26,14 +26,14 @@
     "water_on",
     "time_remaining",
     "cycles_remaining",
+    "measure_water",
+    "meter_water",
     "alarm_fallen",
     "alarm_broken",
     "alarm_freeze",
     "alarm_water",
     "alarm_high_flow",
-    "alarm_low_flow",
-    "measure_water",
-    "meter_water"
+    "alarm_low_flow"
   ],
   "capabilitiesOptions": {
     "meter_water": {
