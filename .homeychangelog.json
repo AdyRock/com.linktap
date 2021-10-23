@@ -42,6 +42,6 @@
         "en": "Major rewrite to use webhooks instead of polling. The app is now much more responsive but uses less CPU resources. Some capabilities have been removed or changed and there are also some new ones. Added lost Dutch translations"
     },
     "1.0.2": {
-        "en": "Major rewrite to use webhooks instead of polling. The app is now much more responsive but uses less CPU resources. Some capabilities have been removed or changed and there are also some new ones. Added lost Dutch translations. Fix issue with G1 valves"
+        "en": "Major rewrite to use webhooks instead of polling. The app is now much more responsive but uses less CPU resources. Some capabilities have been removed or changed and there are also some new ones. Added lost Dutch translations. Fix issue with G1 valves as they don't have the 'Fall' alarm"
     }
 }
