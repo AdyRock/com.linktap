@@ -13,8 +13,10 @@ class LinkTapDevice extends Homey.Device
         this.log('LinkTapDevice initialising');
         this.isWatering = false;
         this.cycles = 0;
+        this.abortTimer = null;
 
         this.onDeviceUpdateVol = this.onDeviceUpdateVol.bind(this);
+        this.abortWatering = this.abortWatering.bind(this);
 
         if (!this.hasCapability('onoff'))
         {
@@ -432,6 +434,13 @@ class LinkTapDevice extends Homey.Device
         {
             body.action = false;
             body.duration = 0;
+
+            this.abortTimer = this.homey.setTimeout(() =>
+            {
+                // Switch of watering if no activity for 1 minute
+                this.abortWatering();
+            }, 1000 * 60 * 1);
+
         }
 
         let response = await this.homey.app.PostURL(url, body);
@@ -439,6 +448,33 @@ class LinkTapDevice extends Homey.Device
         {
             throw (new Error(response.result));
         }
+    }
+
+    abortWatering()
+    {
+        if (this.abortTimer)
+        {
+            this.homey.clearTimeout(this.abortTimer);
+            this.abortTimer = null;
+        }
+
+        if (this.timerVolUpdate)
+        {
+            this.homey.clearInterval(this.timerVolUpdate);
+            this.timerVolUpdate = null;
+        }
+
+        this.setCapabilityValue('water_on', false).catch(this.error);
+        this.setCapabilityValue('time_remaining', 0).catch(this.error);
+
+        this.cycles = 0;
+        this.setCapabilityValue('cycles_remaining', this.cycles).catch(this.error);
+
+        this.isWatering = false;
+        this.setCapabilityValue('watering', this.isWatering).catch(this.error);
+        this.setCapabilityValue('onoff', this.isWatering).catch(this.error);
+        this.setCapabilityValue('measure_water', 0).catch(this.error);
+        this.driver.triggerWateringFinished(this);
     }
 
     async onDeviceUpdateVol()
@@ -462,6 +498,12 @@ class LinkTapDevice extends Homey.Device
                 this.setCapabilityValue('onoff', this.isWatering).catch(this.error);
                 this.setCapabilityValue('watering', this.isWatering).catch(this.error);
                 this.driver.triggerWateringStarted(this);
+
+                if (this.abortTimer)
+                {
+                    this.homey.clearTimeout(this.abortTimer);
+                    this.abortTimer = null;
+                }
             }
             else if ((message.msg === 'wateringOn') || (message.event === 'wateringOn'))
             {
@@ -533,6 +575,12 @@ class LinkTapDevice extends Homey.Device
             }
             else if (message.event === 'watering end')
             {
+                if (this.abortTimer)
+                {
+                    this.homey.clearTimeout(this.abortTimer);
+                    this.abortTimer = null;
+                }
+
                 if (this.timerVolUpdate)
                 {
                     this.homey.clearInterval(this.timerVolUpdate);
