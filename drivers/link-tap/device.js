@@ -175,7 +175,7 @@ class LinkTapDevice extends Homey.Device
 
             if (typeof tapLinker.fall !== "undefined")
             {
-                if (!this.hasCapabilityValue('alarm_fallen'))
+                if (!this.hasCapability('alarm_fallen'))
                 {
                     this.addCapability('alarm_fallen').catch(this.error);
                     this.addCapability('alarm_broken').catch(this.error);
@@ -185,7 +185,7 @@ class LinkTapDevice extends Homey.Device
             }
             else
             {
-                if (this.hasCapabilityValue('alarm_fallen'))
+                if (this.hasCapability('alarm_fallen'))
                 {
                     this.removeCapability('alarm_fallen').catch(this.error);
                     this.removeCapability('alarm_broken').catch(this.error);
@@ -431,7 +431,7 @@ class LinkTapDevice extends Homey.Device
         else
         {
             body.action = false;
-            body.duration = 1;
+            body.duration = 0;
         }
 
         let response = await this.homey.app.PostURL(url, body);

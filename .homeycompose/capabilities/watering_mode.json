@@ -48,6 +48,14 @@
                 "de": "Monats-Modus",
                 "nl": "Maand modus"
             }
+        },
+        {
+            "id": "D",
+            "title": {
+                "en": "Calender Mode",
+                "de": "Kalendermodus",
+                "nl": "Kalendermodus"
+            }
         }
     ]
 }
