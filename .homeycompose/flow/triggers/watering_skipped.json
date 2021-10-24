@@ -1,16 +1,19 @@
 {
     "title": {
-        "en": "The watering cycle has been skipped"
+        "en": "The watering cycle has been skipped",
+        "de": "Der Bewässerungszyklus wurde übersprungen"
     },
     "hint": {
-        "en": "When the watering cycle has been skipped due to rain"
+        "en": "When the watering cycle has been skipped due to rain",
+        "de": "Wenn der Bewässerungszyklus aufgrund von Regen übersprungen wurde"
     },
     "tokens":[
         {
             "name": "past_rainfall",
             "type": "number",
             "title": {
-                "en": "Past Rainfall"
+                "en": "Past Rainfall",
+                "de": "Vergangener Niederschlag"
             },
             "example": 2.5
         },
@@ -18,7 +21,8 @@
             "name": "forecast_rainfall",
             "type": "number",
             "title": {
-                "en": "Forecast Rainfall"
+                "en": "Forecast Rainfall",
+                "de": "Niederschlagsvorhersage"
             },
             "example": 2.5
         }

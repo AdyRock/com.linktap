@@ -2,7 +2,7 @@
     "type": "boolean",
     "title": {
         "en": "High Water Flow Alarm",
-        "de": "hoher Wasserdurchfluss Alarm"
+        "de": "Alarm für hohen Wasserdurchfluss"
     },
     "getable": true,
     "setable": false,
