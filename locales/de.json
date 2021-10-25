@@ -3,6 +3,7 @@
         "settings": "Internet",
         "detected": "Erkannt",
         "diagnosticsLog": "Diagnoseprotokoll",
+        "subtitle": "Internet Einstellungen",
         "accountDetails": "Kontodetails",
         "userName": "Benutzername",
         "apiKey": "API Key",

@@ -1,7 +1,7 @@
 {
   "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
   "id": "com.linktap",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "compatibility": ">=5.0.0",
   "platforms": [
     "local",
@@ -214,7 +214,7 @@
       {
         "title": {
           "en": "High Water Flow Alarm",
-          "de": "hoher Wasserdurchfluss Alarm"
+          "de": "Alarm für hohen Wasserdurchfluss"
         },
         "hint": {
           "en": "When there is a leak",
@@ -287,17 +287,20 @@
       },
       {
         "title": {
-          "en": "The watering cycle has been skipped"
+          "en": "The watering cycle has been skipped",
+          "de": "Der Bewässerungszyklus wurde übersprungen"
         },
         "hint": {
-          "en": "When the watering cycle has been skipped due to rain"
+          "en": "When the watering cycle has been skipped due to rain",
+          "de": "Wenn der Bewässerungszyklus aufgrund von Regen übersprungen wurde"
         },
         "tokens": [
           {
             "name": "past_rainfall",
             "type": "number",
             "title": {
-              "en": "Past Rainfall"
+              "en": "Past Rainfall",
+              "de": "Vergangener Niederschlag"
             },
             "example": 2.5
           },
@@ -305,7 +308,8 @@
             "name": "forecast_rainfall",
             "type": "number",
             "title": {
-              "en": "Forecast Rainfall"
+              "en": "Forecast Rainfall",
+              "de": "Niederschlagsvorhersage"
             },
             "example": 2.5
           }
@@ -982,7 +986,8 @@
     "alarm_freeze": {
       "type": "boolean",
       "title": {
-        "en": "Freezing Alarm"
+        "en": "Freezing Alarm",
+        "de": "Frostalarm"
       },
       "getable": true,
       "setable": false,
@@ -992,7 +997,7 @@
       "type": "boolean",
       "title": {
         "en": "High Water Flow Alarm",
-        "de": "hoher Wasserdurchfluss Alarm"
+        "de": "Alarm für hohen Wasserdurchfluss"
       },
       "getable": true,
       "setable": false,
