@@ -24,21 +24,18 @@ class LinkTapDriver extends Homey.Driver
     triggerWateringStarted(device)
     {
         this.wateringStartedTrigger.trigger(device, {}, {})
-            .then(this.log)
             .catch(this.error);
     }
 
     triggerWateringFinished(device)
     {
         this.wateringFinishedTrigger.trigger(device, {}, {})
-            .then(this.log)
             .catch(this.error);
     }
 
     triggerWateringSkipped(device)
     {
         this.wateringSkippedTrigger.trigger(device, {}, {})
-            .then(this.log)
             .catch(this.error);
     }
 

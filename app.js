@@ -170,7 +170,8 @@ class MyApp extends Homey.App
 
         // Setup the local MQTT server
         const server = net.createServer(aedes.handle);
-        server.listen(PORT, () => {
+        server.listen(PORT, () =>
+        {
             _this.homey.app.updateLog(`server started and listening on port ${PORT}`);
         });
 
@@ -206,13 +207,15 @@ class MyApp extends Homey.App
         this.MQTTclient = mqtt.connect('mqtt://localhost:49876', { clientId: 'homeyLinkTapApp', username: 'homeyApp', password: 'fred69' });
         this.MQTTclient.on('connect', () =>
         {
-            _this.MQTTclient.subscribe('linktap/up_cmd', err => {
+            _this.MQTTclient.subscribe('linktap/up_cmd', err =>
+            {
                 if (err)
                 {
                     _this.updateLog("setupLocalAccess.onConnect 'linktap/up_cmd' error: " * _this.varToString(err), 0);
                 }
             });
-            _this.MQTTclient.subscribe('linktap/down_cmd_ack', err => {
+            _this.MQTTclient.subscribe('linktap/down_cmd_ack', err =>
+            {
                 if (err)
                 {
                     _this.updateLog("setupLocalAccess.onConnect 'linktap/down_cmd_ack' error: " * _this.varToString(err), 0);
@@ -564,12 +567,11 @@ class MyApp extends Homey.App
 
                     // Add this device to the table
                     devices.push(
-                        {
-                            name: `${tapLinker.location} - ${tapLinker.taplinkerName}`,
-                            data,
-                            store: useInternet ? store : {},
-                        },
-                    );
+                    {
+                        name: `${tapLinker.location} - ${tapLinker.taplinkerName}`,
+                        data,
+                        store: useInternet ? store : {},
+                    }, );
                 }
             }
             return devices;
@@ -740,7 +742,8 @@ class MyApp extends Homey.App
                     reject(new Error(`HTTPS Catch: ${err}`), 0);
                 });
 
-                req.setTimeout(5000, () => {
+                req.setTimeout(5000, () =>
+                {
                     req.destroy();
                     reject(new Error('HTTP Catch: Timeout'));
                 });
@@ -803,7 +806,8 @@ class MyApp extends Homey.App
                     reject(new Error(`HTTPS Catch: ${err}`), 0);
                 });
 
-                req.setTimeout(5000, () => {
+                req.setTimeout(5000, () =>
+                {
                     req.destroy();
                     reject(new Error('HTTP Catch: Timeout'));
                 });
@@ -901,7 +905,7 @@ class MyApp extends Homey.App
                 const stack = source.stack.replace('/\\n/g', '\n');
                 return `${source.message}\n${stack}`;
             }
-            if (typeof (source) === 'object')
+            if (typeof(source) === 'object')
             {
                 const getCircularReplacer = () =>
                 {
@@ -922,7 +926,7 @@ class MyApp extends Homey.App
 
                 return JSON.stringify(source, getCircularReplacer(), 2);
             }
-            if (typeof (source) === 'string')
+            if (typeof(source) === 'string')
             {
                 return source;
             }
@@ -1042,7 +1046,7 @@ class MyApp extends Homey.App
                         rejectUnauthorized: false,
                     },
                 },
-);
+                );
 
                 // send mail with defined transport object
                 const info = await transporter.sendMail(
@@ -1052,7 +1056,7 @@ class MyApp extends Homey.App
                     subject: `LinkTap ${body.logType} log`, // Subject line
                     text: logData, // plain text body
                 },
-);
+                );
 
                 this.updateLog(`Message sent: ${info.messageId}`);
                 // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
