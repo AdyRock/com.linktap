@@ -43,51 +43,10 @@
 
     <!-- Tab links -->
     <div class="tab">
-        <button class="tablinks" onclick="setPage(event, 'settings')" id="defaultOpen"><span data-i18n="settings.settings"></span></button>
-        <button class="tablinks" onclick="setPage(event, 'gateways')"><span data-i18n="settings.gateways"></span></button>
+        <button class="tablinks" onclick="setPage(event, 'gateways')" id="defaultOpen"><span data-i18n="settings.gateways"></span></button>
         <button class="tablinks" onclick="setPage(event, 'detected')"><span data-i18n="settings.detected"></span></button>
         <button class="tablinks" onclick="setPage(event, 'log')"><span data-i18n="settings.diagnosticsLog"></span></button>
         <button class="tablinks" onclick="setPage(event, 'simulator')" id="simLogTab" style="visibility:hidden">Simulation Data</button>
-    </div>
-
-    <!-- SETTINGS PAGE -->
-    <div id="settings" class="tabcontent">
-        <fieldset>
-            <legend><span data-i18n="settings.subtitle"></span></legend>
-            <div id="iNetSettings">
-                <fieldset>
-                    <legend><span data-i18n="settings.accountDetails"></span></legend>
-                    <fieldset>
-                        <div class="field row">
-                            <label for="UserName"><span data-i18n="settings.userName"></span></label>
-                            <input id="UserName" type="text" value="" />
-                        </div>
-                    </fieldset>
-                    <fieldset>
-                        <div class="field row">
-                            <label for="APIToken"><span data-i18n="settings.apiKey"></span></label>
-                            <input id="APIToken" type="text" value="" />
-                        </div>
-                        <div class="field row">
-                            <p></p>
-                            <p><b><span data-i18n="settings.getKeyInstruction1"></span>:</b></p>
-                            <p><span data-i18n="settings.getKeyInstruction2"></span></p>
-                            <p>
-                                <b><span data-i18n="settings.note"></span>:</b> <span data-i18n="settings.noteText"></span>
-                            </p>
-                        </div>
-                        <div class="field row">
-                            <label for="password"><span data-i18n="settings.password"></span></label>
-                            <input id="password" type="text" value="" />
-                        </div>
-                        <div class="field row">
-                            <p><button id="getKey" class="right"><span data-i18n="settings.getKey"></span></button></p>
-                        </div>
-                    </fieldset>
-                    <p><button id="save" class="right"><span data-i18n="settings.saveChanges"></span></button></p>
-                </fieldset>
-            </div>
-        </fieldset>
     </div>
 
     <!-- GATEWAYS PAGE -->
@@ -152,12 +111,6 @@
         // Create the busy indicator
         var busyi = new busy_indicator(document.getElementById("busybox"), document.querySelector("#busybox div"));
 
-        var UserNameElement = document.getElementById('UserName');
-        var APITokenElement = document.getElementById('APIToken');
-        var passwordElement = document.getElementById('password');
-        var getKeyElement = document.getElementById('getKey');
-        var saveElement = document.getElementById('save');
-
         var autoConfigElement = document.getElementById('autoConfig');
 
         var detectedDevicesElement = document.getElementById('detectedDevices');
@@ -212,27 +165,6 @@
                 detectedDevicesElement.value = data.devices;
             });
 
-            Homey.on('settings.set', function()
-            {
-                Homey.get('APIToken', function(err, APIToken)
-                {
-                    if (err) return Homey.alert(err);
-                    APITokenElement.value = APIToken;
-                });
-            });
-
-            Homey.get('APIToken', function(err, APIToken)
-            {
-                if (err) return Homey.alert(err);
-                APITokenElement.value = APIToken;
-            });
-
-            Homey.get('UserName', function(err, UserName)
-            {
-                if (err) return Homey.alert(err);
-                UserNameElement.value = UserName;
-            });
-
             Homey.get('logEnabled', function(err, logEnabled)
             {
                 if (err) return Homey.alert(err);
@@ -267,64 +199,6 @@
                 {
                     detectedDevicesElement.value = result;
                 }
-            });
-
-            getKeyElement.addEventListener('click', function(e)
-            {
-                if (UserNameElement.value === '')
-                {
-                    return Homey.alert(Homey.__('settings.missingUsername'));
-                }
-
-                if (passwordElement.value === '')
-                {
-                    return Homey.alert(Homey.__('settings.missingPassword'));
-                }
-
-                waitCursor(true);
-                Homey.api('POST', '/getAPIKey/',
-                {
-                    username: UserNameElement.value,
-                    password: passwordElement.value
-                }, function(err, result)
-                {
-                    waitCursor(false);
-                    if (err)
-                    {
-                        return Homey.alert(err);
-                    }
-                    else
-                    {
-                        APITokenElement.value = result.key;
-                        Homey.set('APIToken', APITokenElement.value, function(err)
-                        {
-                            if (err) return Homey.alert(err);
-                        });
-
-                        Homey.set('UserName', UserNameElement.value, function(err)
-                        {
-                            if (err) return Homey.alert(err);
-                        });
-
-                        return Homey.alert(Homey.__('settings.saved'));
-                    }
-                });
-            });
-
-            saveElement.addEventListener('click', function(e)
-            {
-                APITokenElement.value = APITokenElement.value.replace(/[\"\']/g, '');
-                Homey.set('APIToken', APITokenElement.value, function(err)
-                {
-                    if (err) return Homey.alert(err);
-                });
-
-                Homey.set('UserName', UserNameElement.value, function(err)
-                {
-                    if (err) return Homey.alert(err);
-                });
-
-                return Homey.alert(Homey.__('settings.saved'));
             });
 
             autoConfigElement.addEventListener('click', function(e)

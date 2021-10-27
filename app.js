@@ -114,12 +114,12 @@ class MyApp extends Homey.App
         {
             if (key === 'APIToken')
             {
-                this.APIToken = this.homey.settings.get('APIToken');
+                this.apiKey = this.homey.settings.get('APIToken');
                 this.setupWebhook().catch(this.error);
             }
             else if (key === 'UserName')
             {
-                this.UserName = this.homey.settings.get('UserName');
+                this.username = this.homey.settings.get('UserName');
                 this.setupWebhook().catch(this.error);
             }
             else if (key === 'autoConfig')
@@ -133,8 +133,8 @@ class MyApp extends Homey.App
             }
         });
 
-        this.APIToken = this.homey.settings.get('APIToken');
-        this.UserName = this.homey.settings.get('UserName');
+        this.apiKey = this.homey.settings.get('APIToken');
+        this.username = this.homey.settings.get('UserName');
         this.lastDetectionTime = this.homey.settings.get('lastDetectionTime');
         this.detectedDevices = this.homey.settings.get('detectedDevices');
         this.cacheClean = false; // We have no idea what might have changed while the app wasn't running
@@ -553,12 +553,13 @@ class MyApp extends Homey.App
                     this.updateLog('Found LinkTap: ');
                     this.updateLog(tapLinker);
 
-                    let data = {};
-                    data = {
+                    const data = {
                         id: tapLinker.taplinkerId,
                         gatewayId: gateway.gatewayId,
-                        apiKey: body.apiKey ? body.apiKey : this.APIToken,
-                        username: body.username ? body.username : this.UserName,
+                    };
+                    const store = {
+                        apiKey: body.apiKey ? body.apiKey : this.apiKey,
+                        username: body.username ? body.username : this.username,
                     };
 
                     // Add this device to the table
@@ -566,6 +567,7 @@ class MyApp extends Homey.App
                         {
                             name: `${tapLinker.location} - ${tapLinker.taplinkerName}`,
                             data,
+                            store: useInternet ? store : {},
                         },
                     );
                 }
@@ -607,29 +609,15 @@ class MyApp extends Homey.App
     {
         try
         {
-            if (this.APIToken && this.UserName)
+            const id = Homey.env.WEBHOOK_ID;
+            const secret = Homey.env.WEBHOOK_SECRET;
+            const myWebhook = await this.homey.cloud.createWebhook(id, secret, {});
+
+            myWebhook.on('message', args =>
             {
-                const homeyId = await this.homey.cloud.getHomeyId();
-                const id = Homey.env.WEBHOOK_ID;
-                const secret = Homey.env.WEBHOOK_SECRET;
-                const webhookUrl = `https://webhooks.athom.com/webhook/${id}?homey=${homeyId}`;
-                const myWebhook = await this.homey.cloud.createWebhook(id, secret, {});
-
-                myWebhook.on('message', args =>
-                {
-                    this.updateLog(`Got a webhook message!${this.varToString(args.body)}`, 0);
-                    this.processWebhookMessage(args.body).catch(this.error);
-                });
-
-                // https://www.link-tap.com/api/setWebHookUrl
-                const url = 'setWebHookUrl';
-                const response = await this.PostURL(url, { webHookUrl: webhookUrl }, false);
-                if (response.result === 'error')
-                {
-                    this.updateLog(`setWebHookURL error: ${this.varToString(response.message)}`, 0);
-                    return false;
-                }
-            }
+                this.updateLog(`Got a webhook message!${this.varToString(args.body)}`, 0);
+                this.processWebhookMessage(args.body).catch(this.error);
+            });
         }
         catch (err)
         {
@@ -641,12 +629,44 @@ class MyApp extends Homey.App
         return true;
     }
 
+    async registerWebhookURL(apiKey, username)
+    {
+        if (apiKey && username)
+        {
+            try
+            {
+                // https://www.link-tap.com/api/setWebHookUrl
+                const homeyId = await this.homey.cloud.getHomeyId();
+                const id = Homey.env.WEBHOOK_ID;
+                const webHookUrl = `https://webhooks.athom.com/webhook/${id}?homey=${homeyId}`;
+                const url = 'setWebHookUrl';
+                const body = {
+                    webHookUrl,
+                    apiKey,
+                    username,
+                };
+                const response = await this.PostURL(url, body, false);
+                if (response.result !== 'error')
+                {
+                    return true;
+                }
+                this.updateLog(`setWebHookURL error: ${this.varToString(response.message)}`, 0);
+            }
+            catch (err)
+            {
+                this.updateLog(`setWebHookURL error: ${err.message}`, 0);
+            }
+        }
+
+        return false;
+    }
+
     // Clear the webhook URL from the LinkTap account
     async unregisterWebhook()
     {
         // https://www.link-tap.com/api/deleteWebHookUrl
         const url = 'deleteWebHookUrl';
-        const response = await this.PostURL(url, {});
+        const response = await this.PostURL(url, { username: this.username, apiKey: this.apiKey });
         this.updateLog(this.varToString(response.message));
     }
 
@@ -654,18 +674,12 @@ class MyApp extends Homey.App
     {
         if (!body.username)
         {
-            if (!this.UserName)
-            {
-                throw (new Error('HTTPS: No user name specified'));
-            }
+            throw (new Error('HTTPS: No user name specified'));
+        }
 
-            if (!this.APIToken)
-            {
-                throw (new Error('HTTPS: No API Key specified'));
-            }
-
-            body.username = this.UserName;
-            body.apiKey = this.APIToken;
+        if (!body.apiKey)
+        {
+            throw (new Error('HTTPS: No API Key specified'));
         }
 
         this.updateLog(`Post to: ${url}`);

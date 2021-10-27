@@ -46,29 +46,35 @@ class LinkTapDriver extends Homey.Driver
      * onPairListDevices is called when a user is adding a device and the 'list_devices' view is called.
      * This should return an array with the data of devices that are available for pairing.
      */
-    async onPairListDevices()
+    async onPairListDevices(body)
     {
-        return this.homey.app.getLinkTapDevices(true, {});
+        return this.homey.app.getLinkTapDevices(true, body);
     }
 
     async onPair(session)
     {
-        const oldAPICode = this.homey.app.APIToken;
-        const oldUserName = this.homey.app.UserName;
+        let { apiKey } = this.homey.app;
+        let { username } = this.homey.app;
 
         session.setHandler('list_devices', async () =>
         {
             try
             {
-                const devices = await this.onPairListDevices();
-                this.homey.settings.set('APIToken', this.homey.app.APIToken);
-                this.homey.settings.set('UserName', this.homey.app.UserName);
+                const body = {
+                    apiKey,
+                    username,
+                };
+                const devices = await this.onPairListDevices(body);
+
+                // Save the settings for next time
+                this.homey.app.apiKey = apiKey;
+                this.homey.app.username = username;
+                this.homey.settings.set('APIToken', this.homey.app.apiKey);
+                this.homey.settings.set('UserName', this.homey.app.username);
                 return devices;
             }
             catch (err)
             {
-                this.homey.app.APIToken = oldAPICode;
-                this.homey.app.UserName = oldUserName;
                 throw new Error(err.message);
             }
         });
@@ -76,24 +82,25 @@ class LinkTapDriver extends Homey.Driver
         session.setHandler('connection_setup', async () =>
         {
             // Initialise page with last used token and user name
-            return { APIToken: this.homey.app.APIToken, userName: this.homey.app.UserName };
+            return { apiKey, username };
         });
 
         session.setHandler('api_connection', async data =>
         {
-            if (!data.userName)
+            if (!data.username)
             {
                 return { ok: false, err: this.homey.__('missingUsername') };
             }
-            if (!data.APIToken && !data.password)
+            if (!data.apiKey && !data.password)
             {
                 return { ok: false, err: this.homey.__('missingAPIToken') };
             }
 
-            if (!data.APIToken)
+            if (!data.apiKey)
             {
                 try
                 {
+                    // As the apiKey is not specified get a new one
                     await this.homey.app.getAPIKey(data);
                 }
                 catch (err)
@@ -102,8 +109,8 @@ class LinkTapDriver extends Homey.Driver
                 }
             }
 
-            this.homey.app.APIToken = data.APIToken;
-            this.homey.app.UserName = data.userName;
+            apiKey = data.apiKey;
+            username = data.username;
             return { ok: true };
         });
     }
@@ -115,21 +122,23 @@ class LinkTapDriver extends Homey.Driver
 
         session.setHandler('connection_setup', async () =>
         {
-            return { APIToken: this.homey.app.APIToken, userName: this.homey.app.UserName };
+            const apiKey = device.getStoreValue('apiKey');
+            const username = device.getStoreValue('username');
+            return { apiKey, username };
         });
 
         session.setHandler('api_connection', async data =>
         {
-            if (!data.userName)
+            if (!data.username)
             {
                 return { ok: false, err: this.homey.__('missingUsername') };
             }
-            if (!data.APIToken && !data.password)
+            if (!data.apiKey && !data.password)
             {
                 return { ok: false, err: this.homey.__('missingAPIToken') };
             }
 
-            if (!data.APIToken)
+            if (!data.apiKey)
             {
                 try
                 {
@@ -141,9 +150,18 @@ class LinkTapDriver extends Homey.Driver
                 }
             }
 
-            this.homey.app.APIToken = data.APIToken;
-            this.homey.app.UserName = data.UserName;
-            return { ok: true };
+            if (await this.homey.app.registerWebhookURL(data.apiKey, data.username))
+            {
+                this.homey.app.apiKey = data.apiKey;
+                this.homey.app.username = data.username;
+                device.setStoreValue('apiKey', data.apiKey);
+                device.setStoreValue('username', data.username);
+                device.setAvailable();
+                device.updateDeviceValues();
+                return { ok: true };
+            }
+
+            return { ok: false, err: 'Failed to connect' };
         });
     }
 

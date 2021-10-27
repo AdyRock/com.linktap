@@ -3,12 +3,12 @@
     <div class="form-group">
         <fieldset>
             <div class="field row">
-                <label for="userName" data-i18n="settings.userName"></label>
-                <input type="text" name="userName" id="userName" />
+                <label for="username" data-i18n="settings.username"></label>
+                <input type="text" name="username" id="username" />
             </div>
             <div class="field row">
-                <label for="APIToken" data-i18n="settings.apiKey"></label>
-                <input type="text" name="APIToken" id="APIToken" />
+                <label for="apiKey" data-i18n="settings.apiKey"></label>
+                <input type="text" name="apiKey" id="apiKey" />
             </div>
         </fieldset>
         <fieldset>
@@ -38,8 +38,8 @@
 
     Homey.emit('connection_setup', {}).then(function(result)
     {
-        document.getElementById('userName').value = result.userName;
-        document.getElementById('APIToken').value = result.APIToken;
+        document.getElementById('username').value = result.username;
+        document.getElementById('apiKey').value = result.apiKey;
     });
 
     function getForm()
@@ -50,8 +50,8 @@
 
         Homey.emit('api_connection',
         {
-            userName: document.forms.form.userName.value,
-            APIToken: document.forms.form.APIToken.value,
+            username: document.forms.form.username.value,
+            apiKey: document.forms.form.apiKey.value,
             password: document.forms.form.password.value,
         }).then(function(result)
         {

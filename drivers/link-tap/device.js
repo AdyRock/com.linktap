@@ -20,6 +20,25 @@ class LinkTapDevice extends Homey.Device
         this.onDeviceUpdateVol = this.onDeviceUpdateVol.bind(this);
         this.abortWatering = this.abortWatering.bind(this);
 
+        this.username = this.getStoreValue('username');
+        this.apiKey = this.getStoreValue('apiKey');
+
+        // Old devices used the global credentials so check if they are OK
+        if (!this.apiKey)
+        {
+            // Update the values
+            this.apiKey = this.homey.app.apiKey;
+            this.username = this.homey.app.username;
+
+            this.setStoreValue('username', this.username);
+            this.setStoreValue('apiKey', this.apiKey);
+        }
+
+        if (!await this.homey.app.registerWebhookURL(this.apiKey, this.username))
+        {
+            this.setUnavailable('Failed to setup webhook: Try too repair');
+        }
+
         if (!this.hasCapability('onoff'))
         {
             this.addCapability('onoff')
@@ -138,13 +157,10 @@ class LinkTapDevice extends Homey.Device
 
     async __updateDeviceValues()
     {
-        const dd = this.getData();
-        const body = {};
-        if (dd.apiKey)
-        {
-            body.apiKey = dd.apiKey;
-            body.username = dd.username;
-        }
+        const body = {
+            apiKey: this.apiKey,
+            username: this.username,
+        };
 
         const devices = await this.homey.app.getDeviceData(false, body);
 
@@ -152,6 +168,8 @@ class LinkTapDevice extends Homey.Device
         {
             return false;
         }
+
+        const dd = this.getData();
 
         try
         {
@@ -288,6 +306,8 @@ class LinkTapDevice extends Homey.Device
             gatewayId: dd.gatewayId,
             taplinkerId: dd.id,
             alarm: '',
+            apiKey: this.apiKey,
+            username: this.username,
         };
 
         if (this.getCapabilityValue('alarm_water'))
@@ -360,6 +380,8 @@ class LinkTapDevice extends Homey.Device
         const body = {
             gatewayId: dd.gatewayId,
             taplinkerId: dd.id,
+            apiKey: this.apiKey,
+            username: this.username,
         };
 
         if (mode === 'I')
@@ -402,6 +424,8 @@ class LinkTapDevice extends Homey.Device
             taplinkerId: dd.id,
             action: false,
             duration: 0,
+            apiKey: this.apiKey,
+            username: this.username,
         };
 
         if (onOff)
