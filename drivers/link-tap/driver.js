@@ -1,10 +1,12 @@
-/*jslint node: true */
+/* jslint node: true */
+
 'use strict';
 
 const Homey = require('homey');
 
 class LinkTapDriver extends Homey.Driver
 {
+
     /**
      * onInit is called when the driver is initialized.
      */
@@ -46,26 +48,26 @@ class LinkTapDriver extends Homey.Driver
      */
     async onPairListDevices()
     {
-        return this.homey.app.getDevices(true);
+        return this.homey.app.getLinkTapDevices(true, {});
     }
 
     async onPair(session)
     {
-        let oldAPICode = this.homey.app.APIToken;
-        let oldUserName = this.homey.app.UserName;
+        const oldAPICode = this.homey.app.APIToken;
+        const oldUserName = this.homey.app.UserName;
 
-        session.setHandler("list_devices", async () =>
+        session.setHandler('list_devices', async () =>
         {
             try
             {
-                let devices = await this.onPairListDevices();
+                const devices = await this.onPairListDevices();
                 this.homey.settings.set('APIToken', this.homey.app.APIToken);
                 this.homey.settings.set('UserName', this.homey.app.UserName);
                 return devices;
             }
             catch (err)
             {
-                this.homey.app.BearerToken = oldAPICode;
+                this.homey.app.APIToken = oldAPICode;
                 this.homey.app.UserName = oldUserName;
                 throw new Error(err.message);
             }
@@ -73,18 +75,19 @@ class LinkTapDriver extends Homey.Driver
 
         session.setHandler('connection_setup', async () =>
         {
+            // Initialise page with last used token and user name
             return { APIToken: this.homey.app.APIToken, userName: this.homey.app.UserName };
         });
 
-        session.setHandler('api_connection', async (data) =>
+        session.setHandler('api_connection', async data =>
         {
             if (!data.userName)
             {
-                return { ok: false, err: this.homey.__("missingUsername") };
+                return { ok: false, err: this.homey.__('missingUsername') };
             }
             if (!data.APIToken && !data.password)
             {
-                return { ok: false, err: this.homey.__("missingAPIToken") };
+                return { ok: false, err: this.homey.__('missingAPIToken') };
             }
 
             if (!data.APIToken)
@@ -115,15 +118,15 @@ class LinkTapDriver extends Homey.Driver
             return { APIToken: this.homey.app.APIToken, userName: this.homey.app.UserName };
         });
 
-        session.setHandler('api_connection', async (data) =>
+        session.setHandler('api_connection', async data =>
         {
             if (!data.userName)
             {
-                return { ok: false, err: this.homey.__("missingUsername") };
+                return { ok: false, err: this.homey.__('missingUsername') };
             }
             if (!data.APIToken && !data.password)
             {
-                return { ok: false, err: this.homey.__("missingAPIToken") };
+                return { ok: false, err: this.homey.__('missingAPIToken') };
             }
 
             if (!data.APIToken)
@@ -143,6 +146,7 @@ class LinkTapDriver extends Homey.Driver
             return { ok: true };
         });
     }
+
 }
 
 module.exports = LinkTapDriver;

@@ -1,23 +1,25 @@
+'use strict';
+
 module.exports = {
-    async getLog({ homey, query })
+    async getLog({ homey })
     {
         return homey.app.diagLog;
     },
-    async getDetect({ homey, query })
+    async getDetect({ homey })
     {
         return homey.app.detectedDevices;
     },
     async getAPIKey({ homey, body })
     {
-        return await homey.app.getAPIKey(body);
+        return homey.app.getAPIKey(body);
     },
-    async clearLog({ homey, body })
+    async clearLog({ homey })
     {
-        homey.app.diagLog = "";
+        homey.app.diagLog = '';
         return 'OK';
     },
     async sendLog({ homey, body })
     {
-        return await homey.app.sendLog(body);
-    }
+        return homey.app.sendLog(body);
+    },
 };

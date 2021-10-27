@@ -1,10 +1,12 @@
-/*jslint node: true */
+/* jslint node: true */
+
 'use strict';
 
 const Homey = require('homey');
 
 class LinkTapLocalDevice extends Homey.Device
 {
+
     /**
      * onInit is called when the device is initialized.
      */
@@ -91,7 +93,7 @@ class LinkTapLocalDevice extends Homey.Device
         try
         {
             // Check if the data is from our gateway
-            if (tapLinkData.gw_id === dd.gatewayId);
+            if (tapLinkData.gw_id === dd.gatewayId)
             {
                 // Yep, check if a watering skipped cmd
                 if (tapLinkData.cmd === 9)
@@ -100,10 +102,10 @@ class LinkTapLocalDevice extends Homey.Device
                     // yep, so check if for this device
                     if (tapLinkData.dev_id === dd.id)
                     {
-                        //Watering skipped notification
+                        // Watering skipped notification
                         const tokens = {
                             past_rainfall: tapLinkData.rain[0],
-                            forecast_rainfall: tapLinkData.rain[1]
+                            forecast_rainfall: tapLinkData.rain[1],
                         };
 
                         this.driver.triggerWateringSkipped(this, tokens);
@@ -122,7 +124,7 @@ class LinkTapLocalDevice extends Homey.Device
                         // Yep, so update the values
                         if (!tapLinker.is_rf_linked)
                         {
-                            await this.setUnavailable("LinkTap Offline");
+                            await this.setUnavailable('LinkTap Offline');
                             return;
                         }
 
@@ -199,8 +201,7 @@ class LinkTapLocalDevice extends Homey.Device
                             this.setCapabilityValue('meter_water', tapLinker.volume).catch(this.error);
                         }
                         else
-                        {
-                            if (this.hasCapability('alarm_fallen'))
+                        if (this.hasCapability('alarm_fallen'))
                             {
                                 this.removeCapability('alarm_fallen');
                                 this.removeCapability('alarm_broken');
@@ -208,14 +209,13 @@ class LinkTapLocalDevice extends Homey.Device
                                 this.removeCapability('measure_water');
                                 this.removeCapability('meter_water');
                             }
-                        }
                     }
                 }
             }
         }
         catch (err)
         {
-            this.homey.app.updateLog("updateDeviceValues (" + dd.id + ") Error: " + err.message, 0);
+            this.homey.app.updateLog(`updateDeviceValues (${dd.id}) Error: ${err.message}`, 0);
         }
     }
 
@@ -224,10 +224,10 @@ class LinkTapLocalDevice extends Homey.Device
         const dd = this.getData();
 
         const message = {
-            "cmd": 11,
-            "gw_id": dd.gatewayId,
-            "dev_id": dd.id,
-            "alert": 0
+            cmd: 11,
+            gw_id: dd.gatewayId,
+            dev_id: dd.id,
+            alert: 0,
         };
 
         this.homey.app.publishMQTTMessage(message);
@@ -242,9 +242,9 @@ class LinkTapLocalDevice extends Homey.Device
         if (value === false)
         {
             const message = {
-                "cmd": 7,
-                "gw_id": dd.gatewayId,
-                "dev_id": dd.id,
+                cmd: 7,
+                gw_id: dd.gatewayId,
+                dev_id: dd.id,
             };
 
             this.homey.app.publishMQTTMessage(message);
@@ -253,10 +253,10 @@ class LinkTapLocalDevice extends Homey.Device
         {
             const settings = this.getSettings();
             const message = {
-                "cmd": 6,
-                "gw_id": dd.gatewayId,
-                "dev_id": dd.id,
-                "duration": opts ? opts.duration : (settings.watering_duration * 60)
+                cmd: 6,
+                gw_id: dd.gatewayId,
+                dev_id: dd.id,
+                duration: opts ? opts.duration : (settings.watering_duration * 60),
             };
 
             this.homey.app.publishMQTTMessage(message);
@@ -268,20 +268,21 @@ class LinkTapLocalDevice extends Homey.Device
         const dd = this.getData();
         const xref = ['', 'M', 'T', 'O', 'I', 'Y'];
 
-        let mode = xref.findIndex((entry) =>
+        const mode = xref.findIndex(entry =>
         {
             return (entry === value);
         });
 
         const message = {
-            "cmd": 4,
-            "gw_id": dd.gatewayId,
-            "dev_id": dd.id,
-            "mode": mode
+            cmd: 4,
+            gw_id: dd.gatewayId,
+            dev_id: dd.id,
+            mode,
         };
 
         this.homey.app.publishMQTTMessage(message);
     }
+
 }
 
 module.exports = LinkTapLocalDevice;

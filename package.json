@@ -11,5 +11,13 @@
         "mqtt": "^4.2.6",
         "nodemailer": "^6.5.0"
     },
-    "license": "GPL-3.0"
+    "license": "GPL-3.0",
+    "devDependencies": {
+        "@types/homey": "npm:homey-apps-sdk-v3-types@^0.2.2",
+        "eslint": "^8.1.0",
+        "eslint-config-athom": "^3.0.1"
+    },
+    "engines": {
+        "node": ">=12.16.1"
+      }    
 }

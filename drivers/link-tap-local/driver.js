@@ -1,10 +1,12 @@
-/*jslint node: true */
+/* jslint node: true */
+
 'use strict';
 
 const Homey = require('homey');
 
 class LinkTapLocalDriver extends Homey.Driver
 {
+
     /**
      * onInit is called when the driver is initialized.
      */
@@ -51,7 +53,7 @@ class LinkTapLocalDriver extends Homey.Driver
      */
     async onPairListDevices()
     {
-        return this.homey.app.getDevices(false);
+        return this.homey.app.getLinkTapDevices(false);
     }
 
     async onPair(session)
@@ -62,18 +64,18 @@ class LinkTapLocalDriver extends Homey.Driver
             {
                 await this.setupLocalAccess();
             }
-            catch(err)
+            catch (err)
             {
-                this.updateLog("Error setting up local access: " + err.message );
-                throw new Error("Failed to setup local access");
+                this.updateLog(`Error setting up local access: ${err.message}`);
+                throw new Error('Failed to setup local access');
             }
         }
 
-        session.setHandler("list_devices", async () =>
+        session.setHandler('list_devices', async () =>
         {
             try
             {
-                let devices = await this.onPairListDevices();
+                const devices = await this.onPairListDevices();
                 return devices;
             }
             catch (err)
@@ -82,6 +84,7 @@ class LinkTapLocalDriver extends Homey.Driver
             }
         });
     }
+
 }
 
 module.exports = LinkTapLocalDriver;
