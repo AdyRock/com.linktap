@@ -1,14 +1,14 @@
 {
   "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
   "id": "com.linktap",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "compatibility": ">=5.0.0",
   "platforms": [
     "local",
     "cloud"
   ],
   "sdk": 3,
-  "brandColor": "#ff7d4b",
+  "brandColor": "#00A0E9",
   "name": {
     "en": "LinkTap"
   },
@@ -159,8 +159,8 @@
       },
       {
         "title": {
-          "en": "Freeze Alarm has cleared",
-          "de": "Frostalarm wurde gelöscht"
+          "en": "Freeze alarm turned off",
+          "de": "Frostalarm ausgeschaltet"
         },
         "hint": {
           "en": "When there is no longer a chance of freezing",
@@ -177,8 +177,8 @@
       },
       {
         "title": {
-          "en": "Freeze Alarm",
-          "de": "Frostalarm"
+          "en": "Freeze alarm turned on",
+          "de": "Frostalarm eingeschaltet"
         },
         "hint": {
           "en": "When there is a chance of freezing",
@@ -195,8 +195,8 @@
       },
       {
         "title": {
-          "en": "High Water Flow Alarm Cleared",
-          "de": "Alarm für hohen Wasserdurchfluss gelöscht"
+          "en": "High Water flow alarm turned off",
+          "de": "Alarm für hohen Wasserdurchfluss ausgeschaltet"
         },
         "hint": {
           "en": "The leak is fixed",
@@ -213,8 +213,8 @@
       },
       {
         "title": {
-          "en": "High Water Flow Alarm",
-          "de": "Alarm für hohen Wasserdurchfluss"
+          "en": "High water flow alarm turned on",
+          "de": "Alarm für hohen Wasserdurchfluss eingeschaltet"
         },
         "hint": {
           "en": "When there is a leak",
@@ -231,8 +231,8 @@
       },
       {
         "title": {
-          "en": "Low Water Flow Alarm",
-          "de": "Alarm für niedrigen Wasserdurchfluss"
+          "en": "Low water flow alarm turned on",
+          "de": "Alarm für niedrigen Wasserdurchfluss eingeschaltet"
         },
         "hint": {
           "en": "When there is a blockage",
@@ -249,8 +249,8 @@
       },
       {
         "title": {
-          "en": "Low Water Flow Alarm Cleared",
-          "de": "Alarm für niedrigen Wasserdurchfluss gelöscht"
+          "en": "Low water flow alarm turned off",
+          "de": "Alarm für niedrigen Wasserdurchfluss ausgeschaltet"
         },
         "hint": {
           "en": "The blockage is clear",

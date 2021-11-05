@@ -3,28 +3,30 @@
         "settings": "Instellingen",
         "detected": "Gedetecteerd",
         "diagnosticsLog": "Diagnostice Loggegevens",
-        "subtitle": "Applicatie Instellingen",
         "accountDetails": "Account Informatie",
         "userName": "LinkTap Gebruikersnaam (geen email)",
-        "apiKey": "API-sleutel",
-        "saveChanges": "Sla wijziging op",
         "clearLog": "Opschonen Loggegevens",
         "sendLog": "Verstuur Loggegevens",
         "detectedDescription": "** Deel deze informatie niet publiekelijk **",
         "logEnabled": "Log Ingeschakeld",
-        "saved": "De instellingen zijn opgeslagen",
         "confirmSend": "Verstuur de log inhoud naar de ontwikkelaar\n** Alle identificeerbare informatie wordt verwijderd **",
         "logSent": "De loggegevens zijn verstuurd.",
         "logSendFailed": "Het is niet gelukt om gegevens te versturen na 5 pogingen.\nDe fout codes zijn te zien in het einde van de log.",
         "password": "TapLink wachtwoord",
-        "getKey": "Genereer een nieuwe API-sleutel",
-        "getKeyInstruction1": "Indien je geen API-sleutel bezit",
-        "getKeyInstruction2": "Voer je LinkTap wachtwoord hieronder in en klik op 'Get a new API key'",
-        "note": "Notitie",
-        "noteText": "Wanneer een nieuwe API-sleutel wordt gegeneerd vervalt de oude sleutel; applicaties die van deze sleutel gebruik maken zullen niet meer werken.",
         "missingUsername": "Voer LinkTap gebruikersnaam in",
-        "missingPassword": "Voer LinkTap wachtwoord in"
+        "missingPassword": "Voer LinkTap wachtwoord in",
+        "gateways": "Local",
+        "autoConfig": "Auto Configure for local access",
+        "localGateways": "Gateways"
     },
     "timeRemaining": "Tijd resterend",
-    "timeActive": "Tijd actief"
+    "timeActive": "Tijd actief",
+    "pair": {
+        "title": "Connection Details",
+        "login": "Connect",
+        "checking": "Checking connection",
+        "correct": "Successful",
+        "adding": "Adding device(s)",
+        "failed": "Failed to connect"
+    }
 }

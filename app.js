@@ -567,11 +567,12 @@ class MyApp extends Homey.App
 
                     // Add this device to the table
                     devices.push(
-                    {
-                        name: `${tapLinker.location} - ${tapLinker.taplinkerName}`,
-                        data,
-                        store: useInternet ? store : {},
-                    }, );
+                        {
+                            name: `${tapLinker.location} - ${tapLinker.taplinkerName}`,
+                            data,
+                            store: useInternet ? store : {},
+                        },
+                    );
                 }
             }
             return devices;
@@ -679,7 +680,7 @@ class MyApp extends Homey.App
             throw (new Error('HTTPS: No user name specified'));
         }
 
-        if (!body.apiKey)
+        if (!body.apiKey && !body.password)
         {
             throw (new Error('HTTPS: No API Key specified'));
         }
@@ -905,7 +906,7 @@ class MyApp extends Homey.App
                 const stack = source.stack.replace('/\\n/g', '\n');
                 return `${source.message}\n${stack}`;
             }
-            if (typeof(source) === 'object')
+            if (typeof (source) === 'object')
             {
                 const getCircularReplacer = () =>
                 {
@@ -926,7 +927,7 @@ class MyApp extends Homey.App
 
                 return JSON.stringify(source, getCircularReplacer(), 2);
             }
-            if (typeof(source) === 'string')
+            if (typeof (source) === 'string')
             {
                 return source;
             }
@@ -1077,7 +1078,7 @@ class MyApp extends Homey.App
     // Retrive the API key for the specified account
     async getAPIKey(body)
     {
-        return this.PostURL('getApiKey', body);
+        return this.PostURL('getApiKey', body, false);
     }
 
 }

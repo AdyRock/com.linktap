@@ -1,7 +1,7 @@
 {
     "title": {
-        "en": "Low Water Flow Alarm",
-        "de": "Alarm für niedrigen Wasserdurchfluss"
+        "en": "Low water flow alarm turned on",
+        "de": "Alarm für niedrigen Wasserdurchfluss eingeschaltet"
     },
     "hint": {
         "en": "When there is a blockage",

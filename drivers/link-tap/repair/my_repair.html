@@ -7,28 +7,13 @@
                 <input type="text" name="username" id="username" />
             </div>
             <div class="field row">
-                <label for="apiKey" data-i18n="settings.apiKey"></label>
-                <input type="text" name="apiKey" id="apiKey" />
-            </div>
-        </fieldset>
-        <fieldset>
-            <div class="field row">
-                <p></p>
-                <p><b><span data-i18n="settings.getKeyInstruction1"></span>:</b></p>
-                <p><span data-i18n="pair.getKeyInstruction2"></span></p>
-                <p>
-                    <b><span data-i18n="settings.note"></span>:</b> <span data-i18n="settings.noteText"></span>
-                </p>
-            </div>
-            <div class="field row">
                 <label for="password" data-i18n="settings.password"></label>
-                <input type="text" name="password" id="password" />
+                <input type="password" name="password" id="password" />
             </div>
         </fieldset>
         <input type="submit" id="submit" value="Connect" style="margin: 15px; padding: 10px; text-align:center; color: white; background-color: rgb(15, 170, 36);border-radius: 5px" />
         </br>
         </br>
-        <input type="text" id="status" readonly />
     </div>
 </form>
 
@@ -39,7 +24,6 @@
     Homey.emit('connection_setup', {}).then(function(result)
     {
         document.getElementById('username').value = result.username;
-        document.getElementById('apiKey').value = result.apiKey;
     });
 
     function getForm()
@@ -51,7 +35,6 @@
         Homey.emit('api_connection',
         {
             username: document.forms.form.username.value,
-            apiKey: document.forms.form.apiKey.value,
             password: document.forms.form.password.value,
         }).then(function(result)
         {
@@ -59,17 +42,14 @@
             {
                 console.log('authentication succeeded');
                 document.getElementById('submit').value = __('pair.correct');
-                document.getElementById('status').value = __('pair.adding');
-                document.getElementById('status').style.color = 'green';
                 Homey.done();
             }
             else
             {
                 console.log('authentication failed');
                 document.getElementById('submit').disabled = false;
-                document.getElementById('submit').value = __('pair.try_again');
-                document.getElementById('status').value = result.err;
-                document.getElementById('status').style.color = 'red';
+                document.getElementById('submit').value = __('pair.login');
+                Homey.alert(result.err);
             }
         });
     }
