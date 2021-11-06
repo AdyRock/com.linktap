@@ -34,9 +34,29 @@ class LinkTapDevice extends Homey.Device
             this.setStoreValue('apiKey', this.apiKey);
         }
 
+        // Check the connection with the credentials
         if (!await this.homey.app.registerWebhookURL(this.apiKey, this.username))
         {
-            this.setUnavailable('Failed to setup webhook: Try too repair');
+            // No good. Check if the global API key is different for the same usernam
+            if ((this.apiKey !== this.homey.app.apiKey) && (this.username === this.homey.app.username))
+            {
+                // The device store values are not good so try the app ones
+                this.apiKey = this.homey.app.apiKey;
+                if (!await this.homey.app.registerWebhookURL(this.apiKey, this.username))
+                {
+                    // Still no good
+                    this.setUnavailable(this.homey.__('connectionFailed'));
+                }
+                else
+                {
+                    // Connect OK so save the API key
+                    this.setStoreValue('apiKey', this.apiKey);
+                }
+            }
+            else
+            {
+                this.setUnavailable(this.homey.__('connectionFailed'));
+            }
         }
 
         if (!this.hasCapability('onoff'))
@@ -177,7 +197,7 @@ class LinkTapDevice extends Homey.Device
 
             if (gateway.status !== 'Connected')
             {
-                this.setUnavailable('Gateway Offline').catch(this.error);
+                this.setUnavailable(this.homey.__('gwOffline')).catch(this.error);
                 return false;
             }
 
@@ -187,7 +207,7 @@ class LinkTapDevice extends Homey.Device
 
             if (tapLinker.status !== 'Connected')
             {
-                this.setUnavailable('LinkTap Offline').catch(this.error);
+                this.setUnavailable(this.homey.__('ltOffline')).catch(this.error);
                 return false;
             }
 
@@ -639,11 +659,11 @@ class LinkTapDevice extends Homey.Device
             }
             else if (message.msg === 'gatewayOffline')
             {
-                this.setUnavailable().catch(this.error);
+                this.setUnavailable(this.homey.__('gwOffline')).catch(this.error);
             }
             else if (message.msg === 'deviceOffline')
             {
-                this.setUnavailable().catch(this.error);
+                this.setUnavailable(this.homey.__('ltOffline')).catch(this.error);
             }
             else if (message.msg === 'deviceOnline')
             {

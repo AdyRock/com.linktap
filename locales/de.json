@@ -3,7 +3,6 @@
         "settings": "Internet",
         "detected": "Erkannt",
         "diagnosticsLog": "Diagnoseprotokoll",
-        "accountDetails": "Kontodetails",
         "userName": "Benutzername",
         "clearLog": "Protokoll löschen",
         "sendLog": "Protokoll senden",
@@ -21,12 +20,15 @@
     },
     "timeRemaining": "Verbleibende Zeit",
     "timeActive": "Zeit aktiv",
+    "gwOffline": "Das Gateway ist offline",
+    "ltOffline": "Das Ventil ist offline",
+    "connectionFailed": "Verbindung fehlgeschlagen. Sollte das Problem weiterhin bestehen, probieren Sie die Repair-Option",
     "pair": {
-        "title": "Verbindungsdetails",
-        "login": "Verbinden",
+        "title": "Kontodetails",
+        "login": "Mit LinkTap verbinden",
         "checking": "Verbindung überprüfen",
-        "correct": "Erfolgreich",
+        "correct": "Erfolgreich verbunden mit LinkTap",
         "adding": "Gerät(e) hinzufügen",
-        "failed": "Failed to connect"
+        "failed": "Die Verbindung zum LinkTap-Server konnte nicht hergestellt werden.\nStellen Sie sicher, dass Sie den richtigen Benutzernamen und das richtige Passwort eingegeben haben."
     }
 }

@@ -124,7 +124,7 @@ class LinkTapLocalDevice extends Homey.Device
                         // Yep, so update the values
                         if (!tapLinker.is_rf_linked)
                         {
-                            await this.setUnavailable('LinkTap Offline');
+                            await this.setUnavailable(this.homey.__('ltOffline'));
                             return;
                         }
 

@@ -24,13 +24,21 @@
     Homey.emit('connection_setup', {}).then(function(result)
     {
         document.getElementById('username').value = result.username;
+        if (result.ok)
+        {
+            document.getElementById('submit').style.visibility = 'hidden';
+            Homey.alert(Homey.__('pair.correct')).then(function()
+            {
+                Homey.done();
+            });
+        }
     });
 
     function getForm()
     {
         // Mark as authenticating
         document.getElementById('submit').disabled = 'disabled';
-        document.getElementById('submit').value = __('pair.checking');
+        document.getElementById('submit').value = Homey.__('pair.checking');
 
         Homey.emit('api_connection',
         {
@@ -41,14 +49,16 @@
             if (result.ok)
             {
                 console.log('authentication succeeded');
-                document.getElementById('submit').value = __('pair.correct');
-                Homey.done();
+                Homey.alert(Homey.__('pair.correct')).then(function()
+                {
+                    Homey.done();
+                });
             }
             else
             {
                 console.log('authentication failed');
                 document.getElementById('submit').disabled = false;
-                document.getElementById('submit').value = __('pair.login');
+                document.getElementById('submit').value = Homey.__('pair.login');
                 Homey.alert(result.err);
             }
         });

@@ -3,7 +3,6 @@
         "settings": "Internet",
         "detected": "Detected",
         "diagnosticsLog": "Diagnostics Log",
-        "accountDetails": "Account Details",
         "username": "LinkTap User Name ( NOT your email )",
         "clearLog": "Clear Log",
         "sendLog": "Send Log",
@@ -12,7 +11,7 @@
         "confirmSend": "Send the log contents to the developer?\n** All identifiers will be removed **",
         "logSent": "The log has been sent.",
         "logSendFailed": "Failed to send after 5 attempts.\nThe error messages are at the end of the log.",
-        "password": "TapLink Password",
+        "password": "LinkTap Password",
         "missingUsername": "You need to enter your LinkTap Username",
         "missingPassword": "You need to enter your LinkTap Password",
         "gateways": "Local",
@@ -21,12 +20,15 @@
     },
     "timeRemaining": "Time Remaining",
     "timeActive": "Time Active",
+    "gwOffline": "The Gateway is offline",
+    "ltOffline": "The Valve is offline",
+    "connectionFailed": "Connection failed. Try the Repair option if the problem persists",
     "pair": {
-        "title": "Connection Details",
-        "login": "Connect",
+        "title": "Account Details",
+        "login": "Connect to LinkTap",
         "checking": "Checking connection",
-        "correct": "Successful",
+        "correct": "Successfully connected to LinkTap",
         "adding": "Adding device(s)",
-        "failed": "Failed to connect"
+        "failed": "Failed to connect to the LinkTap server.\nMake sure you have entered the correct Username and Password"
     }
 }
