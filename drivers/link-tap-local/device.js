@@ -13,6 +13,20 @@ class LinkTapLocalDevice extends Homey.Device
     async onInit()
     {
         this.log('LinkTapLocalDevice initialising');
+        if (!this.homey.app.enableLocal)
+        {
+            this.homey.app.enableLocal = true;
+            this.homey.settings.set('enableLocal', true);
+            try
+            {
+                await this.homey.app.setupLocalAccess();
+            }
+            catch (err)
+            {
+                this.homey.app.updateLog(`Error setting up local access: ${err.message}`);
+            }
+        }
+
         this.isWatering = false;
         this.OnOffChanged = false;
         this.OnOffChangedTimeout = null;

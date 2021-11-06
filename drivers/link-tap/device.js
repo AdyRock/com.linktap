@@ -166,6 +166,8 @@ class LinkTapDevice extends Homey.Device
             {
                 if (!success)
                 {
+                    this.homey.app.updateLog('updateDeviceValues retry in 5 minutes');
+
                     this.homey.setTimeout(async () =>
                     {
                         // Try again after 5 minutes as it could be failing with the cached data
@@ -177,6 +179,8 @@ class LinkTapDevice extends Homey.Device
 
     async __updateDeviceValues()
     {
+        this.homey.app.updateLog('updateDeviceValues');
+
         const body = {
             apiKey: this.apiKey,
             username: this.username,
@@ -186,6 +190,7 @@ class LinkTapDevice extends Homey.Device
 
         if (devices === null)
         {
+            this.homey.app.updateLog('updateDeviceValues no device data available');
             return false;
         }
 
@@ -197,6 +202,7 @@ class LinkTapDevice extends Homey.Device
 
             if (gateway.status !== 'Connected')
             {
+                this.homey.app.updateLog('updateDeviceValues Gateway status is not connected');
                 this.setUnavailable(this.homey.__('gwOffline')).catch(this.error);
                 return false;
             }
@@ -207,6 +213,7 @@ class LinkTapDevice extends Homey.Device
 
             if (tapLinker.status !== 'Connected')
             {
+                this.homey.app.updateLog('updateDeviceValues Valve status is not connected');
                 this.setUnavailable(this.homey.__('ltOffline')).catch(this.error);
                 return false;
             }
@@ -253,6 +260,7 @@ class LinkTapDevice extends Homey.Device
         catch (err)
         {
             this.homey.app.updateLog(`updateDeviceValues (${dd.id}) Error: ${err.message}`, 0);
+            return false;
         }
 
         return true;

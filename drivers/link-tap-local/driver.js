@@ -13,11 +13,6 @@ class LinkTapLocalDriver extends Homey.Driver
     async onInit()
     {
         this.log('LinkTapLocalDriver initialising');
-        if (!this.homey.app.enableLocal)
-        {
-            this.homey.app.enableLocal = true;
-            this.homey.settings.set('enableLocal', true);
-        }
 
         this.wateringStartedTrigger = this.homey.flow.getDeviceTriggerCard('watering_started');
         this.wateringFinishedTrigger = this.homey.flow.getDeviceTriggerCard('watering_finished');
@@ -62,7 +57,7 @@ class LinkTapLocalDriver extends Homey.Driver
         {
             try
             {
-                await this.setupLocalAccess();
+                await this.homey.app.setupLocalAccess();
             }
             catch (err)
             {

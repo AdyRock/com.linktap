@@ -30,6 +30,8 @@ class MyApp extends Homey.App
         this.diagLog = '';
         this.homeyIP = null;
         this.cloudOnly = true;
+
+        this.homey.settings.set('enableLocal', false); // Remove this line when the local option is released on the LinkTap gateway
         this.enableLocal = this.homey.settings.get('enableLocal'); // Set to true when a local access device is added
         this.fetchingData = false;
 
@@ -496,6 +498,8 @@ class MyApp extends Homey.App
             this.fetchingData = true;
             try
             {
+                this.homey.app.updateLog('App updateDeviceValues fetching data');
+
                 // More than 5 minutes since last request
                 // https://www.link-tap.com/api/getAllDevices
                 const url = 'getAllDevices';
