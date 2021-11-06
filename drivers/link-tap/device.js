@@ -568,7 +568,7 @@ class LinkTapDevice extends Homey.Device
                 {
                     this.cycles = 1;
                     this.setCapabilityValue('cycles_remaining', this.cycles).catch(this.error);
-                    if ((message.onMin === 0) && (message.totalMin === '-1'))
+                    if ((message.onMin === 0) && (message.totalMin === -1))
                     {
                         // Turned on via the button
                         this.setCapabilityOptions('time_remaining', { title: this.homey.__('timeActive') });
