@@ -13,10 +13,7 @@
         "logSendFailed": "Failed to send after 5 attempts.\nThe error messages are at the end of the log.",
         "password": "LinkTap Password",
         "missingUsername": "You need to enter your LinkTap Username",
-        "missingPassword": "You need to enter your LinkTap Password",
-        "gateways": "Local",
-        "autoConfig": "Auto Configure for local access",
-        "localGateways": "Gateways"
+        "missingPassword": "You need to enter your LinkTap Password"
     },
     "timeRemaining": "Time Remaining",
     "timeActive": "Time Active",

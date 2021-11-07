@@ -8,15 +8,8 @@ if (process.env.DEBUG === '1')
 
 const Homey = require('homey');
 const https = require('https');
-const http = require('http');
 
 const nodemailer = require('nodemailer');
-
-const aedes = require('aedes')();
-const net = require('net');
-
-const PORT = 49876;
-const mqtt = require('mqtt');
 
 class MyApp extends Homey.App
 {
@@ -28,25 +21,8 @@ class MyApp extends Homey.App
     {
         this.log('MyApp initialising');
         this.diagLog = '';
-        this.homeyIP = null;
-        this.cloudOnly = true;
-
-        this.homey.settings.set('enableLocal', false); // Remove this line when the local option is released on the LinkTap gateway
-        this.enableLocal = this.homey.settings.get('enableLocal'); // Set to true when a local access device is added
         this.fetchingData = false;
-
-        if (this.enableLocal)
-        {
-            try
-            {
-                // Setup the local access method if possible
-                await this.setupLocalAccess();
-            }
-            catch (err)
-            {
-                this.updateLog(`Error setting up local access: ${err.message}`);
-            }
-        }
+        this.cloudOnly = true;
 
         if (process.env.DEBUG === '1')
         {
@@ -56,6 +32,18 @@ class MyApp extends Homey.App
         else
         {
             this.homey.settings.set('debugMode', false);
+        }
+
+        try
+        {
+            // Try to get the local IP address to see if the app is running in Homet cloud
+            await this.homey.cloud.getLocalAddress();
+            this.cloudOnly = false;
+        }
+        catch (err)
+        {
+            // getLocalAddress will fail on Homey cloud installations so dissbale the loging options
+            this.cloudOnly = true;
         }
 
         const activateInstantMode = this.homey.flow.getActionCard('activate_instant_mode');
@@ -88,30 +76,6 @@ class MyApp extends Homey.App
             return args.device.isWatering; // true or false
         });
 
-        const activateInstantModeLocal = this.homey.flow.getActionCard('activate_instant_mode_local');
-        activateInstantModeLocal
-            .registerRunListener(async (args, state) =>
-            {
-                this.log('activate_instant_mode');
-                return args.device.onCapabilityOnOff(true, { duration: args.water_duration });
-            });
-
-        const turnOffInstantModeLocal = this.homey.flow.getActionCard('turn_off_instant_mode_local');
-        turnOffInstantModeLocal
-            .registerRunListener(async (args, state) =>
-            {
-                this.log('turn_off_instant_mode');
-                return args.device.onCapabilityOnOff(false);
-            });
-
-        const activateWateringModeLocal = this.homey.flow.getActionCard('activate_watering_mode_local');
-        activateWateringModeLocal
-            .registerRunListener(async (args, state) =>
-            {
-                this.log('activate_watering_mode');
-                return args.device.onCapabilityWateringMode(args.mode);
-            });
-
         this.homey.settings.on('set', async key =>
         {
             if (key === 'APIToken')
@@ -123,15 +87,6 @@ class MyApp extends Homey.App
             {
                 this.username = this.homey.settings.get('UserName');
                 this.setupWebhook().catch(this.error);
-            }
-            else if (key === 'autoConfig')
-            {
-                this.autoConfigGateway = this.homey.settings.get('autoConfig');
-                if (this.autoConfigGateway)
-                {
-                    // Automatically configure the gateways for local MQTT access
-                    this.checkGatewaysConfiguration().catch(this.error);
-                }
             }
         });
 
@@ -150,324 +105,6 @@ class MyApp extends Homey.App
         });
 
         this.log('MyApp has been initialized');
-    }
-
-    // Try to setup local access
-    async setupLocalAccess()
-    {
-        let homeyLocalURL = null;
-        try
-        {
-            homeyLocalURL = await this.homey.cloud.getLocalAddress();
-            this.cloudOnly = false;
-        }
-        catch (err)
-        {
-            // getLocalAddress will fail on Homey cloud installations so only use cloud to cloud method
-            this.cloudOnly = true;
-            return false;
-        }
-
-        const _this = this;
-
-        // Setup the local MQTT server
-        const server = net.createServer(aedes.handle);
-        server.listen(PORT, () =>
-        {
-            _this.homey.app.updateLog(`server started and listening on port ${PORT}`);
-        });
-
-        aedes.authenticate = function aedesAuthenticate(client, username, password, callback)
-        {
-            callback(null, (username === 'homeyApp') && (password.toString() === 'fred69'));
-        };
-
-        this.homeyIP = homeyLocalURL.split(':')[0];
-
-        this.mDNSGateways = this.homey.settings.get('gateways');
-        this.mDNSGateways = [];
-
-        this.autoConfigGateway = this.homey.settings.get('autoConfig');
-
-        // setup the mDNS discovery for local gateways
-        this.discoveryStrategy = this.homey.discovery.getStrategy('link_tap');
-
-        const discoveryResult = this.discoveryStrategy.getDiscoveryResults();
-        this.updateLog(`Got initial mDNS result:${this.varToString(discoveryResult)}`);
-        if (discoveryResult && discoveryResult.address)
-        {
-            this.mDNSGatewaysUpdate(discoveryResult);
-        }
-
-        this.discoveryStrategy.on('result', discoveryResult =>
-        {
-            this.updateLog(`Got mDNS result:${this.varToString(discoveryResult)}`);
-            this.mDNSGatewaysUpdate(discoveryResult);
-        });
-
-        // Connect to the MQTT server and subscribe to the required topics
-        this.MQTTclient = mqtt.connect('mqtt://localhost:49876', { clientId: 'homeyLinkTapApp', username: 'homeyApp', password: 'fred69' });
-        this.MQTTclient.on('connect', () =>
-        {
-            _this.MQTTclient.subscribe('linktap/up_cmd', err =>
-            {
-                if (err)
-                {
-                    _this.updateLog("setupLocalAccess.onConnect 'linktap/up_cmd' error: " * _this.varToString(err), 0);
-                }
-            });
-            _this.MQTTclient.subscribe('linktap/down_cmd_ack', err =>
-            {
-                if (err)
-                {
-                    _this.updateLog("setupLocalAccess.onConnect 'linktap/down_cmd_ack' error: " * _this.varToString(err), 0);
-                }
-            });
-        });
-
-        this.MQTTclient.on('message', (topic, message) =>
-        {
-            // message is in Buffer
-            try
-            {
-                const tapLinkData = JSON.parse(message.toString());
-                _this.homey.app.updateLog(`MQTTDeviceValues: ${_this.homey.app.varToString(tapLinkData)}`);
-
-                if ((tapLinkData.cmd === 0) || (tapLinkData.cmd === 13))
-                {
-                    // A gateway is connecting or refreshing so return the current date and time
-                    const t = new Date();
-                    const date = (`0${t.getDate()}`).slice(-2);
-                    const month = (`0${t.getMonth() + 1}`).slice(-2);
-                    const year = t.getFullYear();
-                    const hours = (`0${t.getHours()}`).slice(-2);
-                    const minutes = (`0${t.getMinutes()}`).slice(-2);
-                    const seconds = (`0${t.getSeconds()}`).slice(-2);
-                    const dateTxt = `${year}${month}${date}`;
-                    const timeTxt = `${hours}${minutes}${seconds}`;
-                    const reply = {
-                        cmd: 0,
-                        gwID: tapLinkData.gwID,
-                        date: dateTxt,
-                        time: timeTxt,
-                        wday: t.getDay(),
-                    };
-
-                    const data = JSON.stringify(reply);
-
-                    _this.MQTTclient.publish('linktap/up_cmd_ack', data);
-                }
-                else if ((tapLinkData.cmd === 3) || (tapLinkData.cmd === 9))
-                {
-                    // New data has been received so update the device cache used when adding devices
-                    _this.updateDetectedMQTTDevices(tapLinkData);
-
-                    // Update the device capabilities
-                    _this.updateDevicesMQTT(tapLinkData);
-                }
-            }
-            catch (err)
-            {
-                _this.homey.app.updateLog(`MQTT Client error: ${topic}: ${err.message}`);
-            }
-        });
-
-        return true;
-    }
-
-    // Build up a cache of the tapLinkers (valves) for the get devices part of the add device
-    updateDetectedMQTTDevices(tapLinkData)
-    {
-        if (tapLinkData.dev_stat && this.mDNSGateways)
-        {
-            try
-            {
-                // find the gateway in the list of mDNS detected gateways
-                const index = this.mDNSGateways.findIndex(gateway =>
-                {
-                    return gateway.gatewayId === tapLinkData.gw_id;
-                });
-
-                if (index >= 0)
-                {
-                    // Found the gateway so look for the taplinkers to see if already cached
-                    const gatewayTapLinkers = this.mDNSGateways[index].taplinker;
-                    tapLinkData.dev_stat.forEach(tapLinker1 =>
-                    {
-                        const index2 = gatewayTapLinkers.findIndex(tapLinker2 =>
-                        {
-                            return tapLinker2.taplinkerId === tapLinker1.dev_id;
-                        });
-
-                        if (index2 < 0)
-                        {
-                            // No match found so add this tapLinker
-                            const newTapLinker = {
-                                location: '',
-                                taplinkerName: tapLinker1.dev_id,
-                                taplinkerId: tapLinker1.dev_id,
-                            };
-                            gatewayTapLinkers.push(newTapLinker);
-                            this.homey.settings.set('gateways', this.mDNSGateways);
-                            this.homey.app.updateLog(`MQTTDevice: ${this.homey.app.varToString(this.mDNSGateways)}`);
-                        }
-                    });
-                }
-            }
-            catch (err)
-            {
-                this.homey.app.updateLog(`updateDetectedMQTTDevices error: ${err.message}`);
-            }
-        }
-    }
-
-    // Build a list of gateways detected by mDNS
-    mDNSGatewaysUpdate(discoveryResult)
-    {
-        try
-        {
-            let index = this.mDNSGateways.findIndex(gateway =>
-            {
-                return gateway.gatewayId === discoveryResult.id;
-            });
-
-            if (index >= 0)
-            {
-                // Already cached so just make sure the address is up to date
-                this.mDNSGateways[index].address = discoveryResult.address;
-            }
-            else
-            {
-                // Add a new entry to the cache
-                const gateway = {
-                    gatewayId: discoveryResult.id,
-                    address: discoveryResult.address,
-                    model: discoveryResult.txt.model,
-                    taplinker: [],
-                };
-
-                this.mDNSGateways.push(gateway);
-                index = this.mDNSGateways.length - 1;
-            }
-
-            this.homey.settings.set('gateways', this.mDNSGateways);
-
-            if (this.autoConfigGateway)
-            {
-                // Make sure the gateway is configure for local access
-                this.checkGatewayConfiguration(this.mDNSGateways[index]);
-            }
-        }
-        catch (err)
-        {
-            this.homey.app.updateLog(`mDNSGatewaysUpdate error: ${err.message}`);
-        }
-    }
-
-    async checkGatewayConfiguration(gateway)
-    {
-        // Check if gateway already configured
-        const res = await this.GetURL(`http://${gateway.address}`, {});
-        const hostPos = res.search('#HOST');
-        if (hostPos > 0)
-        {
-            const hostValuePos = res.indexOf('value=', hostPos);
-            let hostValue = res.substr(hostValuePos + 6, 17);
-            hostValue = hostValue.split('"');
-            hostValue = hostValue[1];
-
-            if (hostValue !== this.homeyIP)
-            {
-                // the gateway needs to be configured for local access
-                this.updateGatewayConfiguration(gateway, this.homeyIP);
-            }
-        }
-    }
-
-    // The gateways are setup via a html forms so plug in the values by posting the forma data
-    async updateGatewayConfiguration(gateway, homeyIP)
-    {
-        // Post form 2 data to configure the MQTT client settings
-        let urlOptions = '?';
-        urlOptions += 'flag=2';
-        urlOptions += '&func=2';
-        urlOptions += '&hosttype=0';
-        urlOptions += '&prefix=linktap';
-        urlOptions += `&host=${encodeURIComponent(homeyIP)}`;
-        urlOptions += '&port=49876';
-        urlOptions += `&cltid=${gateway.gatewayId}`;
-        urlOptions += '&user=homeyApp';
-        urlOptions += '&pwd=fred69';
-        urlOptions += '&alive=120';
-        try
-        {
-            await this.GetURL(`http://${gateway.address}/index.shtml${urlOptions}`, {});
-        }
-        catch (err)
-        {
-            this.homey.app.updateLog(`Publish Form 1 error:${err.message}`, 0);
-        }
-
-        // Post form 3 data to configure the MQTT topics settings
-        urlOptions = '?';
-        urlOptions += 'flag=3';
-        urlOptions += '&uptopic=linktap/up_cmd';
-        urlOptions += '&uptpcrx=linktap/up_cmd_ack';
-        urlOptions += '&dwntpc=linktap/down_cmd';
-        urlOptions += '&dwntpcrx=linktap/down_cmd_ack';
-        try
-        {
-            await this.GetURL(`http://${gateway.address}/index.shtml${urlOptions}`, {});
-        }
-        catch (err)
-        {
-            this.homey.app.updateLog(`Publish Form 2 error:${err.message}`);
-        }
-
-        // Post form 0 to reboot the gateway
-        urlOptions = '?';
-        urlOptions += 'flag=0';
-        try
-        {
-            await this.GetURL(`http://${gateway.address}/index.shtml${urlOptions}`, {});
-        }
-        catch (err)
-        {
-            this.homey.app.updateLog(`Publish Form 3 error:${err.message}`, 0);
-        }
-    }
-
-    // Send the data to each device so it can filter and update as required
-    async updateDevicesMQTT(tapLinkData)
-    {
-        const promises = [];
-        const drivers = this.homey.drivers.getDrivers();
-        // eslint-disable-next-line no-restricted-syntax
-        for (const driver in drivers)
-        {
-            if (Object.prototype.hasOwnProperty.call(drivers, driver))
-            {
-                const devices = this.homey.drivers.getDriver(driver).getDevices(false);
-                const numDevices = devices.length;
-                for (let i = 0; i < numDevices; i++)
-                {
-                    const device = devices[i];
-                    if (device.updateDeviceMQTT)
-                    {
-                        promises.push(device.updateDeviceMQTT(tapLinkData));
-                    }
-                }
-            }
-        }
-
-        await Promise.all(promises);
-    }
-
-    async publishMQTTMessage(message)
-    {
-        const data = JSON.stringify(message);
-        this.homey.app.updateLog(`publishMQTTMessage: ${data}`);
-        this.MQTTclient.publish('linktap/down_cmd', data);
     }
 
     // The getAllDevices API can only be called once every 5 minutes so get the data from the cache if it was called less than 5 minutes ago
@@ -532,23 +169,14 @@ class MyApp extends Homey.App
         return searchData;
     }
 
-    // useInternet is true for cloud devices and false for local devices
     // body can be use to pass in the APIKey and user name. If it is empty then the global app settings will be used
-    async getLinkTapDevices(useInternet, body)
+    async getLinkTapDevices(body)
     {
         const devices = [];
         let searchData = null;
 
-        if (useInternet)
-        {
-            // For cloud to cloud connections use the API
-            searchData = await this.getDeviceData(true, body);
-        }
-        else
-        {
-            // For local access use the MQTT cache
-            searchData = this.mDNSGateways;
-        }
+        // For cloud to cloud connections use the API
+        searchData = await this.getDeviceData(true, body);
 
         if (searchData)
         {
@@ -574,7 +202,7 @@ class MyApp extends Homey.App
                         {
                             name: `${tapLinker.location} - ${tapLinker.taplinkerName}`,
                             data,
-                            store: useInternet ? store : {},
+                            store,
                         },
                     );
                 }
@@ -759,135 +387,6 @@ class MyApp extends Homey.App
             catch (err)
             {
                 reject(new Error(`HTTPS Catch: ${err.message}`));
-            }
-        });
-    }
-
-    async PostFormData(url, headers, body)
-    {
-        const bodyText = JSON.stringify(body);
-
-        return new Promise((resolve, reject) =>
-        {
-            try
-            {
-                const httpOptions = {
-                    host: url,
-                    path: '',
-                    method: 'POST',
-                    headers,
-                };
-
-                const req = http.request(httpOptions, res =>
-                {
-                    const body = [];
-                    res.on('data', chunk =>
-                    {
-                        body.push(chunk);
-                    });
-
-                    res.on('end', () =>
-                    {
-                        if (res.statusCode === 200)
-                        {
-                            let returnData = Buffer.concat(body);
-                            if (returnData.length > 2)
-                            {
-                                returnData = JSON.parse(returnData);
-                            }
-                            resolve(returnData);
-                        }
-                        else
-                        {
-                            this.updateLog(`Post Form Data HTTPS Error: ${res.statusCode}`, 0);
-                            reject(new Error(`HTTPS Error - ${res.statusCode}`));
-                        }
-                    });
-                });
-
-                req.on('error', err =>
-                {
-                    this.updateLog(err);
-                    reject(new Error(`HTTPS Catch: ${err}`), 0);
-                });
-
-                req.setTimeout(5000, () =>
-                {
-                    req.destroy();
-                    reject(new Error('HTTP Catch: Timeout'));
-                });
-
-                req.write(bodyText);
-                req.end();
-            }
-            catch (err)
-            {
-                this.updateLog(err.message, 0);
-                reject(new Error(`HTTPS Catch: ${err.message}`));
-            }
-        });
-    }
-
-    async GetURL(url, Options)
-    {
-        return new Promise((resolve, reject) =>
-        {
-            try
-            {
-                this.updateLog(`Checking: ${url}`);
-                http.get(url, Options, res =>
-                {
-                    if (res.statusCode === 200)
-                    {
-                        const body = [];
-                        res.on('data', chunk =>
-                        {
-                            body.push(chunk);
-                        });
-                        res.on('end', () =>
-                        {
-                            resolve(
-                                Buffer.concat(body).toString(),
-                            );
-                        });
-                    }
-                    else
-                    {
-                        let message = '';
-                        if (res.statusCode === 204)
-                        {
-                            message = 'No Data Found';
-                        }
-                        else if (res.statusCode === 302)
-                        {
-                            message = res.headers.location;
-                        }
-                        else if (res.statusCode === 400)
-                        {
-                            message = 'Bad request';
-                        }
-                        else if (res.statusCode === 401)
-                        {
-                            message = 'Unauthorized';
-                        }
-                        else if (res.statusCode === 403)
-                        {
-                            message = 'Forbidden';
-                        }
-                        else if (res.statusCode === 404)
-                        {
-                            message = 'Not Found';
-                        }
-                        reject(new Error({ source: 'HTTPS Error', code: res.statusCode, message }));
-                    }
-                }).on('error', err =>
-                {
-                    reject(new Error({ source: 'HTTPS Catch', err }));
-                });
-            }
-            catch (e)
-            {
-                reject(new Error({ source: 'HTTPS Try Catch', err: e }));
             }
         });
     }

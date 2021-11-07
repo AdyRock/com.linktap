@@ -43,27 +43,9 @@
 
     <!-- Tab links -->
     <div class="tab">
-        <button class="tablinks" onclick="setPage(event, 'gateways')" id="defaultOpen"><span data-i18n="settings.gateways"></span></button>
-        <button class="tablinks" onclick="setPage(event, 'detected')"><span data-i18n="settings.detected"></span></button>
+        <button class="tablinks" onclick="setPage(event, 'detected')" id="defaultOpen"><span data-i18n="settings.detected"></span></button>
         <button class="tablinks" onclick="setPage(event, 'log')"><span data-i18n="settings.diagnosticsLog"></span></button>
         <button class="tablinks" onclick="setPage(event, 'simulator')" id="simLogTab" style="visibility:hidden">Simulation Data</button>
-    </div>
-
-    <!-- GATEWAYS PAGE -->
-    <div id="gateways" class="tabcontent">
-        <p data-i18n="settings.localGateways"></p>
-        <fieldset>
-            <legend><span data-i18n="settings.gatways"></span></legend>
-            <div class="field row">
-                <label for="autoConfig"><span data-i18n="settings.autoConfig"></span></label>
-                <input id="autoConfig" type="checkbox" value="notify" />
-            </div>
-        </fieldset>
-
-        <fieldset>
-            <legend>Available Gateways</legend>
-            <div id="gatewaySection"></div>
-        </fieldset>
     </div>
 
     <!-- detected-->
@@ -111,8 +93,6 @@
         // Create the busy indicator
         var busyi = new busy_indicator(document.getElementById("busybox"), document.querySelector("#busybox div"));
 
-        var autoConfigElement = document.getElementById('autoConfig');
-
         var detectedDevicesElement = document.getElementById('detectedDevices');
         var diagLogElement = document.getElementById('diagLog');
         var logEnabledElement = document.getElementById('logEnabled');
@@ -139,21 +119,6 @@
             });
 
             document.getElementById("defaultOpen").click();
-
-            Homey.get('autoConfig', function(err, autoConfig)
-            {
-                if (err) return Homey.alert(err);
-                autoConfigElement.checked = autoConfig;
-            });
-
-            Homey.on('com.linktap.GatewaysUpdated', function(data)
-            {
-                if (data.status)
-                {
-                    Homey.alert(data.status);
-                }
-                getGateways();
-            });
 
             Homey.on('com.linktap.logupdated', function(data)
             {
@@ -199,11 +164,6 @@
                 {
                     detectedDevicesElement.value = result;
                 }
-            });
-
-            autoConfigElement.addEventListener('click', function(e)
-            {
-                Homey.set('autoConfig', autoConfigElement.checked);
             });
 
             logEnabledElement.addEventListener('click', function(e)
@@ -349,11 +309,7 @@
             document.getElementById(tabPage).style.display = "block";
             evt.currentTarget.className += " active";
 
-            if (tabPage == 'gateways')
-            {
-                getGateways();
-            }
-            else if (tabPage == 'log')
+            if (tabPage == 'log')
             {
                 // Refresh the log data
                 Homey.get('logEnabled', function(err, logEnabled)
@@ -395,39 +351,6 @@
             {
                 busyi.hide();
             }
-        }
-
-        function addGateway(gateway)
-        {
-            console.log("addApp");
-            var section = document.getElementById('gatewaySection').innerHTML;
-
-            document.getElementById('gatewaySection').innerHTML = section +
-                '<div class="field row"><p><label class="a">' +
-                gateway.gatewayId + ' (Model:' + gateway.model + ') </label><button onClick="Homey.openURL(' + "'http://" + gateway.address + "'" + ')">View</button></p></div>';
-
-        }
-
-        function getGateways()
-        {
-            document.getElementById('gatewaySection').innerHTML = "";
-            Homey.get('gateways', function(err, gatewayList)
-            {
-                if (err) return Homey.alert(err);
-
-                if (gatewayList.length == 0)
-                {
-                    document.getElementById('gatewaySection').innerHTML = "No gateways";
-                }
-                else
-                {
-                    document.getElementById('gatewaySection').innerHTML = "";
-                    gatewayList.forEach(element =>
-                    {
-                        addGateway(element);
-                    });
-                }
-            });
         }
     </script>
 

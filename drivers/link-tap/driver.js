@@ -45,7 +45,7 @@ class LinkTapDriver extends Homey.Driver
      */
     async onPairListDevices(body)
     {
-        return this.homey.app.getLinkTapDevices(true, body);
+        return this.homey.app.getLinkTapDevices(body);
     }
 
     async onPair(session)

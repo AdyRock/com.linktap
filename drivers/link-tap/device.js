@@ -190,7 +190,7 @@ class LinkTapDevice extends Homey.Device
 
         if (devices === null)
         {
-            this.homey.app.updateLog('updateDeviceValues no device data available');
+            this.homey.app.updateLog('updateDeviceValues no new device data available');
             return false;
         }
 

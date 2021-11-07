@@ -1,7 +1,7 @@
 {
     "id": "link-tap",
     "name": {
-        "en": "LinkTap (cloud)"
+        "en": "LinkTap"
     },
     "platforms": [
         "local",

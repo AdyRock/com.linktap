@@ -13,10 +13,7 @@
         "logSendFailed": "Het is niet gelukt om gegevens te versturen na 5 pogingen.\nDe fout codes zijn te zien in het einde van de log.",
         "password": "TapLink wachtwoord",
         "missingUsername": "Voer LinkTap gebruikersnaam in",
-        "missingPassword": "Voer LinkTap wachtwoord in",
-        "gateways": "Local",
-        "autoConfig": "Auto Configure for local access",
-        "localGateways": "Gateways"
+        "missingPassword": "Voer LinkTap wachtwoord in"
     },
     "timeRemaining": "Tijd resterend",
     "timeActive": "Tijd actief",
