@@ -104,7 +104,7 @@ class LinkTapDriver extends Homey.Driver
 
             try
             {
-                // Get the apiKey using the username and password
+                // Get the current apiKey using the username and password
                 const res = await this.homey.app.getAPIKey(data);
                 apiKey = res.key;
             }
@@ -114,7 +114,25 @@ class LinkTapDriver extends Homey.Driver
                 {
                     return { ok: false, err: this.homey.__('pair.failed') };
                 }
-                return { ok: false, err: err.message };
+            }
+
+            if (!apiKey)
+            {
+                try
+                {
+                    // Get a new apiKey using the username and password
+                    data.replace = true;
+                    const res = await this.homey.app.getAPIKey(data);
+                    apiKey = res.key;
+                }
+                catch (err)
+                {
+                    if (err.message === 'HTTPS Error - 400')
+                    {
+                        return { ok: false, err: this.homey.__('pair.failed') };
+                    }
+                    return { ok: false, err: err.message };
+                }
             }
 
             if (!await this.homey.app.registerWebhookURL(apiKey, data.username))
