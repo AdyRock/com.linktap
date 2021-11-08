@@ -299,10 +299,17 @@ class MyApp extends Homey.App
     // Clear the webhook URL from the LinkTap account
     async unregisterWebhook()
     {
-        // https://www.link-tap.com/api/deleteWebHookUrl
-        const url = 'deleteWebHookUrl';
-        const response = await this.PostURL(url, { username: this.username, apiKey: this.apiKey });
-        this.updateLog(this.varToString(response.message));
+        try
+        {
+            // https://www.link-tap.com/api/deleteWebHookUrl
+            const url = 'deleteWebHookUrl';
+            const response = await this.PostURL(url, { username: this.username, apiKey: this.apiKey });
+            this.updateLog(this.varToString(response.message));
+        }
+        catch(err)
+        {
+            this.updateLog(err.message);
+        }
     }
 
     async PostURL(url, body, logBody = true)
@@ -386,7 +393,9 @@ class MyApp extends Homey.App
             }
             catch (err)
             {
-                reject(new Error(`HTTPS Catch: ${err.message}`));
+                this.log('HTTPS Catch: ', err);
+                const stack = this.varToString(err.stack);
+                reject(new Error(`HTTPS Catch: ${err.message}\n${stack}`));
             }
         });
     }

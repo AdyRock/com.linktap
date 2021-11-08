@@ -110,12 +110,16 @@ class LinkTapDriver extends Homey.Driver
             }
             catch (err)
             {
+                if (err.message === 'HTTPS Error - 400')
+                {
+                    return { ok: false, err: this.homey.__('pair.failed') };
+                }
                 return { ok: false, err: err.message };
             }
 
             if (!await this.homey.app.registerWebhookURL(apiKey, data.username))
             {
-                return { ok: false, err: this.homey.__('failed') };
+                return { ok: false, err: this.homey.__('pair.failed') };
             }
 
             // Successful connection so save the credentials
@@ -172,11 +176,11 @@ class LinkTapDriver extends Homey.Driver
         {
             if (!data.username)
             {
-                return { ok: false, err: this.homey.__('missingUsername') };
+                return { ok: false, err: this.homey.__('settings.missingUsername') };
             }
             if (!data.password)
             {
-                return { ok: false, err: this.homey.__('missingPassword') };
+                return { ok: false, err: this.homey.__('settings.missingPassword') };
             }
 
             try
@@ -207,7 +211,7 @@ class LinkTapDriver extends Homey.Driver
                 return { ok: true };
             }
 
-            return { ok: false, err: this.homey.__('failed') };
+            return { ok: false, err: this.homey.__('pair.failed') };
         });
     }
 
