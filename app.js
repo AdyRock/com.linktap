@@ -36,7 +36,7 @@ class MyApp extends Homey.App
 
         try
         {
-            // Try to get the local IP address to see if the app is running in Homet cloud
+            // Try to get the local IP address to see if the app is running in Homey cloud so we don't update the logs
             await this.homey.cloud.getLocalAddress();
             this.cloudOnly = false;
         }
@@ -364,10 +364,7 @@ class MyApp extends Homey.App
                         if (res.statusCode === 200)
                         {
                             let returnData = Buffer.concat(body);
-                            if (returnData.length > 2)
-                            {
-                                returnData = JSON.parse(returnData);
-                            }
+                            returnData = JSON.parse(returnData);
                             resolve(returnData);
                         }
                         else
