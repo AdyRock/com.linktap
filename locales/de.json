@@ -11,7 +11,7 @@
         "confirmSend": "Das Protokoll an den Entwickler senden?\n** Alle Identifizierungsmerkmale werden entfernt **",
         "logSent": "Das Protokoll wurde gesendet.",
         "logSendFailed": "Senden nach 5 Versuchen fehlgeschlagen.\nDie Fehlermeldungen finden Sie am Ende des Protokolls.",
-        "password": "TapLink Passwort",
+        "password": "Passwort",
         "missingUsername": "Sie müssen Ihren LinkTap Benutzernamen eingeben",
         "missingPassword": "Sie müssen Ihr LinkTap Passwort eingeben"
     },

@@ -3,7 +3,7 @@
         "settings": "Instellingen",
         "detected": "Gedetecteerd",
         "diagnosticsLog": "Diagnostice Loggegevens",
-        "userName": "LinkTap Gebruikersnaam (geen email)",
+        "userName": "Gebruikersnaam (geen email)",
         "clearLog": "Opschonen Loggegevens",
         "sendLog": "Verstuur Loggegevens",
         "detectedDescription": "** Deel deze informatie niet publiekelijk **",
@@ -11,7 +11,7 @@
         "confirmSend": "Verstuur de log inhoud naar de ontwikkelaar\n** Alle identificeerbare informatie wordt verwijderd **",
         "logSent": "De loggegevens zijn verstuurd.",
         "logSendFailed": "Het is niet gelukt om gegevens te versturen na 5 pogingen.\nDe fout codes zijn te zien in het einde van de log.",
-        "password": "TapLink wachtwoord",
+        "password": "Wachtwoord",
         "missingUsername": "Voer LinkTap gebruikersnaam in",
         "missingPassword": "Voer LinkTap wachtwoord in"
     },

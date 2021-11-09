@@ -48,7 +48,8 @@
             "id": "list_my_devices",
             "template": "list_devices",
             "navigation": {
-                "next": "add_my_devices"
+                "next": "add_my_devices",
+                "prev": "my_connect"
             }
         },
         {

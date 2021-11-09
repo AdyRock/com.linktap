@@ -1,14 +1,17 @@
-</br>
+<div style="text-align: center;">
+    <img src="logo.png" alt="LinkTap">
+    <p style="font-size:25px">LinkTap</p>
+</div>
 <form id="form" name="form" onsubmit="return getForm()" action="javascript:void(0);" method="post" style="text-align:left;">
     <div class="form-group">
         <fieldset>
             <div class="field row">
                 <label for="username" data-i18n="settings.username"></label>
-                <input type="text" name="username" id="username" required/>
+                <input type="text" name="username" id="username" onchange="usernameChanged()" required />
             </div>
             <div class="field row">
                 <label for="password" data-i18n="settings.password"></label>
-                <input type="password" name="password" id="password" required/>
+                <input type="password" name="password" id="password" required />
             </div>
         </fieldset>
         <input type="submit" id="submit" value="Connect" style="margin: 15px; padding: 10px; text-align:center; color: white; background-color: rgb(15, 170, 36);border-radius: 5px" />
@@ -18,10 +21,16 @@
 
 <script type="text/javascript">
     Homey.setTitle(__('pair.title'));
+    document.getElementById('submit').value = __('pair.login');
+    var originalUsername = '';
+    var originalPassword = '';
 
     Homey.emit('connection_setup', {}).then(function(result)
     {
+        originalUsername = result.username;
+        originalPassword = result.password;
         document.getElementById('username').value = result.username;
+        document.getElementById('password').value = result.password;
     });
 
     function getForm()
@@ -50,5 +59,19 @@
                 Homey.alert(result.err);
             }
         });
+    }
+
+    function usernameChanged()
+    {
+        var newUsername = document.getElementById("username").value;
+        var newPassword = document.getElementById("password").value;
+        if ((newUsername !== originalUsername) && (newPassword === originalPassword))
+        {
+            document.getElementById("password").value = '';
+        }
+        else if (originalPassword !== '')
+        {
+            document.getElementById("password").value = originalPassword;
+        }
     }
 </script>

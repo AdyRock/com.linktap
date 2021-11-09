@@ -52,25 +52,27 @@ class LinkTapDriver extends Homey.Driver
     {
         let { apiKey } = this.homey.app;
         let { username } = this.homey.app;
+        let listDevicesDisplayed = false;
 
         session.setHandler('showView', async view =>
         {
-            if (view === 'my_connect')
-            {
-                if (username && apiKey)
-                {
-                    // Check if we can connect with the specified credentials
-                    if (await this.homey.app.registerWebhookURL(apiKey, username))
-                    {
-                        // Valid credentials to by pass the login screen
-                        await session.nextView();
-                    }
-                }
-            }
+            // if (!listDevicesDisplayed && (view === 'my_connect'))
+            // {
+            //     if (username && apiKey)
+            //     {
+            //         // Check if we can connect with the specified credentials
+            //         if (await this.homey.app.registerWebhookURL(apiKey, username))
+            //         {
+            //             // Valid credentials to by pass the login screen
+            //             await session.nextView();
+            //         }
+            //     }
+            // }
         });
 
         session.setHandler('list_devices', async () =>
         {
+            listDevicesDisplayed = true;
             try
             {
                 const body = {
@@ -88,7 +90,7 @@ class LinkTapDriver extends Homey.Driver
         session.setHandler('connection_setup', async () =>
         {
             // Initialise page with last used token and user name
-            return { username };
+            return { username, password: apiKey ? 'apiKey-apiKey' : '' };
         });
 
         session.setHandler('api_connection', async data =>
@@ -102,28 +104,23 @@ class LinkTapDriver extends Homey.Driver
                 return { ok: false, err: this.homey.__('settings.missingPassword') };
             }
 
-            try
-            {
-                // Get the current apiKey using the username and password
-                const res = await this.homey.app.getAPIKey(data);
-                apiKey = res.key;
-            }
-            catch (err)
-            {
-                if (err.message === 'HTTPS Error - 400')
-                {
-                    return { ok: false, err: this.homey.__('pair.failed') };
-                }
-            }
-
-            if (!apiKey)
+            if (data.password !== 'apiKey-apiKey')
             {
                 try
                 {
-                    // Get a new apiKey using the username and password
-                    data.replace = true;
+                    // Get the current apiKey using the username and password
                     const res = await this.homey.app.getAPIKey(data);
-                    apiKey = res.key;
+                    if (res.key)
+                    {
+                        apiKey = res.key;
+                    }
+                    else
+                    {
+                        // Get a new apiKey using the username and password
+                        data.replace = true;
+                        const res = await this.homey.app.getAPIKey(data);
+                        apiKey = res.key;
+                    }
                 }
                 catch (err)
                 {
@@ -131,8 +128,12 @@ class LinkTapDriver extends Homey.Driver
                     {
                         return { ok: false, err: this.homey.__('pair.failed') };
                     }
-                    return { ok: false, err: err.message };
                 }
+            }
+
+            if (!apiKey)
+            {
+                return { ok: false, err: this.homey.__('pair.failed') };
             }
 
             if (!await this.homey.app.registerWebhookURL(apiKey, data.username))
