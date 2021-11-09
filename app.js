@@ -67,7 +67,7 @@ class MyApp extends Homey.App
             .registerRunListener(async (args, state) =>
             {
                 this.log('activate_watering_mode');
-                return args.device.activateWateringMode(true, args.mode);
+                return args.device.activateWateringMode(args.mode);
             });
 
         const wateringCondition = this.homey.flow.getConditionCard('is_watering');
@@ -452,10 +452,10 @@ class MyApp extends Homey.App
     // Add a message to the debug log if not running in the cloud
     updateLog(newMessage, errorLevel = 1)
     {
+        this.log(newMessage);
+
         if (!this.cloudOnly && ((errorLevel === 0) || this.homey.settings.get('logEnabled')))
         {
-            this.log(newMessage);
-
             try
             {
                 const nowTime = new Date(Date.now());

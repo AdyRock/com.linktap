@@ -1,7 +1,8 @@
 {
     "title": {
         "en": "Low water flow alarm turned off",
-        "de": "Alarm für niedrigen Wasserdurchfluss ausgeschaltet"
+        "de": "Alarm für niedrigen Wasserdurchfluss ausgeschaltet",
+        "nl": "Laagwaterstroomalarm gaat uit"
     },
     "hint": {
         "en": "The blockage is clear",

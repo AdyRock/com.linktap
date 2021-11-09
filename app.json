@@ -160,7 +160,8 @@
       {
         "title": {
           "en": "Freeze alarm turned off",
-          "de": "Frostalarm ausgeschaltet"
+          "de": "Frostalarm ausgeschaltet",
+          "nl": "Het bevriezingsalarm gaat uit"
         },
         "hint": {
           "en": "When there is no longer a chance of freezing",
@@ -178,7 +179,8 @@
       {
         "title": {
           "en": "Freeze alarm turned on",
-          "de": "Frostalarm eingeschaltet"
+          "de": "Frostalarm eingeschaltet",
+          "nl": "Het bevriezingsalarm gaat aan"
         },
         "hint": {
           "en": "When there is a chance of freezing",
@@ -196,7 +198,8 @@
       {
         "title": {
           "en": "High Water flow alarm turned off",
-          "de": "Alarm für hohen Wasserdurchfluss ausgeschaltet"
+          "de": "Alarm für hohen Wasserdurchfluss ausgeschaltet",
+          "nl": "Hoogwaterstroomalarm gaat uit"
         },
         "hint": {
           "en": "The leak is fixed",
@@ -214,7 +217,8 @@
       {
         "title": {
           "en": "High water flow alarm turned on",
-          "de": "Alarm für hohen Wasserdurchfluss eingeschaltet"
+          "de": "Alarm für hohen Wasserdurchfluss eingeschaltet",
+          "nl": "Hoogwaterstroomalarm gaat aan"
         },
         "hint": {
           "en": "When there is a leak",
@@ -232,7 +236,8 @@
       {
         "title": {
           "en": "Low water flow alarm turned on",
-          "de": "Alarm für niedrigen Wasserdurchfluss eingeschaltet"
+          "de": "Alarm für niedrigen Wasserdurchfluss eingeschaltet",
+          "nl": "Laagwaterstroomalarm gaat aan"
         },
         "hint": {
           "en": "When there is a blockage",
@@ -250,7 +255,8 @@
       {
         "title": {
           "en": "Low water flow alarm turned off",
-          "de": "Alarm für niedrigen Wasserdurchfluss ausgeschaltet"
+          "de": "Alarm für niedrigen Wasserdurchfluss ausgeschaltet",
+          "nl": "Laagwaterstroomalarm gaat uit"
         },
         "hint": {
           "en": "The blockage is clear",
@@ -288,7 +294,8 @@
       {
         "title": {
           "en": "The watering cycle has been skipped",
-          "de": "Der Bewässerungszyklus wurde übersprungen"
+          "de": "Der Bewässerungszyklus wurde übersprungen",
+          "nl": "De besproeiingscyclus is overgeslagen"
         },
         "hint": {
           "en": "When the watering cycle has been skipped due to rain",

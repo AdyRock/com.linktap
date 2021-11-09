@@ -1,7 +1,8 @@
 {
     "title": {
         "en": "Freeze alarm turned on",
-        "de": "Frostalarm eingeschaltet"
+        "de": "Frostalarm eingeschaltet",
+        "nl": "Het bevriezingsalarm gaat aan"
     },
     "hint": {
         "en": "When there is a chance of freezing",

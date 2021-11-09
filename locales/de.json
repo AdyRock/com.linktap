@@ -20,6 +20,22 @@
     "gwOffline": "Das Gateway ist offline",
     "ltOffline": "Das Ventil ist offline",
     "connectionFailed": "Verbindung fehlgeschlagen. Sollte das Problem weiterhin bestehen, probieren Sie die Repair-Option",
+    "wateringMode":
+    {
+        "I": "Der Intervallmodus wurde in der LinkTap-App nicht konfiguriert",
+        "O": "Der ungerade und gerade Modus wurde in der LinkTap App nicht konfiguriert",
+        "T": "Der Sieben-Tage-Modus wurde in der LinkTap-App nicht konfiguriert",
+        "Y": "Der Monatsmodus wurde in der LinkTap-App nicht konfiguriert",
+        "D": "Der Kalendermodus wurde in der LinkTap-App nicht konfiguriert"
+    },
+    "wateringModeNotSupported":
+    {
+        "I": "Der Intervallmodus wird nicht unterstützt",
+        "O": "Der ungerade und gerade Modus wird nicht unterstützt",
+        "T": "Der Sieben-Tage-Modus wird nicht unterstützt",
+        "Y": "Der Monatsmodus wird nicht unterstützt",
+        "D": "Der Kalendermodus wird nicht unterstützt"
+    },
     "pair": {
         "title": "Kontodetails",
         "login": "Mit LinkTap verbinden",

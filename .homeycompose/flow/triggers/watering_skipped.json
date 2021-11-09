@@ -1,7 +1,8 @@
 {
     "title": {
         "en": "The watering cycle has been skipped",
-        "de": "Der Bewässerungszyklus wurde übersprungen"
+        "de": "Der Bewässerungszyklus wurde übersprungen",
+        "nl": "De besproeiingscyclus is overgeslagen"
     },
     "hint": {
         "en": "When the watering cycle has been skipped due to rain",

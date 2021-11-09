@@ -1,7 +1,8 @@
 {
     "title": {
         "en": "High Water flow alarm turned off",
-        "de": "Alarm für hohen Wasserdurchfluss ausgeschaltet"
+        "de": "Alarm für hohen Wasserdurchfluss ausgeschaltet",
+        "nl": "Hoogwaterstroomalarm gaat uit"
     },
     "hint": {
         "en": "The leak is fixed",

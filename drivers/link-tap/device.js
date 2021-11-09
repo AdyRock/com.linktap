@@ -428,6 +428,10 @@ class LinkTapDevice extends Homey.Device
         {
             url = 'activateMonthMode';
         }
+        else if (mode === 'D')
+        {
+            url = 'activateCalendarMode';
+        }
 
         try
         {
@@ -439,8 +443,20 @@ class LinkTapDevice extends Homey.Device
         }
         catch (err)
         {
+            if (err.message === 'HTTPS Error - 400')
+            {
+                let errMsg = this.homey.__('wateringModeUndefined.' + mode );
+                throw (new Error(errMsg));
+            }
+            if (err.message === 'HTTPS Error - 404')
+            {
+                let errMsg = this.homey.__('wateringModeNotSupported.' + mode );
+                throw (new Error(errMsg));
+            }
             throw (new Error(err.message));
         }
+
+        return true;
     }
 
     async activateInstantMode(onOff, duration, ecoOption, ecoOn, ecoOff, autoBack)

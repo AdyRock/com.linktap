@@ -20,6 +20,22 @@
     "gwOffline": "The Gateway is offline",
     "ltOffline": "The Valve is offline",
     "connectionFailed": "Connection failed. Try the Repair option if the problem persists",
+    "wateringMode":
+    {
+        "I": "De intervalmodus is niet geconfigureerd in de LinkTap-app",
+        "O": "De Oneven en Even modus is niet geconfigureerd in de LinkTap app",
+        "T": "De Zevendaagse-modus is niet geconfigureerd in de LinkTap-app",
+        "Y": "De maandmodus is niet geconfigureerd in de LinkTap-app",
+        "D": "De kalendermodus is niet geconfigureerd in de LinkTap-app"
+    },
+    "wateringModeNotSupported":
+    {
+        "I": "De intervalmodus wordt niet ondersteund",
+        "O": "De Oneven en Even modus wordt niet ondersteund",
+        "T": "De Zevendaagse-modus wordt niet ondersteund",
+        "Y": "De maandmodus wordt niet ondersteund",
+        "D": "De kalendermodus wordt niet ondersteund"
+    },
     "pair": {
         "title": "Account Informatie",
         "login": "Connect to LinkTap",

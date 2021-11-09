@@ -20,6 +20,22 @@
     "gwOffline": "The Gateway is offline",
     "ltOffline": "The Valve is offline",
     "connectionFailed": "Connection failed. Try the Repair option if the problem persists",
+    "wateringModeUndefined":
+    {
+        "I": "The Interval mode has not been configured in the LinkTap app",
+        "O": "The Odd and Even mode has not been configured in the LinkTap app",
+        "T": "The Seven Day mode has not been configured in the LinkTap app",
+        "Y": "The Month mode has not been configured in the LinkTap app",
+        "D": "The Calender mode has not been configured in the LinkTap app"
+    },
+    "wateringModeNotSupported":
+    {
+        "I": "The Interval mode is not supported",
+        "O": "The Odd and Even mode is not supported",
+        "T": "The Seven Day mode is not supported",
+        "Y": "The Month mode is not supported",
+        "D": "The Calender mode is not supported"
+    },
     "pair": {
         "title": "Account Details",
         "login": "Connect to LinkTap",
