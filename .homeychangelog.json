@@ -61,5 +61,14 @@
     },
     "1.0.8": {
         "en": "Major rewrite to use webhooks instead of polling. The app is now much more responsive but uses less CPU resources. Some capabilities have been removed or changed and there are also some new ones. Improved error message when login failed. Attempt to create a new key if fetching the key fails."
+    },
+    "1.0.9": {
+        "en": "Major rewrite to use webhooks instead of polling. The app is now much more responsive but uses less CPU resources. Some capabilities have been removed or changed and there are also some new ones. Improved error message when login failed. Attempt to create a new key if fetching the key fails."
+    },
+    "1.0.10": {
+        "en": "Major rewrite to use webhooks instead of polling. The app is now much more responsive but uses less CPU resources. Some capabilities have been removed or changed and there are also some new ones. Improved error message when login failed. Attempt to create a new key if fetching the key fails."
+    },
+    "1.0.11": {
+        "en": "Major rewrite to use webhooks instead of polling. The app is now much more responsive but uses less CPU resources. Some capabilities have been removed or changed and there are also some new ones. Login in is now presented during pairing."
     }
 }

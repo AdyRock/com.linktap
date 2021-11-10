@@ -99,16 +99,17 @@ class MyApp extends Homey.App
         // Setup the webhook call back to receive push notifications
         this.setupWebhook().catch(this.error);
 
-        this.homey.on('unload', async () =>
-        {
-            await this.unregisterWebhook();
-        });
-
         this.log('MyApp has been initialized');
+    }
+
+    async onUninit()
+    {
+        this.deleteLinkTapWebhook();
     }
 
     // The getAllDevices API can only be called once every 5 minutes so get the data from the cache if it was called less than 5 minutes ago
     // Set UseDirtyCache to true if just need a list of devices and the values are not important
+    // Returns null if no new data or an error
     async getDeviceData(UseDirtyCache, body)
     {
         let searchData = null;
@@ -199,12 +200,11 @@ class MyApp extends Homey.App
 
                     // Add this device to the table
                     devices.push(
-                        {
-                            name: `${tapLinker.location} - ${tapLinker.taplinkerName}`,
-                            data,
-                            store,
-                        },
-                    );
+                    {
+                        name: `${tapLinker.location} - ${tapLinker.taplinkerName}`,
+                        data,
+                        store,
+                    }, );
                 }
             }
             return devices;
@@ -250,7 +250,7 @@ class MyApp extends Homey.App
 
             myWebhook.on('message', args =>
             {
-                this.updateLog(`Got a webhook message!${this.varToString(args.body)}`, 0);
+                this.updateLog(`Got a webhook message! ${this.varToString(args.body)}`, 0);
                 this.processWebhookMessage(args.body).catch(this.error);
             });
         }
@@ -297,7 +297,7 @@ class MyApp extends Homey.App
     }
 
     // Clear the webhook URL from the LinkTap account
-    async unregisterWebhook()
+    async deleteLinkTapWebhook()
     {
         try
         {
@@ -306,7 +306,7 @@ class MyApp extends Homey.App
             const response = await this.PostURL(url, { username: this.username, apiKey: this.apiKey });
             this.updateLog(this.varToString(response.message));
         }
-        catch(err)
+        catch (err)
         {
             this.updateLog(err.message);
         }
@@ -415,7 +415,7 @@ class MyApp extends Homey.App
                 const stack = source.stack.replace('/\\n/g', '\n');
                 return `${source.message}\n${stack}`;
             }
-            if (typeof (source) === 'object')
+            if (typeof(source) === 'object')
             {
                 const getCircularReplacer = () =>
                 {
@@ -436,7 +436,7 @@ class MyApp extends Homey.App
 
                 return JSON.stringify(source, getCircularReplacer(), 2);
             }
-            if (typeof (source) === 'string')
+            if (typeof(source) === 'string')
             {
                 return source;
             }
@@ -555,8 +555,7 @@ class MyApp extends Homey.App
                         // do not fail on invalid certs
                         rejectUnauthorized: false,
                     },
-                },
-                );
+                }, );
 
                 // send mail with defined transport object
                 const info = await transporter.sendMail(
@@ -565,8 +564,7 @@ class MyApp extends Homey.App
                     to: Homey.env.MAIL_RECIPIENT, // list of receivers
                     subject: `LinkTap ${body.logType} log`, // Subject line
                     text: logData, // plain text body
-                },
-                );
+                }, );
 
                 this.updateLog(`Message sent: ${info.messageId}`);
                 // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>

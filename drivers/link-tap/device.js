@@ -23,7 +23,7 @@ class LinkTapDevice extends Homey.Device
         this.username = this.getStoreValue('username');
         this.apiKey = this.getStoreValue('apiKey');
 
-        // Old devices used the global credentials so check if they are OK
+        // Old devices used the global credentials so use those if the local ones are not defined
         if (!this.apiKey)
         {
             // Update the values
@@ -94,11 +94,13 @@ class LinkTapDevice extends Homey.Device
 
         if (this.hasCapability('signal_strength'))
         {
+            // Signal strength is no longer part of the API that we use
             this.removeCapability('signal_strength').catch(this.error);
         }
 
         if (this.hasCapability('measure_battery'))
         {
+            // The new webhook only provides a good / bad status
             this.removeCapability('measure_battery').catch(this.error);
             this.addCapability('alarm_battery')
                 .then(this.setCapabilityValue('alarm_battery', false).catch(this.error))
@@ -112,6 +114,7 @@ class LinkTapDevice extends Homey.Device
         this.registerCapabilityListener('clear_alarms', this.onCapabilityClearAlarms.bind(this));
         this.registerCapabilityListener('watering_mode', this.onCapabilityWateringMode.bind(this));
 
+        // Try to fetch the initial values
         this.updateDeviceValues();
 
         this.log('LinkTapDevice has been initialized');
@@ -124,6 +127,7 @@ class LinkTapDevice extends Homey.Device
     {
         this.log('LinkTapDevice has been added');
 
+        // Try to fetch the initial values
         this.updateDeviceValues();
     }
 
@@ -156,10 +160,9 @@ class LinkTapDevice extends Homey.Device
     async onDeleted()
     {
         this.log('LinkTapDevice has been deleted');
-        clearTimeout(this.timerPollID);
     }
 
-    async updateDeviceValues()
+    updateDeviceValues()
     {
         this.__updateDeviceValues()
             .then(success =>
@@ -168,9 +171,9 @@ class LinkTapDevice extends Homey.Device
                 {
                     this.homey.app.updateLog('updateDeviceValues retry in 5 minutes');
 
-                    this.homey.setTimeout(async () =>
+                    // Try again after 5 minutes as it could be failing with the cached data
+                    this.homey.setTimeout(() =>
                     {
-                        // Try again after 5 minutes as it could be failing with the cached data
                         this.updateDeviceValues();
                     }, 1000 * 60 * 5);
                 }
@@ -186,6 +189,7 @@ class LinkTapDevice extends Homey.Device
             username: this.username,
         };
 
+        // Get new data via the API (don't use the cache)
         const devices = await this.homey.app.getDeviceData(false, body);
 
         if (devices === null)
@@ -208,7 +212,7 @@ class LinkTapDevice extends Homey.Device
             }
 
             const tapLinkers = gateway.taplinker;
-            const tapLinker = tapLinkers.find(tapLinker => tapLinker.taplinkerId === dd.id);
+            const tapLinker = tapLinkers.find(tapLinkerEntry => tapLinkerEntry.taplinkerId === dd.id);
             this.homey.app.updateLog(`updateDeviceValues (${dd.id}) response: ${this.homey.app.varToString(tapLinker)}`);
 
             if (tapLinker.status !== 'Connected')
@@ -228,6 +232,7 @@ class LinkTapDevice extends Homey.Device
             this.setCapabilityValue('watering', tapLinker.watering === true).catch(this.error);
             this.setCapabilityValue('water_on', tapLinker.watering === true).catch(this.error);
 
+            // Some capabilities are only available on G2 models
             if (typeof tapLinker.fall !== 'undefined')
             {
                 if (!this.hasCapability('alarm_fallen'))
@@ -238,12 +243,11 @@ class LinkTapDevice extends Homey.Device
                 this.setCapabilityValue('alarm_fallen', tapLinker.fall).catch(this.error);
                 this.setCapabilityValue('alarm_broken', tapLinker.valveBroken).catch(this.error);
             }
-            else
-            if (this.hasCapability('alarm_fallen'))
-                {
-                    this.removeCapability('alarm_fallen').catch(this.error);
-                    this.removeCapability('alarm_broken').catch(this.error);
-                }
+            else if (this.hasCapability('alarm_fallen'))
+            {
+                this.removeCapability('alarm_fallen').catch(this.error);
+                this.removeCapability('alarm_broken').catch(this.error);
+            }
 
             // Some capabilities are only available when a flow meter is fitted.
             await this.setupFlowMeterCapabilities(tapLinker.flowMeterStatus);
@@ -328,6 +332,7 @@ class LinkTapDevice extends Homey.Device
 
     async onCapabilityClearAlarms(value)
     {
+        // Send a message for each active alarm to clear it
         const dd = this.getData();
         const url = 'dismissAlarm';
         const body = {
@@ -341,34 +346,34 @@ class LinkTapDevice extends Homey.Device
         if (this.getCapabilityValue('alarm_water'))
         {
             body.alarm = 'noWater';
-            this.homey.app.PostURL(url, body).catch(this.Error);
+            this.homey.app.PostURL(url, body).catch(this.error);
         }
 
         if (this.getCapabilityValue('alarm_broken'))
         {
             body.alarm = 'valveBroken';
-            this.homey.app.PostURL(url, body).catch(this.Error);
+            this.homey.app.PostURL(url, body).catch(this.error);
         }
 
         if (this.getCapabilityValue('alarm_fallen'))
         {
             body.alarm = 'fallFlag';
-            this.homey.app.PostURL(url, body).catch(this.Error);
+            this.homey.app.PostURL(url, body).catch(this.error);
         }
 
         if (this.getCapabilityValue('alarm_low_flow'))
         {
             body.alarm = 'pcFlag';
-            this.homey.app.PostURL(url, body).catch(this.Error);
+            this.homey.app.PostURL(url, body).catch(this.error);
         }
 
         if (this.getCapabilityValue('alarm_high_flow'))
         {
             body.alarm = 'pbFlag';
-            this.homey.app.PostURL(url, body).catch(this.Error);
+            this.homey.app.PostURL(url, body).catch(this.error);
         }
 
-        this.setCapabilityValue('alarm_freeze', false);
+        this.setCapabilityValue('alarm_freeze', false).catch(this.error);
     }
 
     async onCapabilityOnOff(value)
@@ -435,6 +440,8 @@ class LinkTapDevice extends Homey.Device
 
         try
         {
+            this.homey.app.updateLog(`activateWateringMode mode: ${mode}`);
+
             const response = await this.homey.app.PostURL(url, body);
             if (response.result !== 'ok')
             {
@@ -445,18 +452,16 @@ class LinkTapDevice extends Homey.Device
         {
             if (err.message === 'HTTPS Error - 400')
             {
-                let errMsg = this.homey.__('wateringModeUndefined.' + mode );
+                let errMsg = this.homey.__('wateringModeUndefined.' + mode);
                 throw (new Error(errMsg));
             }
             if (err.message === 'HTTPS Error - 404')
             {
-                let errMsg = this.homey.__('wateringModeNotSupported.' + mode );
+                let errMsg = this.homey.__('wateringModeNotSupported.' + mode);
                 throw (new Error(errMsg));
             }
             throw (new Error(err.message));
         }
-
-        return true;
     }
 
     async activateInstantMode(onOff, duration, ecoOption, ecoOn, ecoOff, autoBack)
@@ -487,7 +492,7 @@ class LinkTapDevice extends Homey.Device
             {
                 if (ecoOn > duration)
                 {
-                    throw (new Error('Eco On must be shorted than Duration'));
+                    throw (new Error('Eco On must be shorter than Duration'));
                 }
 
                 body.eco = true;
@@ -511,6 +516,8 @@ class LinkTapDevice extends Homey.Device
             }, 1000 * 60 * 1);
         }
 
+        this.homey.app.updateLog(`activateInstantMode onOff: ${onOff}`);
+
         const response = await this.homey.app.PostURL(url, body);
         if (response.result !== 'ok')
         {
@@ -525,6 +532,8 @@ class LinkTapDevice extends Homey.Device
             this.homey.clearTimeout(this.abortTimer);
             this.abortTimer = null;
         }
+
+        this.homey.app.updateLog('abortWatering');
 
         if (this.timerVolUpdate)
         {
@@ -550,7 +559,7 @@ class LinkTapDevice extends Homey.Device
         const vel = this.getCapabilityValue('measure_water');
         let vol = this.getCapabilityValue('meter_water');
         vol += vel / 30;
-        this.setCapabilityValue('meter_water', vol);
+        this.setCapabilityValue('meter_water', vol).catch(this.error);
     }
 
     async processWebhookMessage(message)
@@ -561,17 +570,17 @@ class LinkTapDevice extends Homey.Device
             // message is for this device
             if (message.event === 'watering start')
             {
-                this.setCapabilityValue('watering_mode', message.workMode);
-                this.isWatering = true;
-                this.setCapabilityValue('onoff', this.isWatering).catch(this.error);
-                this.setCapabilityValue('watering', this.isWatering).catch(this.error);
-                this.driver.triggerWateringStarted(this);
-
                 if (this.abortTimer)
                 {
                     this.homey.clearTimeout(this.abortTimer);
                     this.abortTimer = null;
                 }
+
+                this.isWatering = true;
+                this.setCapabilityValue('onoff', this.isWatering).catch(this.error);
+                this.setCapabilityValue('watering', this.isWatering).catch(this.error);
+                //this.setCapabilityValue('watering_mode', message.workMode).catch(this.error);
+                this.driver.triggerWateringStarted(this);
             }
             else if ((message.msg === 'wateringOn') || (message.event === 'wateringOn'))
             {
