@@ -44,6 +44,7 @@ class MyApp extends Homey.App
         {
             // getLocalAddress will fail on Homey cloud installations so dissbale the loging options
             this.cloudOnly = true;
+            this.homey.settings.set('logEnabled', true);
         }
 
         const activateInstantMode = this.homey.flow.getActionCard('activate_instant_mode');
@@ -81,12 +82,12 @@ class MyApp extends Homey.App
             if (key === 'APIToken')
             {
                 this.apiKey = this.homey.settings.get('APIToken');
-                this.setupWebhook().catch(this.error);
+                this.registerWebhookURL(this.apiKey, this.username).catch(this.error);
             }
             else if (key === 'UserName')
             {
                 this.username = this.homey.settings.get('UserName');
-                this.setupWebhook().catch(this.error);
+                this.registerWebhookURL(this.apiKey, this.username).catch(this.error);
             }
         });
 
@@ -97,7 +98,17 @@ class MyApp extends Homey.App
         this.cacheClean = false; // We have no idea what might have changed while the app wasn't running
 
         // Setup the webhook call back to receive push notifications
-        this.setupWebhook().catch(this.error);
+        const id = Homey.env.WEBHOOK_ID;
+        const secret = Homey.env.WEBHOOK_SECRET;
+        const myWebhook = await this.homey.cloud.createWebhook(id, secret, {});
+
+        myWebhook.on('message', args =>
+        {
+            this.updateLog(`Got a webhook message! ${this.varToString(args.body)}`, 0);
+            this.processWebhookMessage(args.body);
+        });
+
+        this.updateLog('Homey Webhook registered');
 
         this.log('MyApp has been initialized');
     }
@@ -136,7 +147,7 @@ class MyApp extends Homey.App
             this.fetchingData = true;
             try
             {
-                this.homey.app.updateLog('App updateDeviceValues fetching data');
+                this.homey.app.updateLog('App getDeviceData fetching data');
 
                 // More than 5 minutes since last request
                 // https://www.link-tap.com/api/getAllDevices
@@ -215,7 +226,7 @@ class MyApp extends Homey.App
     }
 
     // Send the webhook message to all the devices so they can update their capabilities if applicable
-    async processWebhookMessage(message)
+    processWebhookMessage(message)
     {
         // Receiving a webhook message means the cache data is no longer up to date so we don't want to use that for setting capabilities incase it retards the values
         this.cacheClean = false;
@@ -225,43 +236,18 @@ class MyApp extends Homey.App
         {
             if (Object.prototype.hasOwnProperty.call(drivers, driver))
             {
-                const devices = this.homey.drivers.getDriver(driver).getDevices(true);
+                const devices = this.homey.drivers.getDriver(driver).getDevices();
                 const numDevices = devices.length;
                 for (let i = 0; i < numDevices; i++)
                 {
                     const device = devices[i];
                     if (device.processWebhookMessage)
                     {
-                        device.processWebhookMessage(message).catch(this.error);
+                        device.processWebhookMessage(message);
                     }
                 }
             }
         }
-    }
-
-    // Create the Homey webhook and send the URL to the LinkTap account
-    async setupWebhook()
-    {
-        try
-        {
-            const id = Homey.env.WEBHOOK_ID;
-            const secret = Homey.env.WEBHOOK_SECRET;
-            const myWebhook = await this.homey.cloud.createWebhook(id, secret, {});
-
-            myWebhook.on('message', args =>
-            {
-                this.updateLog(`Got a webhook message! ${this.varToString(args.body)}`, 0);
-                this.processWebhookMessage(args.body).catch(this.error);
-            });
-        }
-        catch (err)
-        {
-            this.updateLog(`setWebHookURL error: ${err.message}`, 0);
-            return false;
-        }
-
-        this.updateLog('Webhook registered');
-        return true;
     }
 
     async registerWebhookURL(apiKey, username)
@@ -303,12 +289,11 @@ class MyApp extends Homey.App
         {
             // https://www.link-tap.com/api/deleteWebHookUrl
             const url = 'deleteWebHookUrl';
-            const response = await this.PostURL(url, { username: this.username, apiKey: this.apiKey });
-            this.updateLog(this.varToString(response.message));
+            await this.PostURL(url, { username: this.username, apiKey: this.apiKey });
         }
         catch (err)
         {
-            this.updateLog(err.message);
+            this.log(err.message);
         }
     }
 
@@ -454,7 +439,7 @@ class MyApp extends Homey.App
     {
         this.log(newMessage);
 
-        if (!this.cloudOnly && ((errorLevel === 0) || this.homey.settings.get('logEnabled')))
+        if ((errorLevel === 0) || this.homey.settings.get('logEnabled'))
         {
             try
             {
@@ -487,7 +472,10 @@ class MyApp extends Homey.App
                     this.diagLog = this.diagLog.substr(this.diagLog.length - 60000);
                 }
 
-                this.homey.api.realtime('com.linktap.logupdated', { log: this.diagLog });
+                if (!this.cloudOnly)
+                {
+                    this.homey.api.realtime('com.linktap.logupdated', { log: this.diagLog });
+                }
             }
             catch (err)
             {

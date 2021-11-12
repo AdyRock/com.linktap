@@ -1,7 +1,7 @@
 {
   "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
   "id": "com.linktap",
-  "version": "1.0.10",
+  "version": "1.0.16",
   "compatibility": ">=5.0.0",
   "platforms": [
     "local",
@@ -651,11 +651,21 @@
         "alarm_freeze",
         "alarm_water",
         "alarm_high_flow",
-        "alarm_low_flow"
+        "alarm_low_flow",
+        "button.send_log"
       ],
       "capabilitiesOptions": {
         "meter_water": {
           "units": "L"
+        },
+        "button.send_log": {
+          "maintenanceAction": true,
+          "title": {
+            "en": "Send Diagnostics Log"
+          },
+          "desc": {
+            "en": "Send a diagnostics log to the developer"
+          }
         }
       },
       "pair": [
