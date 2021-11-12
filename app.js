@@ -102,10 +102,17 @@ class MyApp extends Homey.App
         const secret = Homey.env.WEBHOOK_SECRET;
         const myWebhook = await this.homey.cloud.createWebhook(id, secret, {});
 
-        myWebhook.on('message', args =>
+        myWebhook.on('message', async args =>
         {
             this.updateLog(`Got a webhook message! ${this.varToString(args.body)}`, 0);
-            this.processWebhookMessage(args.body);
+            try
+            {
+                await this.processWebhookMessage(args.body);
+            }
+            catch(err)
+            {
+                this.updateLog(`Homey Webhook message error: ${err.message}`);
+            }
         });
 
         this.updateLog('Homey Webhook registered');
@@ -226,7 +233,7 @@ class MyApp extends Homey.App
     }
 
     // Send the webhook message to all the devices so they can update their capabilities if applicable
-    processWebhookMessage(message)
+    async processWebhookMessage(message)
     {
         // Receiving a webhook message means the cache data is no longer up to date so we don't want to use that for setting capabilities incase it retards the values
         this.cacheClean = false;
@@ -239,7 +246,7 @@ class MyApp extends Homey.App
                 // const device = devices[i];
                 if (device.processWebhookMessage)
                 {
-                    device.processWebhookMessage(message);
+                    await device.processWebhookMessage(message);
                 }
             }
         }

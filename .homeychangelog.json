@@ -85,5 +85,11 @@
     },
     "1.0.16": {
         "en": "Log capability writes."
+    },
+    "1.0.17": {
+        "en": "Changed to await for setting capabilities."
+    },
+    "1.0.18": {
+        "en": "Changed to await for setting capabilities."
     }
 }
