@@ -231,20 +231,15 @@ class MyApp extends Homey.App
         // Receiving a webhook message means the cache data is no longer up to date so we don't want to use that for setting capabilities incase it retards the values
         this.cacheClean = false;
         const drivers = this.homey.drivers.getDrivers();
-        // eslint-disable-next-line no-restricted-syntax
-        for (const driver in drivers)
+        for (const driver of Object.values(drivers))
         {
-            if (Object.prototype.hasOwnProperty.call(drivers, driver))
+            const devices = driver.getDevices();
+            for (const device of Object.values(devices))
             {
-                const devices = this.homey.drivers.getDriver(driver).getDevices();
-                const numDevices = devices.length;
-                for (let i = 0; i < numDevices; i++)
+                // const device = devices[i];
+                if (device.processWebhookMessage)
                 {
-                    const device = devices[i];
-                    if (device.processWebhookMessage)
-                    {
-                        device.processWebhookMessage(message);
-                    }
+                    device.processWebhookMessage(message);
                 }
             }
         }
