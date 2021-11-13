@@ -91,5 +91,8 @@
     },
     "1.0.18": {
         "en": "Changed to await for setting capabilities."
+    },
+    "1.0.19": {
+        "en": "Split time remaining / elapsed into two capabilities."
     }
 }

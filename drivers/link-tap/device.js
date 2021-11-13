@@ -609,17 +609,17 @@ class LinkTapDevice extends Homey.Device
                         this.abortTimer = null;
                     }
 
-                    await this.setCapabilityValueLog('onoff', true);
-                    await this.setCapabilityValueLog('watering', true);
+                    this.setCapabilityValueLog('onoff', true).catch(this.error);
+                    this.setCapabilityValueLog('watering', true).catch(this.error);
                     this.activeTime = 0;
-                    //this.setCapabilityValueLog('watering_mode', message.workMode);
+                    this.setCapabilityValueLog('watering_mode', message.workMode);
                     this.driver.triggerWateringStarted(this);
                 }
                 else if (event === 'wateringOn')
                 {
                     // The water flow (valve) has turned on (also occurs about once per minute)
-                    await this.setCapabilityValueLog('water_on', true);
-                    await this.setCapabilityValueLog('watering', true);
+                    this.setCapabilityValueLog('water_on', true).catch(this.error);
+                    this.setCapabilityValueLog('watering', true).catch(this.error);
 
                     if (message.ecoFlag === 1)
                     {
@@ -627,45 +627,43 @@ class LinkTapDevice extends Homey.Device
                         // totalMin is the total request watering time (valve on)
                         // ecoTotal is the time it will turn on for each cycle
                         this.cycles = Math.ceil(message.ecoTotal / message.totalMin);
-                        await this.setCapabilityValueLog('cycles_remaining', this.cycles);
+                        this.setCapabilityValueLog('cycles_remaining', this.cycles).catch(this.error);
 
                         if (message.onMin === message.totalMin)
                         {
                             // Manual mode was started so the time reported will be the run time instead of time remaining as the total time is unknown
-                            //await this.setCapabilityOptions('time_remaining', { title: this.homey.__('timeRemaining') });
                             this.manualWateringMode = false;
                         }
                     }
                     else if (message.ecoFlag !== 3)
                     {
                         this.cycles = 1;
-                        await this.setCapabilityValueLog('cycles_remaining', this.cycles);
+                        this.setCapabilityValueLog('cycles_remaining', this.cycles).catch(this.error);
                         if ((message.onMin === 0) && (message.totalMin === -1))
                         {
                             // Turned on via the button
-                            // await this.setCapabilityOptions('time_remaining', { title: this.homey.__('timeActive') });
                             this.manualWateringMode = true;
-                            await this.setCapabilityValueLog('time_remaining', null);
+                            this.setCapabilityValueLog('time_remaining', null).catch(this.error);
                         }
                     }
 
                     if (this.manualWateringMode)
                     {
                         // Elapsed time is reported during manual mode
-                        await this.setCapabilityValueLog('time_elapsed', message.onMin);
+                        this.setCapabilityValueLog('time_elapsed', message.onMin).catch(this.error);
                     }
                     else
                     {
                         // Remaining time is reported for a plan
-                        await this.setCapabilityValueLog('time_elapsed', this.activeTime);
-                        await this.setCapabilityValueLog('time_remaining', message.onMin);
+                        this.setCapabilityValueLog('time_elapsed', this.activeTime).catch(this.error);
+                        this.setCapabilityValueLog('time_remaining', message.onMin).catch(this.error);
                         this.activeTime++;
                     }
                     
                     if (message.vol !== undefined)
                     {
-                        await this.setCapabilityValueLog('meter_water', message.vol / 1000);
-                        await this.setCapabilityValueLog('measure_water', message.vel / 1000);
+                        this.setCapabilityValueLog('meter_water', message.vol / 1000).catch(this.error);
+                        this.setCapabilityValueLog('measure_water', message.vel / 1000).catch(this.error);
 
                         if (this.timerVolUpdate)
                         {
@@ -676,9 +674,8 @@ class LinkTapDevice extends Homey.Device
                 }
                 else if (event === 'wateringOff')
                 {
-                    await this.setCapabilityValueLog('water_on', false);
-                    await this.setCapabilityValueLog('time_remaining', 0);
-                    //await this.setCapabilityValueLog('time_elapsed', 0);
+                    this.setCapabilityValueLog('water_on', false).catch(this.error);
+                    this.setCapabilityValueLog('time_remaining', 0).catch(this.error);
     
                     if (this.timerVolUpdate)
                     {
@@ -688,25 +685,25 @@ class LinkTapDevice extends Homey.Device
 
                     if (message.vol !== undefined)
                     {
-                        await this.setCapabilityValueLog('meter_water', message.vol / 1000);
-                        await this.setCapabilityValueLog('measure_water', 0);
+                        this.setCapabilityValueLog('meter_water', message.vol / 1000).catch(this.error);
+                        this.setCapabilityValueLog('measure_water', 0).catch(this.error);
                     }
 
                     if (this.cycles > 0)
                     {
                         this.cycles--;
-                        await this.setCapabilityValueLog('cycles_remaining', this.cycles);
+                        this.setCapabilityValueLog('cycles_remaining', this.cycles).catch(this.error);
                     }
 
                     if (!this.manualWateringMode)
                     {
-                        await this.setCapabilityValueLog('time_elapsed', this.activeTime);
+                        this.setCapabilityValueLog('time_elapsed', this.activeTime).catch(this.error);
                     }
                 }
                 else if (event === 'flowMeterValue')
                 {
                     // A new water flow rate reading
-                    await this.setCapabilityValueLog('measure_water', message.vel / 1000);
+                    this.setCapabilityValueLog('measure_water', message.vel / 1000).catch(this.error);
                 }
                 else if (event === 'watering end')
                 {
@@ -723,24 +720,23 @@ class LinkTapDevice extends Homey.Device
                         this.timerVolUpdate = null;
                     }
 
-                    await this.setCapabilityValueLog('water_on', false);
-                    await this.setCapabilityValueLog('time_remaining', 0);
-                    //await this.setCapabilityValueLog('time_elapsed', 0);
+                    this.setCapabilityValueLog('water_on', false).catch(this.error);
+                    this.setCapabilityValueLog('time_remaining', 0).catch(this.error);
 
                     this.cycles = 0;
-                    await this.setCapabilityValueLog('cycles_remaining', this.cycles);
+                    this.setCapabilityValueLog('cycles_remaining', this.cycles).catch(this.error);
 
-                    await this.setCapabilityValueLog('watering', false);
-                    await this.setCapabilityValueLog('onoff', false);
+                    this.setCapabilityValueLog('watering', false).catch(this.error);
+                    this.setCapabilityValueLog('onoff', false).catch(this.error);
 
                     // Docode the total volume from the message
                     const data = message.content.split(/[(,]+/);
                     if (data.length > 1)
                     {
                         const vol = Number((data[1].split(' '))[0]);
-                        await this.setCapabilityValueLog('meter_water', vol);
+                        this.setCapabilityValueLog('meter_water', vol).catch(this.error);
                     }
-                    await this.setCapabilityValueLog('measure_water', 0);
+                    this.setCapabilityValueLog('measure_water', 0).catch(this.error);
                     this.driver.triggerWateringFinished(this);
                 }
                 else if (event === 'watering cycle skipped')
@@ -765,31 +761,31 @@ class LinkTapDevice extends Homey.Device
                 }
                 else if (event === 'battery low alert')
                 {
-                    await this.setCapabilityValueLog('alarm_battery', true);
+                    this.setCapabilityValueLog('alarm_battery', true).catch(this.error);
                 }
                 else if (event === 'battery good')
                 {
-                    await this.setCapabilityValueLog('alarm_battery', false);
+                    this.setCapabilityValueLog('alarm_battery', false).catch(this.error);
                 }
                 else if (event === 'water cut-off alert')
                 {
-                    await  this.setCapabilityValueLog('alarm_water', true);
+                    this.setCapabilityValueLog('alarm_water', true).catch(this.error);
                 }
                 else if (event === 'unusually high flow alert')
                 {
-                    await  this.setCapabilityValueLog('alarm_high_flow', true);
+                    this.setCapabilityValueLog('alarm_high_flow', true).catch(this.error);
                 }
                 else if (event === 'unusually low flow alert')
                 {
-                    await this.setCapabilityValueLog('alarm_low_flow', true);
+                    this.setCapabilityValueLog('alarm_low_flow', true).catch(this.error);
                 }
                 else if (event === 'valve broken alert')
                 {
-                    await this.setCapabilityValueLog('alarm_broken', true);
+                    this.setCapabilityValueLog('alarm_broken', true).catch(this.error);
                 }
                 else if (event === 'device fall alert')
                 {
-                    await  this.setCapabilityValueLog('alarm_fallen', true);
+                    this.setCapabilityValueLog('alarm_fallen', true).catch(this.error);
                 }
                 else if (event === 'manual button pressed')
                 {
@@ -797,29 +793,29 @@ class LinkTapDevice extends Homey.Device
                 }
                 else if (event === 'freeze alert')
                 {
-                    await this.setCapabilityValueLog('alarm_freeze', true);
+                    this.setCapabilityValueLog('alarm_freeze', true).catch(this.error);
                 }
                 else if (event === 'alarm clear')
                 {
                     if (message.title === 'noWater')
                     {
-                        await this.setCapabilityValueLog('alarm_water', false);
+                        this.setCapabilityValueLog('alarm_water', false).catch(this.error);
                     }
                     else if (message.title === 'valveBroken')
                     {
-                        await this.setCapabilityValueLog('alarm_broken', false);
+                        this.setCapabilityValueLog('alarm_broken', false).catch(this.error);
                     }
                     else if (message.title === 'fallFlag')
                     {
-                        await this.setCapabilityValueLog('alarm_fallen', false);
+                        this.setCapabilityValueLog('alarm_fallen', false).catch(this.error);
                     }
                     else if (message.title === 'pcFlag')
                     {
-                        await this.setCapabilityValueLog('alarm_low_flow', false);
+                        this.setCapabilityValueLog('alarm_low_flow', false).catch(this.error);
                     }
                     else if (message.title === 'pbFlag')
                     {
-                        await this.setCapabilityValueLog('alarm_high_flow', false);
+                        this.setCapabilityValueLog('alarm_high_flow', false).catch(this.error);
                     }
                 }
                 else if (event === 'flowMeterStatus')

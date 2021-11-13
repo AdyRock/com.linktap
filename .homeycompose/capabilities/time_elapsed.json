@@ -8,5 +8,5 @@
     "units": "Minutes",
     "getable": true,
     "setable": false,
-    "icon": "/assets/time_remaining.svg"
+    "icon": "/assets/time_elapsed.svg"
 }
