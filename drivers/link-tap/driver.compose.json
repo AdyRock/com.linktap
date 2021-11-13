@@ -24,6 +24,7 @@
         "watering_mode",
         "watering",
         "water_on",
+        "time_elapsed",
         "time_remaining",
         "cycles_remaining",
         "measure_water",

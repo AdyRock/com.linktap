@@ -1,0 +1,12 @@
+{
+    "type": "number",
+    "title": {
+        "en": "Time Elapsed",
+        "de": "Verstrichene Zeit",
+        "nl": "Tijd verstreken"
+    },
+    "units": "Minutes",
+    "getable": true,
+    "setable": false,
+    "icon": "/assets/time_remaining.svg"
+}

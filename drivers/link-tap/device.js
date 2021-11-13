@@ -13,7 +13,6 @@ class LinkTapDevice extends Homey.Device
     async onInit()
     {
         this.log('LinkTapDevice initialising');
-        this.isWatering = false;
         this.cycles = 0;
         this.abortTimer = null;
 
@@ -70,6 +69,15 @@ class LinkTapDevice extends Homey.Device
             await this.addCapabilityLog('clear_alarms').catch(this.error);
         }
 
+        if (!this.hasCapability('time_elapsed'))
+        {
+            await this.addCapabilityLog('time_elapsed');
+            await this.setCapabilityValueLog('time_elapsed', 0);
+
+            // Ensure the correct tite is set for the time_remaining as it might have been changed by the old version
+            await this.setCapabilityOptions('time_remaining', { title: this.homey.__('timeRemaining') });
+        }
+
         if (!this.hasCapability('alarm_fallen'))
         {
             await this.addCapabilityLog('alarm_fallen');
@@ -104,6 +112,7 @@ class LinkTapDevice extends Homey.Device
 
         await this.setCapabilityValueLog('cycles_remaining', 0);
         await this.setCapabilityValueLog('time_remaining', 0);
+        await this.setCapabilityValueLog('time_elapsed', 0);
 
         this.registerCapabilityListener('onoff', this.onCapabilityOnOff.bind(this));
         this.registerCapabilityListener('clear_alarms', this.onCapabilityClearAlarms.bind(this));
@@ -525,6 +534,7 @@ class LinkTapDevice extends Homey.Device
         }
         else
         {
+            // Cancel watering doesn't generate the 'watering end' webhook event when Eco mode is active so setup a backup to tidy up
             this.abortTimer = this.homey.setTimeout(() =>
             {
                 // Switch of watering if no activity for 1 minute
@@ -559,13 +569,13 @@ class LinkTapDevice extends Homey.Device
 
         this.setCapabilityValueLog('water_on', false).catch(this.error);
         this.setCapabilityValueLog('time_remaining', 0).catch(this.error);
+        //this.setCapabilityValueLog('time_elapsed', 0).catch(this.error);
 
         this.cycles = 0;
         this.setCapabilityValueLog('cycles_remaining', this.cycles).catch(this.error);
 
-        this.isWatering = false;
-        this.setCapabilityValueLog('watering', this.isWatering).catch(this.error);
-        this.setCapabilityValueLog('onoff', this.isWatering).catch(this.error);
+        this.setCapabilityValueLog('watering', false).catch(this.error);
+        this.setCapabilityValueLog('onoff', false).catch(this.error);
         this.setCapabilityValueLog('measure_water', 0).catch(this.error);
         this.driver.triggerWateringFinished(this);
     }
@@ -592,31 +602,38 @@ class LinkTapDevice extends Homey.Device
 
                 if (event === 'watering start')
                 {
+                    // A watering plan has started or or manual mode was turned on
                     if (this.abortTimer)
                     {
                         this.homey.clearTimeout(this.abortTimer);
                         this.abortTimer = null;
                     }
 
-                    this.isWatering = true;
-                    await this.setCapabilityValueLog('onoff', this.isWatering);
-                    await this.setCapabilityValueLog('watering', this.isWatering);
+                    await this.setCapabilityValueLog('onoff', true);
+                    await this.setCapabilityValueLog('watering', true);
+                    this.activeTime = 0;
                     //this.setCapabilityValueLog('watering_mode', message.workMode);
                     this.driver.triggerWateringStarted(this);
                 }
                 else if (event === 'wateringOn')
                 {
+                    // The water flow (valve) has turned on (also occurs about once per minute)
                     await this.setCapabilityValueLog('water_on', true);
-                    await this.setCapabilityValueLog('time_remaining', message.onMin);
-                    await this.setCapabilityValueLog('watering', this.isWatering);
+                    await this.setCapabilityValueLog('watering', true);
 
                     if (message.ecoFlag === 1)
                     {
+                        // The ecoFlag is set so the water will switch off / on during the plan so calculate the number of times it will happens
+                        // totalMin is the total request watering time (valve on)
+                        // ecoTotal is the time it will turn on for each cycle
                         this.cycles = Math.ceil(message.ecoTotal / message.totalMin);
                         await this.setCapabilityValueLog('cycles_remaining', this.cycles);
+
                         if (message.onMin === message.totalMin)
                         {
-                            await this.setCapabilityOptions('time_remaining', { title: this.homey.__('timeRemaining') });
+                            // Manual mode was started so the time reported will be the run time instead of time remaining as the total time is unknown
+                            //await this.setCapabilityOptions('time_remaining', { title: this.homey.__('timeRemaining') });
+                            this.manualWateringMode = false;
                         }
                     }
                     else if (message.ecoFlag !== 3)
@@ -626,10 +643,25 @@ class LinkTapDevice extends Homey.Device
                         if ((message.onMin === 0) && (message.totalMin === -1))
                         {
                             // Turned on via the button
-                            await this.setCapabilityOptions('time_remaining', { title: this.homey.__('timeActive') });
+                            // await this.setCapabilityOptions('time_remaining', { title: this.homey.__('timeActive') });
+                            this.manualWateringMode = true;
+                            await this.setCapabilityValueLog('time_remaining', null);
                         }
                     }
 
+                    if (this.manualWateringMode)
+                    {
+                        // Elapsed time is reported during manual mode
+                        await this.setCapabilityValueLog('time_elapsed', message.onMin);
+                    }
+                    else
+                    {
+                        // Remaining time is reported for a plan
+                        await this.setCapabilityValueLog('time_elapsed', this.activeTime);
+                        await this.setCapabilityValueLog('time_remaining', message.onMin);
+                        this.activeTime++;
+                    }
+                    
                     if (message.vol !== undefined)
                     {
                         await this.setCapabilityValueLog('meter_water', message.vol / 1000);
@@ -644,36 +676,41 @@ class LinkTapDevice extends Homey.Device
                 }
                 else if (event === 'wateringOff')
                 {
-                    if (this.cycles > 0 && this.isWatering)
+                    await this.setCapabilityValueLog('water_on', false);
+                    await this.setCapabilityValueLog('time_remaining', 0);
+                    //await this.setCapabilityValueLog('time_elapsed', 0);
+    
+                    if (this.timerVolUpdate)
                     {
-                        if (this.timerVolUpdate)
-                        {
-                            this.homey.clearInterval(this.timerVolUpdate);
-                            this.timerVolUpdate = null;
-                        }
+                        this.homey.clearInterval(this.timerVolUpdate);
+                        this.timerVolUpdate = null;
+                    }
 
-                        await this.setCapabilityValueLog('water_on', false);
-                        await this.setCapabilityValueLog('time_remaining', 0);
+                    if (message.vol !== undefined)
+                    {
+                        await this.setCapabilityValueLog('meter_water', message.vol / 1000);
+                        await this.setCapabilityValueLog('measure_water', 0);
+                    }
 
-                        if (message.vol !== undefined)
-                        {
-                            await this.setCapabilityValueLog('meter_water', message.vol / 1000);
-                            await this.setCapabilityValueLog('measure_water', 0);
-                        }
+                    if (this.cycles > 0)
+                    {
+                        this.cycles--;
+                        await this.setCapabilityValueLog('cycles_remaining', this.cycles);
+                    }
 
-                        if ((message.ecoFlag === 3) || (message.ecoFlag === 1))
-                        {
-                            this.cycles--;
-                            await this.setCapabilityValueLog('cycles_remaining', this.cycles);
-                        }
+                    if (!this.manualWateringMode)
+                    {
+                        await this.setCapabilityValueLog('time_elapsed', this.activeTime);
                     }
                 }
                 else if (event === 'flowMeterValue')
                 {
+                    // A new water flow rate reading
                     await this.setCapabilityValueLog('measure_water', message.vel / 1000);
                 }
                 else if (event === 'watering end')
                 {
+                    // The watering plan has ended or manual mode has been switched off
                     if (this.abortTimer)
                     {
                         this.homey.clearTimeout(this.abortTimer);
@@ -688,13 +725,15 @@ class LinkTapDevice extends Homey.Device
 
                     await this.setCapabilityValueLog('water_on', false);
                     await this.setCapabilityValueLog('time_remaining', 0);
+                    //await this.setCapabilityValueLog('time_elapsed', 0);
 
                     this.cycles = 0;
                     await this.setCapabilityValueLog('cycles_remaining', this.cycles);
 
-                    this.isWatering = false;
-                    await this.setCapabilityValueLog('watering', this.isWatering);
-                    await this.setCapabilityValueLog('onoff', this.isWatering);
+                    await this.setCapabilityValueLog('watering', false);
+                    await this.setCapabilityValueLog('onoff', false);
+
+                    // Docode the total volume from the message
                     const data = message.content.split(/[(,]+/);
                     if (data.length > 1)
                     {

@@ -642,6 +642,7 @@
         "watering_mode",
         "watering",
         "water_on",
+        "time_elapsed",
         "time_remaining",
         "cycles_remaining",
         "measure_water",
@@ -872,6 +873,18 @@
       "setable": false,
       "units": "dBm",
       "icon": "/assets/signal_strength.svg"
+    },
+    "time_elapsed": {
+      "type": "number",
+      "title": {
+        "en": "Time Elapsed",
+        "de": "Verstrichene Zeit",
+        "nl": "Tijd verstreken"
+      },
+      "units": "Minutes",
+      "getable": true,
+      "setable": false,
+      "icon": "/assets/time_remaining.svg"
     },
     "time_remaining": {
       "type": "number",
