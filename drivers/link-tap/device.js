@@ -58,6 +58,9 @@ class LinkTapDevice extends Homey.Device
             }
         }
 
+        const dd = this.getData();
+        this.homey.app.registerHomeyWebhook(dd.gatewayId);
+        
         if (!this.hasCapability('onoff'))
         {
             await this.addCapabilityLog('onoff');

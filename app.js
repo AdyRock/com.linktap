@@ -23,6 +23,8 @@ class MyApp extends Homey.App
         this.diagLog = '';
         this.fetchingData = false;
         this.cloudOnly = true;
+        this.linkTaps = [];
+        this.homeyWebhook = null;
 
         if (process.env.DEBUG === '1')
         {
@@ -97,12 +99,38 @@ class MyApp extends Homey.App
         this.detectedDevices = this.homey.settings.get('detectedDevices');
         this.cacheClean = false; // We have no idea what might have changed while the app wasn't running
 
+        this.log('MyApp has been initialized');
+    }
+
+    async registerHomeyWebhook(LinkTapID)
+    {
+        // See if the LinkTap is already registered
+        if (this.linkTaps.findIndex(linktap => linktap === LinkTapID) >= 0)
+        {
+            // Already registered
+            return;
+        }
+
+        this.linkTaps.push(LinkTapID);
+
+        const data = {
+            $keys: this.linkTaps,
+        };
+
         // Setup the webhook call back to receive push notifications
         const id = Homey.env.WEBHOOK_ID;
         const secret = Homey.env.WEBHOOK_SECRET;
-        const myWebhook = await this.homey.cloud.createWebhook(id, secret, {});
 
-        myWebhook.on('message', async args =>
+        if (this.homeyWebhook)
+        {
+            // Unregister the existing webhook
+            await this.homeyWebhook.unregister();
+            this.homeyWebhook = null;
+        }
+
+        this.homeyWebhook = await this.homey.cloud.createWebhook(id, secret, data);
+
+        this.homeyWebhook.on('message', async args =>
         {
             this.updateLog(`Got a webhook message! ${this.varToString(args.body)}`, 0);
             try
@@ -116,8 +144,6 @@ class MyApp extends Homey.App
         });
 
         this.updateLog('Homey Webhook registered');
-
-        this.log('MyApp has been initialized');
     }
 
     async onUninit()
@@ -261,7 +287,9 @@ class MyApp extends Homey.App
                 // https://www.link-tap.com/api/setWebHookUrl
                 const homeyId = await this.homey.cloud.getHomeyId();
                 const id = Homey.env.WEBHOOK_ID;
-                const webHookUrl = `https://webhooks.athom.com/webhook/${id}?homey=${homeyId}`;
+                //const webHookUrl = `https://webhooks.athom.com/webhook/${id}?homey=${homeyId}`;
+                const webHookUrl = `https://webhooks.athom.com/webhook/${id}`;
+              
                 const url = 'setWebHookUrl';
                 const body = {
                     webHookUrl,
