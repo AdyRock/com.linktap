@@ -240,6 +240,7 @@ class MyApp extends Homey.App
                     const store = {
                         apiKey: body.apiKey ? body.apiKey : this.apiKey,
                         username: body.username ? body.username : this.username,
+                        type: tapLinker.dType,
                     };
 
                     // Add this device to the table
