@@ -34,21 +34,11 @@
         "alarm_freeze",
         "alarm_water",
         "alarm_high_flow",
-        "alarm_low_flow",
-        "button.send_log"
+        "alarm_low_flow"
     ],
     "capabilitiesOptions": {
         "meter_water": {
             "units": "L"
-        },
-        "button.send_log": {
-            "maintenanceAction": true,
-            "title": {
-                "en": "Send Diagnostics Log"
-            },
-            "desc": {
-                "en": "Send a diagnostics log to the developer"
-            }
         }
     },
     "pair": [

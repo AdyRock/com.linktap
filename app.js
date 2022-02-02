@@ -44,9 +44,9 @@ class MyApp extends Homey.App
         }
         catch (err)
         {
-            // getLocalAddress will fail on Homey cloud installations so dissbale the loging options
+            // getLocalAddress will fail on Homey cloud installations so disable the loging options
             this.cloudOnly = true;
-            this.homey.settings.set('logEnabled', true);
+            this.homey.settings.set('logEnabled', false);
         }
 
         const activateInstantMode = this.homey.flow.getActionCard('activate_instant_mode');
@@ -469,6 +469,10 @@ class MyApp extends Homey.App
     updateLog(newMessage, errorLevel = 1)
     {
         this.log(newMessage);
+        if (errorLevel === 0)
+        {
+            this.error(newMessage);
+        }
 
         if ((errorLevel === 0) || this.homey.settings.get('logEnabled'))
         {
@@ -477,23 +481,7 @@ class MyApp extends Homey.App
                 const nowTime = new Date(Date.now());
 
                 this.diagLog += '\r\n* ';
-                this.diagLog += (nowTime.getHours());
-                this.diagLog += ':';
-                this.diagLog += nowTime.getMinutes();
-                this.diagLog += ':';
-                this.diagLog += nowTime.getSeconds();
-                this.diagLog += '.';
-                const milliSeconds = nowTime.getMilliseconds().toString();
-                if (milliSeconds.length === 2)
-                {
-                    this.diagLog += '0';
-                }
-                else if (milliSeconds.length === 1)
-                {
-                    this.diagLog += '00';
-                }
-                this.diagLog += milliSeconds;
-                this.diagLog += ': ';
+                this.diagLog += nowTime.toJSON();
                 this.diagLog += '\r\n';
 
                 this.diagLog += newMessage;
@@ -581,7 +569,7 @@ class MyApp extends Homey.App
                 {
                     from: `"Homey User" <${Homey.env.MAIL_USER}>`, // sender address
                     to: Homey.env.MAIL_RECIPIENT, // list of receivers
-                    subject: `LinkTap ${body.logType} log`, // Subject line
+                    subject: `LinkTap ${body.logType} log (${Homey.manifest.version})`, // Subject line
                     text: logData, // plain text body
                 }, );
 

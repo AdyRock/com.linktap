@@ -97,5 +97,8 @@
     },
     "1.0.20": {
         "en": "Major rewrite to use webhooks instead of polling. The app is now much more responsive but uses less CPU resources. Some capabilities have been removed or changed and there are also some new ones. Login in is now presented during pairing."
+    },
+    "1.0.21": {
+        "en": "Add support for ValveLinker."
     }
 }
