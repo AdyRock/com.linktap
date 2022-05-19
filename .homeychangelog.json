@@ -100,5 +100,11 @@
     },
     "1.0.21": {
         "en": "Add support for ValveLinker."
+    },
+    "1.0.22": {
+        "en": "Added 'Total water used' for accumulated water volume. Changed battery quantity from 2 to 4."
+    },
+    "1.0.23": {
+        "en": "Changed 'Total water used' units to m³."
     }
 }

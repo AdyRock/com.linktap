@@ -13,7 +13,7 @@
       {
         "type": "device",
         "name": "device",
-        "filter": "driver_id=link-tap|link-tap-local"
+        "filter": "driver_id=link-tap"
       }
     ]
 }
