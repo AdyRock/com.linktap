@@ -106,5 +106,8 @@
     },
     "1.0.23": {
         "en": "Changed 'Total water used' units to m³."
+    },
+    "1.0.24": {
+        "en": "Catch failure to register webhook and retry."
     }
 }

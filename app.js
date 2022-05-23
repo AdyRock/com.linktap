@@ -128,22 +128,35 @@ class MyApp extends Homey.App
             this.homeyWebhook = null;
         }
 
-        this.homeyWebhook = await this.homey.cloud.createWebhook(id, secret, data);
-
-        this.homeyWebhook.on('message', async args =>
+        try
         {
-            this.updateLog(`Got a webhook message! ${this.varToString(args.body)}`, 0);
-            try
-            {
-                await this.processWebhookMessage(args.body);
-            }
-            catch(err)
-            {
-                this.updateLog(`Homey Webhook message error: ${err.message}`);
-            }
-        });
+            this.homeyWebhook = await this.homey.cloud.createWebhook(id, secret, data);
 
-        this.updateLog('Homey Webhook registered');
+            this.homeyWebhook.on('message', async args =>
+            {
+                this.updateLog(`Got a webhook message! ${this.varToString(args.body)}`, 0);
+                try
+                {
+                    await this.processWebhookMessage(args.body);
+                }
+                catch(err)
+                {
+                    this.updateLog(`Homey Webhook message error: ${err.message}`);
+                }
+            });
+
+            this.updateLog('Homey Webhook registered');
+        }
+        catch (err)
+        {
+            this.updateLog(`Homey Webhook failed to register: $(err.message)`);
+
+            // Try again after 1 minute as it could be failing with the cached data
+            this.homey.setTimeout(() =>
+            {
+                this.registerHomeyWebhook(LinkTapID);
+            }, 1000 * 60);
+        }
     }
 
     async onUninit()
