@@ -20,6 +20,7 @@
     "gwOffline": "The Gateway is offline",
     "ltOffline": "The Valve is offline",
     "connectionFailed": "Connection failed. Try the Repair option if the problem persists",
+    "notFound": "Device not found in gateway",
     "wateringModeUndefined":
     {
         "I": "The Interval mode has not been configured in the LinkTap app",

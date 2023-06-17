@@ -232,6 +232,12 @@ class LinkTapDevice extends Homey.Device
 
             const tapLinkers = gateway.taplinker;
             const tapLinker = tapLinkers.find(tapLinkerEntry => tapLinkerEntry.taplinkerId === dd.id);
+            if (tapLinker === undefined)
+            {
+                this.homey.app.updateLog(`updateDeviceValues (${dd.id}) Device not found in gateway`);
+                this.setUnavailable(this.homey.__('notFound')).catch(this.error);
+                return false;
+            }
             this.homey.app.updateLog(`updateDeviceValues (${dd.id}) response: ${this.homey.app.varToString(tapLinker)}`);
 
             if (tapLinker.status !== 'Connected')
@@ -639,6 +645,8 @@ class LinkTapDevice extends Homey.Device
                 if (event === 'watering start')
                 {
                     // A watering plan has started or or manual mode was turned on
+                    this.setAvailable().catch(this.error);
+
                     if (this.abortTimer)
                     {
                         this.homey.clearTimeout(this.abortTimer);
@@ -654,6 +662,7 @@ class LinkTapDevice extends Homey.Device
                 else if (event === 'wateringOn')
                 {
                     // The water flow (valve) has turned on (also occurs about once per minute)
+                    this.setAvailable().catch(this.error);
                     this.setCapabilityValueLog('water_on', true).catch(this.error);
                     this.setCapabilityValueLog('watering', true).catch(this.error);
 
@@ -719,6 +728,7 @@ class LinkTapDevice extends Homey.Device
                 }
                 else if (event === 'wateringOff')
                 {
+                    this.setAvailable().catch(this.error);
                     this.setCapabilityValueLog('water_on', false).catch(this.error);
                     this.setCapabilityValueLog('time_remaining', 0).catch(this.error);
     
@@ -760,6 +770,7 @@ class LinkTapDevice extends Homey.Device
                 }
                 else if (event === 'watering end')
                 {
+                    this.setAvailable().catch(this.error);
                     // The watering plan has ended or manual mode has been switched off
                     if (this.abortTimer)
                     {

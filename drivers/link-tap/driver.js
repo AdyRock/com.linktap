@@ -188,6 +188,8 @@ class LinkTapDriver extends Homey.Driver
             }
 
             // Connected OK with the device credentials
+            device.setAvailable();
+            device.updateDeviceValues();
             return { ok: true, username };
         });
 
