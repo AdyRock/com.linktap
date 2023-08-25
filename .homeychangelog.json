@@ -109,5 +109,8 @@
     },
     "1.0.24": {
         "en": "Catch failure to register webhook and retry."
+    },
+    "1.0.25": {
+        "en": "Revert to previous watering plan when Instant mode stopped manually."
     }
 }

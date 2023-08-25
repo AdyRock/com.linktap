@@ -15,6 +15,7 @@ class LinkTapDevice extends Homey.Device
         this.log('LinkTapDevice initialising');
         this.cycles = 0;
         this.abortTimer = null;
+        this.previousWateringMode = null;
 
         this.onDeviceUpdateVol = this.onDeviceUpdateVol.bind(this);
         this.abortWatering = this.abortWatering.bind(this);
@@ -572,6 +573,14 @@ class LinkTapDevice extends Homey.Device
                 body.eco = false;
             }
             body.autoBack = autoBack;
+            if (autoBack)
+            {
+                this.previousWateringMode = this.getCapabilityValue('watering_mode');
+            }
+            else
+            {
+                this.previousWateringMode = null;
+            }
         }
         else
         {
@@ -619,6 +628,10 @@ class LinkTapDevice extends Homey.Device
         this.setCapabilityValueLog('onoff', false).catch(this.error);
         this.setCapabilityValueLog('measure_water', 0).catch(this.error);
         this.driver.triggerWateringFinished(this);
+        if (this.previousWateringMode)
+        {
+            this.setCapabilityValueLog('watering_mode', this.previousWateringMode).catch(this.error);
+        }
     }
 
     async onDeviceUpdateVol()
@@ -626,8 +639,8 @@ class LinkTapDevice extends Homey.Device
         const vel = this.getCapabilityValue('measure_water');
         let vol = this.getCapabilityValue('meter_water');
         vol += vel / 30;
-        this.setCapabilityValueLog('meter_water', vol).catch(this.error);
-        this.setCapabilityValueLog('meter_water.total', this.waterTotal + (vol / 1000)).catch(this.error);
+        this.setCapabilityValue('meter_water', vol).catch(this.error);
+        this.setCapabilityValue('meter_water.total', this.waterTotal + (vol / 1000)).catch(this.error);
     }
 
     async processWebhookMessage(message)
