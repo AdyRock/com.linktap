@@ -118,5 +118,8 @@
 	},
 	"1.0.27": {
 		"en": "Fix exception when setting capability options for 'Total water used'."
+	},
+	"1.0.28": {
+		"en": "Fix possible failure to return to previous watering plan after manual stop."
 	}
 }

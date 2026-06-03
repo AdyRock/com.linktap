@@ -582,7 +582,7 @@ class LinkTapDevice extends Homey.Device
             body.autoBack = autoBack;
             if (autoBack)
             {
-                this.previousWateringMode = this.getCapabilityValue('watering_mode');
+                this.capturePreviousWateringMode();
             }
             else
             {
@@ -635,9 +635,26 @@ class LinkTapDevice extends Homey.Device
         this.setCapabilityValueLog('onoff', false).catch(this.error);
         this.setCapabilityValueLog('measure_water', 0).catch(this.error);
         this.driver.triggerWateringFinished(this);
+        this.restorePreviousWateringMode();
+    }
+
+    capturePreviousWateringMode()
+    {
+        const mode = this.getCapabilityValue('watering_mode');
+
+        // Only capture scheduled modes. Keep a previously captured value while in manual mode.
+        if (mode && mode !== 'M')
+        {
+            this.previousWateringMode = mode;
+        }
+    }
+
+    restorePreviousWateringMode()
+    {
         if (this.previousWateringMode)
         {
             this.setCapabilityValueLog('watering_mode', this.previousWateringMode).catch(this.error);
+            this.previousWateringMode = null;
         }
     }
 
@@ -666,6 +683,12 @@ class LinkTapDevice extends Homey.Device
                 {
                     // A watering plan has started or or manual mode was turned on
                     this.setAvailable().catch(this.error);
+
+                    if (message.workMode === 'M')
+                    {
+                        // Manual mode can be started externally, so remember the previous schedule mode.
+                        this.capturePreviousWateringMode();
+                    }
 
                     if (this.abortTimer)
                     {
@@ -826,6 +849,7 @@ class LinkTapDevice extends Homey.Device
                     }
                     this.setCapabilityValueLog('measure_water', 0).catch(this.error);
                     this.driver.triggerWateringFinished(this);
+                    this.restorePreviousWateringMode();
                 }
                 else if (event === 'watering cycle skipped')
                 {
