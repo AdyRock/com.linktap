@@ -134,7 +134,7 @@ class MyApp extends Homey.App
 
             this.homeyWebhook.on('message', async args =>
             {
-                this.updateLog(`Got a webhook message! ${this.varToString(args.body)}`, 0);
+                this.updateLog(`Got a webhook message! ${this.varToString(args.body)}`);
                 try
                 {
                     await this.processWebhookMessage(args.body);
@@ -303,7 +303,7 @@ class MyApp extends Homey.App
                 const id = Homey.env.WEBHOOK_ID;
                 //const webHookUrl = `https://webhooks.athom.com/webhook/${id}?homey=${homeyId}`;
                 const webHookUrl = `https://webhooks.athom.com/webhook/${id}`;
-              
+
                 const url = 'setWebHookUrl';
                 const body = {
                     webHookUrl,
@@ -394,10 +394,17 @@ class MyApp extends Homey.App
                         {
                             let returnData = Buffer.concat(body);
                             returnData = JSON.parse(returnData);
+                            let responseLog = this.varToString(returnData);
+                            if (body.apiKey)
+                            {
+                                responseLog = responseLog.replace(body.apiKey, 'hidden');
+                            }
+                            this.updateLog(`Post response from ${url}: ${responseLog}`);
                             resolve(returnData);
                         }
                         else
                         {
+                            this.updateLog(`Post response from ${url} failed with HTTP ${res.statusCode}`, 0);
                             reject(new Error(`HTTPS Error - ${res.statusCode}`));
                         }
                     });

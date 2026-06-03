@@ -121,5 +121,8 @@
 	},
 	"1.0.28": {
 		"en": "Fix possible failure to return to previous watering plan after manual stop."
+	},
+	"1.0.29": {
+		"en": "Forced resend of previous watering plane when manual watering stops via webhook. Improved logging."
 	}
 }

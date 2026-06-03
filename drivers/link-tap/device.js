@@ -510,11 +510,14 @@ class LinkTapDevice extends Homey.Device
             url = 'activateCalendarMode';
         }
 
+        this.homey.app.updateLog(`activateWateringMode resolved endpoint: ${url || 'unknown'}`);
+
         try
         {
             this.homey.app.updateLog(`activateWateringMode mode: ${mode}`);
 
             const response = await this.homey.app.PostURL(url, body);
+            this.homey.app.updateLog(`activateWateringMode response: ${this.homey.app.varToString(response)}`);
             if (response.result !== 'ok')
             {
                 throw (new Error(response.result));
@@ -538,7 +541,7 @@ class LinkTapDevice extends Homey.Device
 
     async activateInstantMode(onOff, duration, ecoOption, ecoOn, ecoOff, autoBack)
     {
-        this.homey.app.updateLog(`activateInstantMode ${onOff}`);
+        this.homey.app.updateLog(`activateInstantMode ${onOff}, duration: ${duration}, ecoOption: ${ecoOption}, ecoOn: ${ecoOn}, ecoOff: ${ecoOff}, autoBack: ${autoBack}`);
 
         const url = 'activateInstantMode';
         const dd = this.getData();
@@ -583,9 +586,14 @@ class LinkTapDevice extends Homey.Device
             if (autoBack)
             {
                 this.capturePreviousWateringMode();
+                this.homey.app.updateLog(`activateInstantMode autoBack enabled. Captured mode: ${this.previousWateringMode || 'none'}`);
             }
             else
             {
+                if (this.previousWateringMode)
+                {
+                    this.homey.app.updateLog(`activateInstantMode autoBack disabled. Clearing previous mode: ${this.previousWateringMode}`);
+                }
                 this.previousWateringMode = null;
             }
         }
@@ -602,6 +610,7 @@ class LinkTapDevice extends Homey.Device
         this.homey.app.updateLog(`activateInstantMode onOff: ${onOff}`);
 
         const response = await this.homey.app.PostURL(url, body);
+        this.homey.app.updateLog(`activateInstantMode response: ${this.homey.app.varToString(response)}`);
         if (response.result !== 'ok')
         {
             throw (new Error(response.result));
@@ -635,7 +644,7 @@ class LinkTapDevice extends Homey.Device
         this.setCapabilityValueLog('onoff', false).catch(this.error);
         this.setCapabilityValueLog('measure_water', 0).catch(this.error);
         this.driver.triggerWateringFinished(this);
-        this.restorePreviousWateringMode();
+        this.restorePreviousWateringMode().catch(this.error);
     }
 
     capturePreviousWateringMode()
@@ -646,15 +655,36 @@ class LinkTapDevice extends Homey.Device
         if (mode && mode !== 'M')
         {
             this.previousWateringMode = mode;
+            this.homey.app.updateLog(`capturePreviousWateringMode stored: ${mode}`);
+        }
+        else
+        {
+            this.homey.app.updateLog(`capturePreviousWateringMode skipped. Current mode: ${mode || 'unset'}, previous mode: ${this.previousWateringMode || 'unset'}`);
         }
     }
 
-    restorePreviousWateringMode()
+    async restorePreviousWateringMode()
     {
         if (this.previousWateringMode)
         {
-            this.setCapabilityValueLog('watering_mode', this.previousWateringMode).catch(this.error);
+            const mode = this.previousWateringMode;
             this.previousWateringMode = null;
+
+            // Re-activate the previously selected schedule mode on the device.
+            this.homey.app.updateLog(`restorePreviousWateringMode restoring: ${mode}`);
+            try
+            {
+                await this.activateWateringMode(mode);
+                this.homey.app.updateLog(`restorePreviousWateringMode success: ${mode}`);
+            }
+            catch (err)
+            {
+                this.homey.app.updateLog(`restorePreviousWateringMode failed: ${err.message}`, 0);
+            }
+        }
+        else
+        {
+            this.homey.app.updateLog('restorePreviousWateringMode skipped: no previous mode stored');
         }
     }
 
@@ -688,6 +718,7 @@ class LinkTapDevice extends Homey.Device
                     {
                         // Manual mode can be started externally, so remember the previous schedule mode.
                         this.capturePreviousWateringMode();
+                        this.homey.app.updateLog(`processWebhookMessage manual start. previous mode: ${this.previousWateringMode || 'none'}`);
                     }
 
                     if (this.abortTimer)
@@ -849,7 +880,7 @@ class LinkTapDevice extends Homey.Device
                     }
                     this.setCapabilityValueLog('measure_water', 0).catch(this.error);
                     this.driver.triggerWateringFinished(this);
-                    this.restorePreviousWateringMode();
+                    this.restorePreviousWateringMode().catch(this.error);
                 }
                 else if (event === 'watering cycle skipped')
                 {
