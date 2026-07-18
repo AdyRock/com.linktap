@@ -73,6 +73,15 @@ class MyApp extends Homey.App
                 return args.device.activateWateringMode(args.mode);
             });
 
+        const clearAlarms = this.homey.flow.getActionCard('clear_alarms');
+        clearAlarms
+            .registerRunListener(async (args, state) =>
+            {
+                this.log('clear_alarms');
+                await args.device.onCapabilityClearAlarms(true);
+                return true;
+            });
+
         const wateringCondition = this.homey.flow.getConditionCard('is_watering');
         wateringCondition.registerRunListener(async (args, state) =>
         {

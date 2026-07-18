@@ -181,6 +181,14 @@
                     ]
                 }
             ]
+        },
+        {
+            "id": "clear_alarms",
+            "title": {
+                "en": "Clear Alarms",
+                "de": "Alarme zurücksetzen",
+                "nl": "Alarmen wissen"
+            }
         }
     ]
 }

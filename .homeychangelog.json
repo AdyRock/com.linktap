@@ -124,5 +124,8 @@
 	},
 	"1.0.29": {
 		"en": "Forced resend of previous watering plane when manual watering stops via webhook. Improved logging."
+	},
+	"1.0.30": {
+		"en": "Added Flow Action card to clear the alarms."
 	}
 }

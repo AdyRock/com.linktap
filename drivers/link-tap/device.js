@@ -7,6 +7,38 @@ const Homey = require('homey');
 class LinkTapDevice extends Homey.Device
 {
 
+    toFiniteNumber(value)
+    {
+        const num = Number(value);
+        return Number.isFinite(num) ? num : undefined;
+    }
+
+    async setAvailableLog(reason)
+    {
+        this.homey.app.updateLog(`setAvailable ${reason}`);
+        try
+        {
+            await this.setAvailable();
+        }
+        catch (err)
+        {
+            this.homey.app.updateLog(`setAvailable error ${reason} ${err.message}`);
+        }
+    }
+
+    async setUnavailableLog(reason, message)
+    {
+        this.homey.app.updateLog(`setUnavailable ${reason}: ${message}`);
+        try
+        {
+            await this.setUnavailable(message);
+        }
+        catch (err)
+        {
+            this.homey.app.updateLog(`setUnavailable error ${reason} ${err.message}`);
+        }
+    }
+
     /**
      * onInit is called when the device is initialized.
      */
@@ -16,6 +48,7 @@ class LinkTapDevice extends Homey.Device
         this.cycles = 0;
         this.abortTimer = null;
         this.previousWateringMode = null;
+        this.gatewayOnlineGraceUntil = 0;
 
         this.onDeviceUpdateVol = this.onDeviceUpdateVol.bind(this);
         this.abortWatering = this.abortWatering.bind(this);
@@ -53,7 +86,7 @@ class LinkTapDevice extends Homey.Device
                 if (!await this.homey.app.registerWebhookURL(this.apiKey, this.username))
                 {
                     // Still no good
-                    this.setUnavailable(this.homey.__('connectionFailed'));
+                    await this.setUnavailableLog('onInit registerWebhookURL retry failed', this.homey.__('connectionFailed'));
                 }
                 else
                 {
@@ -63,7 +96,7 @@ class LinkTapDevice extends Homey.Device
             }
             else
             {
-                this.setUnavailable(this.homey.__('connectionFailed'));
+                await this.setUnavailableLog('onInit registerWebhookURL failed', this.homey.__('connectionFailed'));
             }
         }
 
@@ -217,8 +250,10 @@ class LinkTapDevice extends Homey.Device
             username: this.username,
         };
 
-        // Get new data via the API (don't use the cache)
-        const devices = await this.homey.app.getDeviceData(true, body);
+        // Only use fresh data or a cache entry that is still known to be clean.
+        // Dirty cache snapshots can lag behind webhook activity and incorrectly mark
+        // a device offline immediately after watering/gateway recovery events.
+        const devices = await this.homey.app.getDeviceData(false, body);
 
         if (devices === null)
         {
@@ -235,7 +270,7 @@ class LinkTapDevice extends Homey.Device
             if (gateway.status !== 'Connected')
             {
                 this.homey.app.updateLog('updateDeviceValues Gateway status is not connected');
-                this.setUnavailable(this.homey.__('gwOffline')).catch(this.error);
+                await this.setUnavailableLog('updateDeviceValues gateway offline', this.homey.__('gwOffline'));
                 return false;
             }
 
@@ -244,7 +279,7 @@ class LinkTapDevice extends Homey.Device
             if (tapLinker === undefined)
             {
                 this.homey.app.updateLog(`updateDeviceValues (${dd.id}) Device not found in gateway`);
-                this.setUnavailable(this.homey.__('notFound')).catch(this.error);
+                await this.setUnavailableLog(`updateDeviceValues ${dd.id} not found`, this.homey.__('notFound'));
                 return false;
             }
             this.homey.app.updateLog(`updateDeviceValues (${dd.id}) response: ${this.homey.app.varToString(tapLinker)}`);
@@ -252,11 +287,11 @@ class LinkTapDevice extends Homey.Device
             if (tapLinker.status !== 'Connected')
             {
                 this.homey.app.updateLog('updateDeviceValues Valve status is not connected');
-                this.setUnavailable(this.homey.__('ltOffline')).catch(this.error);
+                await this.setUnavailableLog(`updateDeviceValues ${dd.id} valve offline`, this.homey.__('ltOffline'));
                 return false;
             }
 
-            await this.setAvailable();
+            await this.setAvailableLog(`updateDeviceValues ${dd.id} connected`);
 
             this.type = tapLinker.dType;
             this.setStoreValue('type', this.type);
@@ -665,27 +700,33 @@ class LinkTapDevice extends Homey.Device
 
     async restorePreviousWateringMode()
     {
-        if (this.previousWateringMode)
-        {
-            const mode = this.previousWateringMode;
-            this.previousWateringMode = null;
+        // if (this.previousWateringMode)
+        // {
+        //     const mode = this.previousWateringMode;
+        //     this.previousWateringMode = null;
 
-            // Re-activate the previously selected schedule mode on the device.
-            this.homey.app.updateLog(`restorePreviousWateringMode restoring: ${mode}`);
-            try
-            {
-                await this.activateWateringMode(mode);
-                this.homey.app.updateLog(`restorePreviousWateringMode success: ${mode}`);
-            }
-            catch (err)
-            {
-                this.homey.app.updateLog(`restorePreviousWateringMode failed: ${err.message}`, 0);
-            }
-        }
-        else
-        {
-            this.homey.app.updateLog('restorePreviousWateringMode skipped: no previous mode stored');
-        }
+        //     // Re-activate the previously selected schedule mode on the device.
+        //     this.homey.app.updateLog(`restorePreviousWateringMode restoring: ${mode}`);
+        //     try
+        //     {
+        //         await this.activateWateringMode(mode);
+        //         this.homey.app.updateLog(`restorePreviousWateringMode success: ${mode}`);
+        //     }
+        //     catch (err)
+        //     {
+        //         this.homey.app.updateLog(`restorePreviousWateringMode failed: ${err.message}`, 0);
+        //     }
+        // }
+        // else
+        // {
+        //     this.homey.app.updateLog('restorePreviousWateringMode skipped: no previous mode stored');
+        // }
+
+		// Delay the API query so that all wateringOff messages are processed first. Without the delay our setAvailable() call would race against the incoming wateringOff messages and lose. After 5 seconds the dust has settled and the device fetches its real status from the API which will restore the correct mode.
+		this.homey.setTimeout(() =>
+		{
+			this.updateDeviceValues();
+		}, 1000 * 5);
     }
 
     async onDeviceUpdateVol()
@@ -702,17 +743,20 @@ class LinkTapDevice extends Homey.Device
         try
         {
             const dd = this.getData();
-            if ((dd.id === message.deviceId) && (dd.gatewayId === message.gatewayId))
+            const event = message.event ? message.event : message.msg;
+            const isGatewayEvent = (event === 'gatewayOnline') || (event === 'gatewayOffline');
+            const isForThisDevice = (dd.gatewayId === message.gatewayId)
+                && (isGatewayEvent || (dd.id === message.deviceId));
+
+            if (isForThisDevice)
             {
                 // message is for this device
-                const event = message.event ? message.event : message.msg;
-
                 this.homey.app.updateLog(`processWebhookMessage ${event}`);
 
                 if (event === 'watering start')
                 {
                     // A watering plan has started or or manual mode was turned on
-                    this.setAvailable().catch(this.error);
+                    this.setAvailableLog('processWebhookMessage watering start').catch(this.error);
 
                     if (message.workMode === 'M')
                     {
@@ -736,7 +780,7 @@ class LinkTapDevice extends Homey.Device
                 else if (event === 'wateringOn')
                 {
                     // The water flow (valve) has turned on (also occurs about once per minute)
-                    this.setAvailable().catch(this.error);
+                    this.setAvailableLog('processWebhookMessage wateringOn').catch(this.error);
                     this.setCapabilityValueLog('water_on', true).catch(this.error);
                     this.setCapabilityValueLog('watering', true).catch(this.error);
 
@@ -769,14 +813,40 @@ class LinkTapDevice extends Homey.Device
                     if (this.manualWateringMode)
                     {
                         // Elapsed time is reported during manual mode
-                        this.setCapabilityValueLog('time_elapsed', message.onMin).catch(this.error);
+                        const elapsed = this.toFiniteNumber(message.onMin);
+                        if (elapsed !== undefined)
+                        {
+                            this.setCapabilityValueLog('time_elapsed', elapsed).catch(this.error);
+                        }
+                        else
+                        {
+                            this.homey.app.updateLog('processWebhookMessage skip time_elapsed: message.onMin is not a finite number');
+                        }
                     }
                     else
                     {
                         // Remaining time is reported for a plan
-                        this.setCapabilityValueLog('time_elapsed', this.activeTime).catch(this.error);
-                        this.setCapabilityValueLog('time_remaining', message.onMin).catch(this.error);
-                        this.activeTime++;
+                        const elapsed = this.toFiniteNumber(this.activeTime);
+                        if (elapsed !== undefined)
+                        {
+                            this.setCapabilityValueLog('time_elapsed', elapsed).catch(this.error);
+                            this.activeTime = elapsed + 1;
+                        }
+                        else
+                        {
+                            this.homey.app.updateLog('processWebhookMessage skip time_elapsed: activeTime is not a finite number');
+                            this.activeTime = 0;
+                        }
+
+                        const remaining = this.toFiniteNumber(message.onMin);
+                        if (remaining !== undefined)
+                        {
+                            this.setCapabilityValueLog('time_remaining', remaining).catch(this.error);
+                        }
+                        else
+                        {
+                            this.homey.app.updateLog('processWebhookMessage skip time_remaining: message.onMin is not a finite number');
+                        }
                     }
 
                     if (message.vol !== undefined)
@@ -802,7 +872,7 @@ class LinkTapDevice extends Homey.Device
                 }
                 else if (event === 'wateringOff')
                 {
-                    this.setAvailable().catch(this.error);
+                    this.setAvailableLog('processWebhookMessage wateringOff').catch(this.error);
                     this.setCapabilityValueLog('water_on', false).catch(this.error);
                     this.setCapabilityValueLog('time_remaining', 0).catch(this.error);
 
@@ -829,7 +899,15 @@ class LinkTapDevice extends Homey.Device
 
                     if (!this.manualWateringMode)
                     {
-                        this.setCapabilityValueLog('time_elapsed', this.activeTime).catch(this.error);
+                        const elapsed = this.toFiniteNumber(this.activeTime);
+                        if (elapsed !== undefined)
+                        {
+                            this.setCapabilityValueLog('time_elapsed', elapsed).catch(this.error);
+                        }
+                        else
+                        {
+                            this.homey.app.updateLog('processWebhookMessage skip time_elapsed: activeTime is not a finite number (wateringOff)');
+                        }
                     }
 
                     if (message.battery)
@@ -844,7 +922,7 @@ class LinkTapDevice extends Homey.Device
                 }
                 else if (event === 'watering end')
                 {
-                    this.setAvailable().catch(this.error);
+                    this.setAvailableLog('processWebhookMessage watering end').catch(this.error);
                     // The watering plan has ended or manual mode has been switched off
                     if (this.abortTimer)
                     {
@@ -888,19 +966,32 @@ class LinkTapDevice extends Homey.Device
                 }
                 else if (event === 'gatewayOnline')
                 {
-                    await this.setAvailable().catch(this.error);
+                    this.gatewayOnlineGraceUntil = Date.now() + (1000 * 10);
+
+                    // Delay the API query so that all deviceOffline messages (which arrive ~700ms after
+                    // gatewayOnline) are processed first. Without the delay our setAvailable() call would
+                    // race against the incoming deviceOffline messages and lose. After 5 seconds the dust
+                    // has settled and each device fetches its real status from the API.
+                    this.homey.setTimeout(() => this.updateDeviceValues(), 5000);
                 }
                 else if (event === 'gatewayOffline')
                 {
-                    await this.setUnavailable(this.homey.__('gwOffline')).catch(this.error);
+                    await this.setUnavailableLog('processWebhookMessage gatewayOffline', this.homey.__('gwOffline'));
                 }
                 else if (event === 'deviceOffline')
                 {
-                    await this.setUnavailable(this.homey.__('ltOffline')).catch(this.error);
+                    if (Date.now() < this.gatewayOnlineGraceUntil)
+                    {
+                        this.homey.app.updateLog('processWebhookMessage deviceOffline skipped during gateway recovery grace period');
+                    }
+                    else
+                    {
+                        await this.setUnavailableLog('processWebhookMessage deviceOffline', this.homey.__('ltOffline'));
+                    }
                 }
                 else if (event === 'deviceOnline')
                 {
-                    await this.setAvailable().catch(this.error);
+                    await this.setAvailableLog('processWebhookMessage deviceOnline');
                 }
                 else if (event === 'battery low alert')
                 {
