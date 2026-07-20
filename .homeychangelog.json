@@ -127,5 +127,8 @@
 	},
 	"1.0.30": {
 		"en": "Added Flow Action card to clear the alarms."
+	},
+	"1.0.31": {
+		"en": "Fix race condition if multiple gateways are used."
 	}
 }

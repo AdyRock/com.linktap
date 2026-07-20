@@ -25,6 +25,9 @@ class MyApp extends Homey.App
         this.cloudOnly = true;
         this.linkTaps = [];
         this.homeyWebhook = null;
+        this.webhookRegistrationInProgress = Promise.resolve();
+        this.webhookURLRegistrationState = new Map();
+        this.webhookURLRegistrationTTL = 1000 * 60 * 10;
 
         if (process.env.DEBUG === '1')
         {
@@ -113,17 +116,35 @@ class MyApp extends Homey.App
 
     async registerHomeyWebhook(LinkTapID)
     {
-        // See if the LinkTap is already registered
-        if (this.linkTaps.findIndex(linktap => linktap === LinkTapID) >= 0)
+        if (LinkTapID && (this.linkTaps.findIndex(linktap => linktap === LinkTapID) < 0))
         {
-            // Already registered
+            this.linkTaps.push(LinkTapID);
+        }
+
+        // Queue webhook registration updates so concurrent device initialization cannot
+        // race and leave the webhook subscribed to only a subset of gateways.
+        this.webhookRegistrationInProgress = this.webhookRegistrationInProgress
+            .catch(() => {})
+            .then(async () =>
+            {
+                await this.refreshHomeyWebhook(LinkTapID);
+            });
+
+        return this.webhookRegistrationInProgress;
+    }
+
+    async refreshHomeyWebhook(LinkTapID)
+    {
+        const keys = [...new Set(this.linkTaps)];
+
+        if (keys.length === 0)
+        {
+            this.updateLog('Homey Webhook registration skipped: no gateway keys');
             return;
         }
 
-        this.linkTaps.push(LinkTapID);
-
         const data = {
-            $keys: this.linkTaps,
+            $keys: keys,
         };
 
         // Setup the webhook call back to receive push notifications
@@ -155,6 +176,7 @@ class MyApp extends Homey.App
             });
 
             this.updateLog('Homey Webhook registered');
+            this.updateLog(`Homey Webhook keys: ${this.varToString(keys)}`);
         }
         catch (err)
         {
@@ -163,7 +185,7 @@ class MyApp extends Homey.App
             // Try again after 1 minute as it could be failing with the cached data
             this.homey.setTimeout(() =>
             {
-                this.registerHomeyWebhook(LinkTapID);
+                this.registerHomeyWebhook(LinkTapID).catch(this.error);
             }, 1000 * 60);
         }
     }
@@ -305,6 +327,23 @@ class MyApp extends Homey.App
     {
         if (apiKey && username)
         {
+            const stateKey = `${username}:${apiKey}`;
+            const now = Date.now();
+            const registrationState = this.webhookURLRegistrationState.get(stateKey);
+
+            if (registrationState && registrationState.inFlight)
+            {
+                return registrationState.inFlight;
+            }
+
+            if (registrationState && registrationState.lastSuccess && ((now - registrationState.lastSuccess) < this.webhookURLRegistrationTTL))
+            {
+                this.updateLog('setWebHookURL skipped: already registered recently');
+                return true;
+            }
+
+            const inFlight = (async () =>
+            {
             try
             {
                 // https://www.link-tap.com/api/setWebHookUrl
@@ -322,6 +361,11 @@ class MyApp extends Homey.App
                 const response = await this.PostURL(url, body, false);
                 if (response.result !== 'error')
                 {
+                    this.webhookURLRegistrationState.set(stateKey,
+                    {
+                        lastSuccess: Date.now(),
+                        inFlight: null,
+                    });
                     return true;
                 }
                 this.updateLog(`setWebHookURL error: ${this.varToString(response.message)}`, 0);
@@ -330,6 +374,22 @@ class MyApp extends Homey.App
             {
                 this.updateLog(`setWebHookURL error: ${err.message}`, 0);
             }
+
+                this.webhookURLRegistrationState.set(stateKey,
+                {
+                    lastSuccess: 0,
+                    inFlight: null,
+                });
+                return false;
+            })();
+
+            this.webhookURLRegistrationState.set(stateKey,
+            {
+                lastSuccess: registrationState ? registrationState.lastSuccess : 0,
+                inFlight,
+            });
+
+            return inFlight;
         }
 
         return false;
