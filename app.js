@@ -25,6 +25,7 @@ class MyApp extends Homey.App
         this.cloudOnly = true;
         this.linkTaps = [];
         this.homeyWebhook = null;
+        this.homeyWebhookKeysSignature = '';
         this.webhookRegistrationInProgress = Promise.resolve();
         this.webhookURLRegistrationState = new Map();
         this.webhookURLRegistrationTTL = 1000 * 60 * 10;
@@ -136,10 +137,17 @@ class MyApp extends Homey.App
     async refreshHomeyWebhook(LinkTapID)
     {
         const keys = [...new Set(this.linkTaps)];
+        const keysSignature = keys.slice().sort().join(',');
 
         if (keys.length === 0)
         {
             this.updateLog('Homey Webhook registration skipped: no gateway keys');
+            return;
+        }
+
+        if (this.homeyWebhook && (keysSignature === this.homeyWebhookKeysSignature))
+        {
+            this.updateLog('Homey Webhook registration skipped: keys unchanged');
             return;
         }
 
@@ -161,6 +169,7 @@ class MyApp extends Homey.App
         try
         {
             this.homeyWebhook = await this.homey.cloud.createWebhook(id, secret, data);
+            this.homeyWebhookKeysSignature = keysSignature;
 
             this.homeyWebhook.on('message', async args =>
             {
@@ -192,6 +201,7 @@ class MyApp extends Homey.App
 
     async onUninit()
     {
+        this.homeyWebhookKeysSignature = '';
         this.deleteLinkTapWebhook();
     }
 
